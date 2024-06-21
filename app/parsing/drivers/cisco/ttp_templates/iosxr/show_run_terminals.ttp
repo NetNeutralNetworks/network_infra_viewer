@@ -1,0 +1,63 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all interface information.
+##################################################################################################
+
+```
+line template VTY
+ authorization exec ADMINS
+ login authentication ADMINS
+ exec-timeout 15 0
+ access-class ingress 12
+ transport input ssh
+ transport output none
+ transport preferred none
+!
+line console
+ authorization exec CONSOLE
+ login authentication CONSOLE
+ exec-timeout 15 0
+ transport output none
+ transport preferred none
+!
+vty-pool default 0 15 line-template VTY
+```
+</doc>
+
+<group name='root._terminal-templates*' expand=''>
+line template {{name | _start_ }}
+ authorization {{authorization.type}} {{authorization.group}}
+ login authentication {{login.authentication}}
+ access-class {{acl.direction}} {{acl.name}}
+ exec-timeout {{timeout.minutes|to_int}} {{timeout.seconds|to_int}}
+ logging synchronous{{logging.synchronous | set(True) | default(False) }}
+ stopbits {{stopbits|to_int}}
+ transport preferred {{transport.preferred}}
+ transport input {{transport.input|to_list}}
+ transport output {{transport.output|to_list}}
+    <group name='unforseen_commands*' itemize="command">
+ {{ command | _line_ | _exact_space_ }}
+    </group>
+{{ignore('\S+') }}{{ _end_ }}
+</group>
+
+<group name='root._terminals*' expand=''>
+line {{name | _start_ }}
+ authorization {{authorization.type}} {{authorization.group}}
+ login authentication {{login.authentication}}
+ access-class {{acl.direction}} {{acl.name}}
+ exec-timeout {{timeout.minutes|to_int}} {{timeout.seconds|to_int}}
+ logging synchronous{{logging.synchronous | set(True) | default(False) }}
+ stopbits {{stopbits|to_int}}
+ transport preferred {{transport.preferred}}
+ transport input {{transport.input|to_list}}
+ transport output {{transport.output|to_list}}
+    <group name='unforseen_commands*' itemize="command">
+ {{ command | _line_ | _exact_space_ }}
+    </group>
+{{ignore('\S+') }}{{ _end_ }}
+</group>
+
+<group name="root._terminals*">
+vty-pool {{name | _start_ }} {{ start|to_int }} {{ stop|to_int }} line-template {{terminal-template-id}}
+</group>

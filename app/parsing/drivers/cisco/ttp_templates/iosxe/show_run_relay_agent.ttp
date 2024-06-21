@@ -1,0 +1,17 @@
+<group name='root.relay-agent.dhcp**' expand=''>
+no service dhcp {{config.enable-relay-agent | set(False) | default(True)}}
+ip dhcp relay information{{agent-information-option.config.enable | set(True) | default(False)}}
+</group>
+
+<group name='root.relay-agent.dhcp._disabled-protocols**.{{proto}}**.config**' expand='' method="table">
+no ip forward-protocol {{protocol | copy('proto')}}
+</group>
+
+<group name='root.relay-agent.dhcp._disabled-protocols**.{{proto}}**.config**' itemize="services, path='root.relay-agent.dhcp._disabled-protocols.{{proto}}.config.services'">
+no ip forward-protocol {{protocol | copy('proto')}} {{services | joinmatches}}
+</group>
+
+<group name='root.relay-agent.dhcp.interfaces.interface.{{id}}' expand='' contains='hp' del="hp">
+interface {{config.id | copy('id')}}
+ ip helper-address {{config.helper-address | joinmatches | split | copy('hp')}}
+</group>

@@ -1,0 +1,124 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all basic system information.
+##################################################################################################
+
+```
+version 15.5
+no service pad
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+platform bfd allow-svi
+platform qos policer cpu queue 14 1000000 100000
+platform qos policer cpu queue 16 4000000 4000000
+platform qos policer cpu queue 18 112000 11200
+!
+hostname AMG-LDK2-CE69R-002
+!
+ip bgp-community new-format                 (critical / minor)
+!
+```
+</doc>
+
+<group name='root.system**.config**'>
+hostname {{hostname| default('')}}
+</group>
+
+<group name='root.system.clock.config'>
+clock timezone {{_name}} {{timezone-name}}
+</group>
+
+<group name='root.system.dns.config**' expand='' method="table">
+domain name {{search | to_list}}
+domain lookup disable{{_enabled | set (False)}}
+</group>
+<group name='root.system.dns.servers.server' expand=''>
+domain name-server {{config.address | re('IP')}}
+</group>
+
+<lookup name='system' load="yaml">
+ssh-server:
+  version:
+    v1: V1
+    v2: V2
+</lookup>
+
+<group name='root.system.ssh-server.config**' method="table">
+ssh server vrf {{_network-instance}} {{protocol-version | lookup('system.ssh-server.version') | let('enable', True)}}
+ssh server vrf {{_network-instance | let('protocol-version', 'V1_V2') | let('enable', True)}}
+ssh server {{protocol-version | lookup('system.ssh-server.version') | let('enable', True)}}
+ssh server{{protocol-version | set('V1_V2') | let('enable', True)}}
+ssh timeout {{timeout | to_int}}
+ssh server session-limit {{session-limit | to_int}}
+ssh server login{{_login | set(True)}}
+</group>
+<group name='root.system._ssh-client.config**' method="table">
+ssh client vrf {{network-instance}}
+ssh client source-interface {{source-interface}}
+</group>
+
+<!-- TODO: This is still incorrect, but it's the most it can be in this short time. -->
+<group name='root.system.control-plane-traffic.ingress.acl.acl-set.{{set-name}} {{type}}' expand="">
+{{config.type | re('lpts') | copy('type')}} {{config.set-name | ORPHRASE | copy('set-name')}}
+    <group name='acl-entries._acl-entry*' expand="" method="table" itemize="entry">
+ {{entry | ORPHRASE}}
+    </group>
+!{{_end_}}
+</group>
+
+<group name='root.log_timestamps' method="table">
+service timestamps {{log_level}} {{format}} {{options | ORPHRASE | split(' ')}}
+service timestamps {{log_level}} {{format}}
+</group>
+
+<group name='root._cisco-specific**' method="table">
+nsr process-failures {{nsr-process-failures}}
+icmp ipv4 rate-limit unreachable {{ipv4-icmp-unreachables-rate-limit | to_int}}
+ipv4 conflict-policy {{ipv4-conflict-policy}}
+tcp synwait-time {{tcp-synwait-time | to_int}}
+exception choice {{exception-core-dump-location | ORPHRASE}}
+rcc ipv4 unicast enable{{ipv4-rcc-unicast | set(True) }}
+configuration display interface slot-order{{display-interface-slot-order | set(True) }}
+ipv4 netmask-format bit-count{{ipv4-netmask-format-bit-count | set(True) }}
+fpd auto-upgrade enable{{fpd-auto-upgrade | set(True) }}
+system recovery{{password-recovery | set(True)}}
+</group>
+
+
+
+<!-- <group name='bfd'>
+platform bfd allow-svi {{bfd_allow-svi | set(True) | default(False)}}
+</group> -->
+
+<!-- <group name='platform_qos'>
+platform qos policer cpu queue {{queue|to_int }} {{continuous_rate|to_int }} {{burst_rate|to_int }}
+platform qos-policer queue {{queue|to_int| _start_}} {{continuous_rate|to_int }} {{burst_rate|to_int }}
+</group> -->
+
+<!-- <group name='udld'>
+udld {{mode}}
+</group> -->
+
+<!-- <group name='udld.message'>
+udld message time {{time|to_int}}
+</group> -->
+
+<!-- <group name='system.services'>
+    <group name='ftp**'>
+ip ftp source-interface {{source_interface}}
+    </group>
+    <group name='ftp**'>
+ip ftp username {{username}}
+    </group>
+    <group name='ftp**'>
+ip ftp password {{password}}
+    </group>
+    <group name='tftp'>
+ip tftp source-interface {{source_interface}}
+    </group>
+</group> -->
+
+<!-- <group name='system.bgp-community'>
+ip bgp-community new-format {{new-format | set(True) | default(False)}}
+</group> -->

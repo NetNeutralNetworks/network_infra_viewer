@@ -1,0 +1,17 @@
+<group name="root.lldp**.config**" expand="">
+lldp{{enabled | set(True) | default(False)}}
+</group>
+
+<group name="root.lldp**.interfaces.interface.{{name}}**" expand="">
+interface {{config.name | copy('name')}}
+ lldp enable{{config.enabled | set(True)}}
+</group>
+
+<group name="root._cdp**.config**" expand="">
+cdp{{enabled | set(True) | default(False)}}
+</group>
+
+<group name="root._cdp**.interfaces.interface.{{name}}**" expand="">
+interface {{config.name | copy('name')}}
+ cdp{{config.enabled | set(True)}}
+</group>

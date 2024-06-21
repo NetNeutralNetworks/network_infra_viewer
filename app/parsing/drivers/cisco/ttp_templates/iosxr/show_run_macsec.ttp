@@ -1,0 +1,41 @@
+<doc>
+macsec-policy mac_policy
+ conf-offset CONF-OFFSET-30
+ security-policy must-secure
+ window-size 64
+ cipher-suite GCM-AES-XPN-256
+ include-icv-indicator
+ key-server-priority {{config.key-server-priority}}
+ !
+!
+interface TenGigE0/«slot»/«sub_slot»/«port»
+ macsec psk-keychain mac_chain policy mac_policy
+</doc>
+
+<macro>
+def lookup_cipher_suites(data):
+    lookup = {
+        "GCM-AES-128": "GCM_AES_128",
+        "GCM-AES-256": "GCM_AES_256",
+        "GCM-AES-XPN-128": "GCM_AES_XPN_128",
+        "GCM-AES-XPN-256": "GCM_AES_XPN_256",
+    }
+    for i,v in enumerate(data):
+        data[i] = lookup.get(v, v)
+</macro>
+
+<group name="root.macsec.mka.policies.policy.{{name}}**" expand="">
+macsec-policy {{config.name | copy('name')}}
+ conf-offset {{config.confidentiality-offset | lookup('macsec.confidentiality-offset')}}
+ security-policy {{config._access-control}}
+ window-size {{config._window-size | to_int}}
+ cipher-suite {{config.macsec-cipher-suite | split(' ') | default(['GCM_AES_128']) | macro('lookup_cipher_suites')}}
+ include-icv-indicator{{config.include-icv-indicator | set(True) | default(False)}}
+ key-server-priority {{config.key-server-priority}}
+</group>
+
+<group name="root.macsec.interfaces.interface.{{name}}**" expand="">
+interface {{config.name | copy('name')}}
+ macsec psk-keychain {{mka.config.key-chain | let('config.enable', True)}} policy {{mka.config.mka-policy}}
+{{config.enable | set(False)}}
+</group>

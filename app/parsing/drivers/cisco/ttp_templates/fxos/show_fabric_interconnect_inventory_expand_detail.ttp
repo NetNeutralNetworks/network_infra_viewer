@@ -1,0 +1,21 @@
+<lookup load='yaml' name='interfaces'>
+admin_status:
+  Port is enabled and up: UP
+  down: DOWN
+  up: UP
+  Unknown: DOWN
+oper_status:
+  Down: DOWN
+  Up: UP
+  Sfp Not Present: NOT_PRESENT
+</lookup>
+
+    Ether Port:
+<group name="interfaces.interface">
+        Slot {{slot}} Port {{name|_start_}}:
+            User Label: {{description| ORPHRASE}}
+            Oper State: {{oper_status | ORPHRASE | lookup('interfaces.oper_status')}}
+            State Reason: {{admin_status | ORPHRASE | lookup('interfaces.admin_status')}}
+
+{{_end_}}
+</group>

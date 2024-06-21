@@ -1,0 +1,97 @@
+<macro>
+def copy_name(data):
+    return data, {'name': data}
+
+</macro>
+
+<lookup name="network-instance-afi-safi-name" load="yaml">
+ipv4: IPV4_UNICAST
+ipv6: IPV6_UNICAST
+</lookup>
+<lookup name="network-instance-afi-safi-config" load="yaml">
+IPV4_UNICAST:
+    afi-safi-name: IPV4_UNICAST
+    enabled: true
+IPV6_UNICAST:
+    afi-safi-name: IPV6_UNICAST
+    enabled: true
+</lookup>
+<lookup name="network-instance-protocol-bgp-send-community" load="yaml">
+both: BOTH
+</lookup>
+
+<lookup name="routing-policy-poldef-bgp-community" load="yaml">
+additive: ADD
+delete: REMOVE
+</lookup>
+
+<lookup name='routing-policy-poldef-action' load="yaml">
+permit: ACCEPT_ROUTE
+deny: REJECT_ROUTE
+</lookup>
+
+<lookup name='interfaces' load="yaml">
+duplex:
+  half: 'HALF'
+  full: 'FULL'
+  auto: none
+speed:
+  10: 'SPEED_10MB'
+  100: 'SPEED_100MB'
+  1000: 'SPEED_1GB'
+  auto: none
+</lookup>
+
+<lookup name='stp' load="yaml">
+mode:
+  mst: 'MSTP'
+  rapid-pvst: 'RAPID_PVST'
+  pvst: '_PVST'
+guard:
+  loop: 'LOOP'
+  root: 'ROOT'
+</lookup>
+
+<lookup name='system' load="yaml">
+  ssh-server:
+    version:
+      '1': V1
+      '2': V2
+  </lookup>
+
+<lookup load='yaml' name='system-ntp'>
+key-type:
+  md5: NTP_AUTH_MD5
+</lookup>
+
+<lookup load='yaml' name='crypto'>
+algorithm:
+  0: UNENCRYPTED
+  4: SHA-256
+  5: MD5
+  7: VIGENERE
+  8: PBKDF2-SHA-256
+  9: SCRYPT
+</lookup>
+
+<extend template="show_run_access_list.ttp"/>
+<extend template="../ios/show_run_archive.ttp"/>
+<extend template="./show_run_bfd.ttp"/>
+<extend template="../ios/show_run_events.ttp"/>
+<extend template="show_run_interfaces.ttp"/>
+<extend template="../ios/show_run_lldp_cdp.ttp"/>
+<extend template="../ios/show_run_messages.ttp"/>
+<extend template="./show_run_network_instance.ttp"/>
+<extend template="../ios/show_run_qos.ttp"/>
+<extend template="./show_run_relay_agent.ttp"/>
+<extend template="../ios/show_run_routing_policy.ttp"/>
+<!-- <extend template="show_run_stp.ttp"/> -->
+<extend template="./show_run_system.ttp"/>
+<extend template="../ios/show_run_system_aaa.ttp"/>
+<extend template="show_run_system_aaa_servers.ttp"/>
+<extend template="../ios/show_run_system_logging.ttp"/>
+<extend template="../ios/show_run_system_ntp.ttp"/>
+<extend template="../ios/show_run_system_snmp.ttp"/>
+<!-- <extend template="show_run_vlan.ttp"/> -->
+<extend template="../ios/show_run_terminals.ttp"/>
+<extend template="../ios/show_run_track.ttp"/>

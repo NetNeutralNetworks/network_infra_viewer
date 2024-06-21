@@ -1,0 +1,77 @@
+<doc>
+</doc>
+
+<macro>
+import re
+from collections import defaultdict
+
+STATIC_PARSE = re.compile(r"^(?:(?P&lt;interface&gt;[a-zA-Z]\S+)\s?)?(?:(?P&lt;next_hop&gt;(?:\d{1,3}\.){3}\d{1,3})\s?)?(?:(?P&lt;distance&gt;\d+)\s?)?(?:track (?P&lt;track&gt;\S+)\s?)?(?:tag (?P&lt;tag&gt;\d+)\s?)?(?:description (?P&lt;description&gt;.+)\s?)?(?P&lt;permanent&gt;permanent)?$")
+
+def parse_static_routes(data):
+
+    net_instances = data[0].get('root', {}).get('network-instances', {}).get('network-instance', {})
+    for _, net_instance in net_instances.items():
+        statics = net_instance.get('protocols', {}).get('protocol', {}).get('STATIC', {}).get('static-routes', {}).get('static',{})
+        output = defaultdict(dict)
+        for prefix, static in statics.items():
+            output[prefix].update({'config': {
+                    'prefix': prefix }}
+            )
+            if not output[prefix].get('next-hops'):
+                output[prefix].update({
+                    'next-hops': {
+                        'next-hop': {}
+                    }})
+            if not static:
+                continue
+            for i, line in enumerate(static):
+                #print(line)
+                match = STATIC_PARSE.match(line)
+                #print(match['tag'])
+                if match['tag']:
+                    output[prefix]['config']['set-tag'] = int(match['tag'])
+                #print(match['description'])
+                if match['description']:
+                    output[prefix]['config']['description'] = match['description']
+                next_hop = {str(i): {'config': {'index': str(i)}}}
+                #print(match['next_hop'])
+                if match['next_hop']:
+                    next_hop[str(i)]['config']['next-hop'] = match['next_hop']
+                #print(match['distance'])
+                if match['distance']:
+                    next_hop[str(i)]['config']['preference'] = int(match['distance'])
+                #print(match['track'])
+                if match['track']:
+                    next_hop[str(i)]['config']['_track'] = match['track']
+                #print(match['interface'])
+                if match['interface']:
+                    next_hop[str(i)]['interface-ref'] = {'config': {'interface': match['interface']}}
+                #print(match['permanent'])
+                if match['permanent']:
+                    next_hop[str(i)]['config']['_permanent'] = True
+                output[prefix].get('next-hops').get('next-hop').update(next_hop)
+
+            statics[prefix] = dict(output[prefix])
+        #print(output)
+
+    return data
+</macro>
+
+<group name='root.network-instances.network-instance**' expand=''>
+router static{{_start_}}
+    <group name="DEFAULT_INSTANCE**" expand="">
+ address-family {{ignore}} {{ignore}}
+        <group name="protocols.protocol.STATIC.static-routes.static.{{prefix}}**" expand="" itemize="key='line'">
+  {{config.prefix | PREFIX | copy('prefix')}} {{line | re('.*')}}
+        </group>
+    </group>
+    <group name="{{name}}**" expand="">
+ vrf {{config.name | copy('name')}}
+  address-family {{ignore}} {{ignore}}
+        <group name="protocols.protocol.STATIC.static-routes.static.{{prefix}}**" expand="" itemize="key='line'">
+   {{config.prefix | PREFIX | copy('prefix')}} {{line | re('.*')}}
+        </group>
+    </group>
+</group>
+
+<output macro='parse_static_routes'/>

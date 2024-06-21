@@ -1,0 +1,178 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all multicast information.
+##################################################################################################
+
+```
+```
+</doc>
+
+<group name='root.network-instances.network-instance**.{{name}}**' expand='' method='table'>
+ip multicast-routing vrf {{config.name | copy('name') | let('config._multicast-routing', True)}}
+ip {{config.name | copy('name') | re('multicast-routing') | let('DEFAULT_INSTANCE') | let('config._multicast-routing', True)}} distributed
+ip {{config.name | copy('name') | re('multicast-routing') | let('DEFAULT_INSTANCE') | let('config._multicast-routing', True)}}
+</group>
+
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE**' expand='' method='table'>
+{{config.name | let('DEFAULT_INSTANCE') }}
+{{config._multicast-routing | set(False)}}
+</group>
+
+<group name='root.network-instances.network-instance**.{{instance}}**' expand=''>
+ip vrf {{ config.name | copy("instance") }}
+  <!--<group name='config**' expand=''>-->
+ rd {{config.route-distinguisher}}
+  <!--</group>-->
+ import map {{inter-instance-policies.apply-policy.config.import-policy}}
+  <group name="inter-instance-policies**.import-export-policy.config**" expand="">
+ route-target import {{import-route-target | joinmatches | split}}
+ route-target export {{export-route-target | joinmatches | split}}
+  </group>
+{{config._multicast-routing | set(False)}}
+</group>
+
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol.PIM.pim.global.rendezvous-points.rendezvous-point.{{address}}' method='table' expand=''>
+ip pim vrf {{name}} rp-address {{config.address | copy('address')}} override
+ip pim rp-address {{config.address | copy('address') | let('name', 'DEFAULT_INSTANCE')}} override
+</group>
+
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol**.PIM**.pim**.global**._msdp.config**' expand='' method='table'>
+ip msdp vrf {{name}} {{cache-sa-state | re('cache-sa-state') | let(True)}}
+ip msdp vrf {{name}} cache-rejected-sa {{cache-rejected-sa | to_int}}
+ip msdp vrf {{name}} redistribute list {{access-group}}
+ip msdp vrf {{name}} originator-id {{originator-id}}
+ip msdp vrf {{name}} timer {{timer | to_int}}
+ip msdp {{cache-sa-state | re('cache-ca-state') | let(True) | let('name', 'DEFAULT_INSTANCE')}}
+ip msdp cache-rejected-sa {{cache-rejected-sa | to_int | let('name', 'DEFAULT_INSTANCE')}}
+ip msdp redistribute list {{access-group | let('name', 'DEFAULT_INSTANCE')}}
+ip msdp originator-id {{originator-id | let('name', 'DEFAULT_INSTANCE')}}
+ip msdp timer {{timer | to_int | let('name', 'DEFAULT_INSTANCE')}}
+</group>
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol.PIM.pim.global._msdp.peers.peer.{{address}}.config**' method='table'>
+ip msdp vrf {{name}} peer {{address}} connect-source {{source-interface}}
+ip msdp vrf {{name}} description {{address}} {{description | ORPHRASE}}
+ip msdp vrf {{name}} password peer {{address}} {{ crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm') }} {{password}}
+ip msdp vrf {{name}} password peer {{address}} {{password}}
+ip msdp vrf {{name}} keepalive {{address}} {{keepalive-interval | to_int}} {{hold-time-interval | to_int}}
+ip msdp peer {{address | let('name', 'DEFAULT_INSTANCE')}} connect-source {{source-interface}}
+ip msdp description {{address | let('name', 'DEFAULT_INSTANCE')}} {{description | ORPHRASE}}
+ip msdp password peer {{address | let('name', 'DEFAULT_INSTANCE')}} {{ crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm') }} {{password}}
+ip msdp password peer {{address | let('name', 'DEFAULT_INSTANCE')}} {{password}}
+ip msdp keepalive {{address | let('name', 'DEFAULT_INSTANCE')}} {{keepalive-interval | to_int}} {{hold-time-interval | to_int}}
+</group>
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol.PIM.pim.global._msdp.mesh-groups.mesh-group.{{group}}.members*'>
+ip msdp vrf {{name}} mesh-group {{group}} {{address}}
+ip msdp mesh-group {{group | let('name', 'DEFAULT_INSTANCE')}} {{address}}
+</group>
+
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol.PIM.pim.interfaces.interface.{{interface-id}}' expand="" equal="enabled, True" del="enabled">
+interface {{config.interface-id | copy('interface-id')}}
+ ip vrf forwarding {{ name | default('DEFAULT_INSTANCE') }}
+ ip pim dr-priority {{config.dr-priority | to_int }}
+ ip pim query-interval {{config._query-interval | to_int }}
+ ip pim sparse-mode{{config.mode | set('PIM_MODE_SPARSE') | let('config.enabled', True) | let(enabled, True)}}
+ ip pim dense-mode{{config.mode | set('PIM_MODE_DENSE') | let('config.enabled', True) | let(enabled, True)}}
+ ip pim bsr-border{{config.bsr-border | set(True)}}
+ ip pim bfd{{enable-bfd.config.enabled | set(True)}}
+{{config.enabled | set(False) | let(enabled, False)}}
+</group>
+<group name="root.network-instances.network-instance**.DEFAULT_INSTANCE.protocols.protocol.IGMP.igmp.global._config**" expand=''>
+no ip igmp snooping {{snooping-enabled | set(False)}}
+</group>
+<group name="root.network-instances.network-instance**.{{instance}}.protocols.protocol.IGMP.igmp.global._config**" expand=''>
+  ip igmp vrf {{instance}} limit {{limit}}
+</group>
+<group name='root.network-instances.network-instance**.{{name}}**.protocols.protocol.IGMP.igmp.interfaces.interface.{{interface-id}}' expand="" equal="enabled, True" del="enabled">
+interface {{config.interface-id | copy('interface-id')}}
+ ip vrf forwarding {{ name | default('DEFAULT_INSTANCE') }}
+ ip igmp query-interval {{config.query-interval | to_int | let('config.enabled', True) | let(enabled, True)}}
+ ip igmp querier-timeout {{config._querier-timeout | to_int | let('config.enabled', True) | let(enabled, True)}}
+ ip igmp limit {{config._limit | to_int | let('config.enabled', True) | let(enabled, True)}}
+{{config.enabled | set(False) | let(enabled, False)}}
+</group>
+
+<group name='root.network-instances.network-instance**' expand=''>
+  <group name="DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.config**" expand=''>
+router bgp {{ as | to_int }}
+  </group>
+  <group name='DEFAULT_INSTANCE._peer-policy.{{peer-policy-name}}' expand=''>
+ template peer-policy {{peer-policy-name}}
+  route-map {{ apply-policy.config.export-policy }} out
+  route-map {{ apply-policy.config.import-policy }} in
+  send-community {{ config.send-community-type | lookup("network-instance-protocol-bgp-send-community") }}
+  next-hop-self{{ config._next-hop-self | set(True)}}
+  advertisement-interval {{ timers.config.minimum-advertisement-interval | to_int }}
+  </group>
+  <group name='DEFAULT_INSTANCE._peer-session.{{peer-session-name}}' expand=''>
+ template peer-session {{config.session-group-name | copy('peer-session-name')}}
+  remote-as {{ config.peer-as | to_int}}
+  password {{config._crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm') }} {{config.auth-password | ORPHRASE}}
+  timers {{timers.config.keepalive-interval | to_int}} {{timers.config.hold-time | to_int}}
+  fall-over bfd{{config._fallover-on-bfd | set(True)}}
+  </group>
+  <group name="DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.config**" expand=''>
+ bgp router-id {{ router-id }}
+ bgp log-neighbor-changes{{ _log-neighbor-state-changes | set(True) | default(False)}}
+ bgp scan-time {{_scan-time}}
+ </group>
+ <group name="DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.afi-safis.afi-safi.IPV4_UNICAST**.config**" expand=''>
+ auto-summary{{_auto-summary | set(True)}}
+ synchronization{{_synchronization | set(True)}}
+  </group>
+  <group name="DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global**" expand=''>
+ bgp confederation identifier {{ confederation.config.identifier | to_int }}
+ bgp confederation peers {{ confederation.config.member-as | ORPHRASE | split }}
+ bgp bestpath med confed{{ route-selection-options.config._confed-compare-med | set(True) | default(False) }}
+  </group>
+  <group name='DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.afi-safis.afi-safi.IPV4_UNICAST**._network-statements*'>
+ network {{ip | _start_ }} mask {{ prefix-length| to_cidr}}
+  </group>
+  <group name='DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.afi-safis.afi-safi.IPV4_UNICAST**._neighbors**.neighbor**.{{ neighbor_address }}**.config**' expand=''>
+ neighbor {{ neighbor_address }} inherit peer-session {{ _peer-session }}
+ neighbor {{ neighbor_address }} description {{ description | PHRASE }}
+ neighbor {{ neighbor_address }} {{ enabled | re("activate") | let(True) }}
+ neighbor {{ neighbor_address }} inherit peer-policy {{ _peer-policy }}
+  </group>
+  <group name='DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.afi-safis.afi-safi.IPV4_UNICAST**._neighbors**.neighbor**.{{ neighbor_address }}**.apply-policy**.config**' expand=''>
+ neighbor {{ neighbor_address }} prefix-list {{ export-policy }} out
+ neighbor {{ neighbor_address }} prefix-list {{ import-policy }} in
+  </group>
+  <group name='{{name}}.protocols.protocol.BGP.bgp.global**.afi-safis.afi-safi.{{afi-safi-name}}**' expand=''>
+ address-family {{ afi-safi-name | lookup('network-instance-afi-safi-name') | lookup("network-instance-afi-safi-config", add_field='config') | let('name', 'DEFAULT_INSTANCE') | _start_}}
+ address-family {{ afi-safi-name | lookup('network-instance-afi-safi-name') | lookup("network-instance-afi-safi-config", add_field='config')}} vrf {{ name | _start_}}
+    <group name="DEFAULT_INSTANCE.protocols.protocol.BGP.bgp.global.afi-safis.afi-safi.IPV4_UNICAST**.config**" expand=''>
+  auto-summary{{_auto-summary | set(True)}}
+  synchronization{{_synchronization | set(True)}}
+    </group>
+    <group name='_network-statements.network-statement.{{network}} {{prefix-length}}' expand=''>
+  network {{config.network | copy('network') | _start_ }} mask {{ config.prefix-length| to_cidr | copy('prefix-length')}} route-map {{config.route-map}}
+  network {{config.network | copy('network') | _start_ }} mask {{ config.prefix-length| to_cidr | copy('prefix-length')}}
+    </group>
+    <!-- This isn't correct, but it works for now -->
+    <group name='_neighbors**.neighbor**.{{ neighbor_address }}**.config**' expand=''>
+  neighbor {{ neighbor_address }} {{ enabled | re("activate") | let(True) | _start_ }}
+  neighbor {{ neighbor_address }} inherit peer-session {{ _peer-session | _start_ }}
+  neighbor {{ neighbor_address }} description {{ description | PHRASE }}
+  neighbor {{ neighbor_address }} {{ enabled | re("activate") | let(True) }}
+  neighbor {{ neighbor_address }} inherit peer-policy {{ _peer-policy }}
+    </group>
+    <group name='_neighbors**.neighbor**.{{ neighbor_address }}**.apply-policy**.config**' expand=''>
+  neighbor {{ neighbor_address }} prefix-list {{ export-policy }} out
+  neighbor {{ neighbor_address }} prefix-list {{ import-policy }} in
+    </group>
+ exit-address-family{{_end_}}
+  </group>
+</group>
+
+
+<!-- Not correct yet, only does main interface, not sub-interfaces/efp's -->
+<group name='root.network-instances.network-instance**.{{name}}**.interfaces.interface.{{id}}' expand="">
+interface {{config.id | copy('id')}}
+ ip vrf forwarding {{ name | default('DEFAULT_INSTANCE') }}
+</group>
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE.interfaces.interface**' expand="">
+interface {{ id }}
+  <!-- <group name='{{id}}.{{efp}}' expand="" method='table'>
+ service instance {{efp}} ethernet
+  </group> -->
+</group>

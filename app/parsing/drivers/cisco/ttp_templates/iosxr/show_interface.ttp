@@ -1,0 +1,17 @@
+<lookup load='yaml' name='interfaces'>
+admin_status:
+  administratively down: DOWN
+  down: UP
+  up: UP
+oper_status:
+  down: DOWN
+  up: UP
+</lookup>
+
+<group name="interfaces.interface*">
+{{name|_start_}} is {{admin_status | lookup('interfaces.admin_status')}}, line protocol is {{oper_status | lookup('interfaces.oper_status')}}
+{{name|_start_}} is {{admin_status | lookup('interfaces.admin_status')}}, line protocol is {{oper_status | lookup('interfaces.oper_status')}} ({{_line_}})
+{{name|_start_}} is {{admin_status | ORPHRASE | lookup('interfaces.admin_status')}}, line protocol is {{oper_status | lookup('interfaces.oper_status')}} ({{_line_}})
+  Description: {{description | ORPHRASE}}
+     0 output buffer failures, 0 output buffers swapped out{{_end_}}
+</group>

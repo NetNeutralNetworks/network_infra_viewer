@@ -1,0 +1,40 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all NTP information.
+##################################################################################################
+
+```
+ntp authentication-key 1 md5 «ntp_password» «hash_type»    (non-critical / minor)
+ntp authenticate                        (non-critical / minor)
+ntp trusted-key 1                   (non-critical / minor)
+ntp source Loopback0                (non-critical / minor)
+ntp access-group peer 96                (non-critical / minor)
+ntp update-calendar                     (non-critical / minor)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!! Two NTP servers - same 2 IP's on every device !!!!
+ntp server 145.50.42.149 key 1 prefer           (non-critical / minor)
+ntp server 145.50.42.21 key 1                   (non-critical / minor)
+```
+</doc>
+
+<group name='root.system.ntp' expand='' record='NTP_SOURCE_ADDR'>
+    <group name='config**' expand='' method="table">
+{{enabled | set(True)}}
+ntp authenticate {{enable-ntp-auth | set(True) | default(False)}}
+ntp access-group peer {{_peer-acl}}
+ntp access-group serve {{_serve-acl}}
+ntp update-calendar{{_update-calendar | set(True)}}
+    </group>
+    <group name='ntp-keys.ntp-key.{{key_id}}.config**' expand='' method="table">
+ntp authentication-key {{key-id | copy('key_id') | to_int}} {{key-type | lookup('system-ntp.key-type')}} {{key-value}} {{_crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm')}}
+ntp trusted-key {{key_id | let('_trusted-key', True)}}
+    </group>
+    <group name='_' expand='' del="source_address">
+ntp source {{source_address | record("NTP_SOURCE_ADDR")}}
+    </group>
+    <group name='servers.server.{{address}}' expand=''>
+{{config.source-address | set("NTP_SOURCE_ADDR")}}
+ntp server {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }} {{config.prefer | re('prefer') | let(True)}}
+ntp server {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }}
+    </group>
+</group>

@@ -1,0 +1,12 @@
+<extend template="../ios/show_run_system.ttp"/>
+
+<group name='root**' expand='' >
+redundancy{{ _start_ }}
+<group name='_redundancy**' expand='' >
+ mode {{ mode }}
+</group>
+</group>
+
+<group name='root._cisco-specific**' method="table" expand="">
+no standby bfd all-interface{{hsrp-bfd-all-interfaces | set(False)}}
+</group>

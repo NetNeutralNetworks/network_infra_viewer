@@ -1,0 +1,25 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all event information. This is
+Cisco specific configuration.
+##################################################################################################
+
+```
+```
+</doc>
+
+<group name='root._events.event-definitions.event-definition.{{event-name}}' expand=''>
+event manager {{config.type}} {{config.event-name | copy('event-name')}}
+    <group name='statements**' expand=''>
+ event {{conditions | re('.*')}}
+ action {{actions | re('.*') | joinmatches(",,") | split(",,")}}
+    </group>
+</group>
+
+<group name='root._events.event-definitions.event-definition.{{event-name}}' expand=''>
+event manager {{config.type}} {{config.event-name | copy('event-name')}} {{ arguments | ORPHRASE }}
+    <group name='statements**' expand=''>
+ event {{conditions | re('.*')}}
+ action {{actions | re('.*') | joinmatches(",,") | split(",,")}}
+    </group>
+</group>

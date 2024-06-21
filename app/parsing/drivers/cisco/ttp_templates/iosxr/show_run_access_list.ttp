@@ -1,0 +1,34 @@
+<lookup name="network_objects" load="yaml">
+any: 0.0.0.0/0
+</lookup>
+
+<vars>
+ANY_CIDR_RE = r'(.*?/\d{1,2}|any)'
+</vars>
+
+<!-- I'm sorry, this sucks, please refactor with some python code. -->
+<group name="root.acls.acl.{{name}}**" expand="">
+ipv4 access-list {{config.name | copy('name') }}
+    <group name='rules*' method='table'>
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} {{destination-address}} {{destination-mask}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} {{destination-address}} {{destination-mask}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} host {{destination-address | append('/32')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} host {{source-address | append('/32')}} host {{destination-address | append('/32')}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{destination-address}} {{destination-mask}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{destination-address}} {{destination-mask}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} host {{destination-address | append('/32')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address | re("ANY_CIDR_RE") | lookup('network_objects')}} host {{destination-address | append('/32')}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} {{destination-address}} {{destination-mask}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} {{destination-address}} {{destination-mask}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} {{destination-address | re("ANY_CIDR_RE") | lookup('network_objects')}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} host {{destination-address | append('/32')}} {{log-action | re('log') | let(True) | default(False)}}
+ {{sequence-id | DIGIT | to_int}} {{forwarding-action}} {{protocol}} {{source-address}} {{source-mask}} host {{destination-address | append('/32')}}
+    </group>
+</group>
+
+<output macro='expand_acl2' />

@@ -1,0 +1,53 @@
+<macro>
+from datetime import datetime
+
+def convert_timestamps(data):
+    """Converts times to unix timestamps."""
+
+    keychains = data[0].get('root',{}).get('keychains',{}).get('keychain', {})
+
+    for _, chain in keychains.items():
+        keys = chain.get('keys', {}).get('key',{})
+        for _, key in keys.items():
+            send = key.get('send-lifetime', {}).get('config', {})
+            if send.get('start-time'):
+                unix_send = datetime.strptime(str(send['start-time']),"%H:%M:%S %B %d %Y").timestamp()
+                send['start-time'] = unix_send
+                if send['end-time'] == 32503676399:
+                    send['end-time'] = unix_send + send['end-time']
+            recv = key.get('receive-lifetime', {}).get('config', {})
+            if recv.get('start-time'):
+                unix_recv = datetime.strptime(str(recv['start-time']),"%H:%M:%S %B %d %Y").timestamp()
+                recv['start-time'] = unix_recv
+                if recv['end-time'] == 32503676399:
+                    recv['end-time'] = unix_recv + recv['end-time']
+
+</macro>
+<group name='root.keychains.keychain.{{name}}**' expand=''>
+key chain {{config.name | copy('name')}}
+ macsec{{config._type | set('MACSEC')}}
+    <group name='keys.key.{{key-id}}' expand='' >
+  key {{config.key-id | copy('key-id') | _start_ | let('config._type', 'macsec')}}
+   accept-lifetime {{receive-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('receive-lifetime.config.end-time', 32503676399)}} infinite
+   accept-lifetime {{receive-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}')}} duration {{receive-lifetime.config.end-time | to_int}}
+   key-string password {{config.secret-key}}
+   lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', True) | let('send-lifetime.config.end-time',32503676399)}} infinite
+   lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', True)}} duration {{send-lifetime.config.end-time | to_int}}
+   send-lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', False) | let('send-lifetime.config.end-time',32503676399)}} infinite
+   send-lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', False)}} duration {{send-lifetime.config.end-time | to_int}}
+   cryptographic-algorithm {{config.crypto-algorithm}}
+    </group>
+    <group name='keys.key.{{key-id}}' expand='' >
+ key {{config.key-id | copy('key-id') | _start_}}
+  accept-lifetime {{receive-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('receive-lifetime.config.end-time', 32503676399)}} infinite
+  accept-lifetime {{receive-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}')}} duration {{receive-lifetime.config.end-time | to_int}}
+  key-string password {{config.secret-key}}
+  lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', True) | let('send-lifetime.config.end-time',32503676399)}} infinite
+  lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', True)}} duration {{send-lifetime.config.end-time | to_int}}
+  send-lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', False) | let('send-lifetime.config.end-time',32503676399)}} infinite
+  send-lifetime {{send-lifetime.config.start-time | re('\d{2}:\d{2}:\d{2} \S+ \d{2} \d{4}') | let('send-lifetime.config.send-and-receive', False)}} duration {{send-lifetime.config.end-time | to_int}}
+  cryptographic-algorithm {{config.crypto-algorithm}}
+    </group>
+</group>
+
+<output macro='convert_timestamps' />

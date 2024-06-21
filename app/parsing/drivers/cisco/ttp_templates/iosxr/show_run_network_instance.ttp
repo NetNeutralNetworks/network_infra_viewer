@@ -1,0 +1,581 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all multicast information.
+##################################################################################################
+
+```
+```
+</doc>
+<lookup name="network-instance" load="yaml">
+afi-safi-name:
+  ipv4 unicast: IPV4_UNICAST
+  ipv4 mdt: IPV4_MULTICAST
+  ipv6 unicast: IPV6_UNICAST
+  vpnv4 unicast: L3VPN_IPV4_UNICAST
+  vpnv6 unicast: L3VPN_IPV6_UNICAST
+afi-name:
+  ipv4: IPV4
+  ipv6: IPV6
+  vpnv4: L3VPN_IPV4
+  vpnv6: L3VPN_IPV6
+safi-name:
+  unicast: UNICAST
+  multicast: MULTICAST
+  mdt: MULTICAST
+isis:
+  level-capability:
+    level-2-only: LEVEL_2
+    level-1-2: LEVEL_1_2
+    level-1: LEVEL_1
+  reset-trigger:
+    wait-for-bgp: WAIT_FOR_BGP
+  metric-style:
+    narrow: NARROW_METRIC
+    wide: WIDE_METRIC
+</lookup>
+
+<!-- <group name='root.network-instances.network-instance**.{{name}}**' expand='' method='table'>
+vrf {{name | let('config._multicast-routing', True)}}
+ip {{name | re('multicast-routing') | let('DEFAULT_INSTANCE') | let('config._multicast-routing', True)}} distributed
+ip {{name | re('multicast-routing') | let('DEFAULT_INSTANCE') | let('config._multicast-routing', True)}}
+</group> -->
+
+<!--                         -->
+<!--       BASIC VRFs        -->
+<!--                         -->
+
+<group name='root.network-instances.network-instance**.{{instance}}**' expand=''>
+vrf {{ config.name | copy("instance") }}
+ description {{config.description | re('.*')}}
+ address-family ipv4 unicast{{ignore}}
+  <group name='inter-instance-policies.import-export-policy.config**' expand=''>
+  import route-target {{_start_}}
+   {{import-route-target}}
+  </group>
+  <group name='inter-instance-policies.import-export-policy.config**' expand=''>
+  export route-target {{_start_}}
+   {{export-route-target}}
+  </group>
+</group>
+
+<!--                         -->
+<!--   ROUTING MULTICAST     -->
+<!--                         -->
+
+<doc>
+```
+!
+multicast-routing
+ address-family ipv4
+  oom-handling
+  log-traps
+  rate-per-route
+  accounting per-prefix
+  interface Loopback0
+   enable
+  !
+  mdt source Loopback0
+  ssm range SSM_RANGE
+  !
+  interface «interface»
+  !
+!
+router pim
+ address-family ipv4
+  auto-rp listen disable
+  log neighbor changes
+  !
+  interface «interface»
+   bfd fast-detect
+   enable
+  !
+ !
+!
+```
+</doc>
+
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE**.protocols.protocol.PIM pim**.pim**' expand=''>
+multicast-routing{{_start_}}
+ address-family ipv4{{ignore}}
+  <group name="interfaces**.interface**.{{interface-id}}**" expand="">
+  interface {{config.interface-id | copy('interface-id')}}
+   enable{{config.enabled | set(True)}}
+  </group>
+  <group name="global**.config**" expand="" method="table">
+  mdt source {{_mdt-source}}
+  oom-handling{{_oom-handling | set(True)}}
+  log-traps{{_log-traps | set(True)}}
+  rate-per-route{{_rate-per-route | set(True)}}
+  accounting per-prefix{{_accounting-per-prefix | set(True)}}
+  </group>
+  <group name="global**.ssm**" expand="">
+  ssm range {{config.ssm-ranges}}
+  </group>
+ !{{_end_}}
+</group>
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE**.protocols.protocol.PIM pim**.pim**' expand=''>
+router pim{{_start_}}
+ address-family ipv4{{ignore}}
+  <group name="global**.config**" expand="">
+  auto-rp listen disable {{_auto-rp-listen | set(False)}}
+  </group>
+  <group name="global**" expand="">
+  log {{_logging-options | ORPHRASE | joinmatches(',') | split(',')}}
+  </group>
+  <group name="interfaces**.interface**.{{interface-id}}**" expand="">
+  interface {{config.interface-id | copy('interface-id')}}
+   bfd fast-detect{{enable-bfd.config.enabled | set(True)}}
+   enable{{config.enabled | set(True)}}
+  </group>
+ !{{_end_}}
+</group>
+
+<group name='root.network-instances.network-instance**.{{instance-name}}**.protocols.protocol.PIM pim**.pim**' expand=''>
+multicast-routing{{ignore}}
+ vrf {{instance-name | _start_}}
+  address-family ipv4{{ignore}}
+  <group name="interfaces**.interface**.{{interface-id}}**" expand="">
+   interface {{config.interface-id | copy('interface-id')}}
+    enable{{config.enabled | set(True)}}
+  </group>
+  <group name="global**.config**" expand="" method="table">
+   mdt source {{_mdt-source}}
+   mdt mtu {{_mdt-mtu | to_int}}
+   mdt data {{_mdt-data}}
+   mdt default ipv4 {{_mdt-default-ipv4}}
+   oom-handling{{_oom-handling | set(True)}}
+   log-traps{{_log-traps | set(True)}}
+   rate-per-route{{_rate-per-route | set(True)}}
+   accounting per-prefix{{_accounting-per-prefix | set(True)}}
+  </group>
+  <group name="global**.ssm**" expand="">
+   ssm range {{config.ssm-ranges}}
+  </group>
+ !{{_end_}}
+</group>
+<group name='root.network-instances.network-instance**.{{instance-name}}**.protocols.protocol.PIM pim**.pim**' expand=''>
+router pim{{ignore}}
+ vrf {{instance-name | _start_}}
+  address-family ipv4{{ignore}}
+  <group name="global**.config**" expand="">
+   auto-rp listen disable {{_auto-rp-listen | set(False)}}
+  </group>
+  <group name="global**" expand="">
+   log {{_logging-options | ORPHRASE | joinmatches(',') | split(',')}}
+  </group>
+  <group name="interfaces**.interface**.{{interface-id}}**" expand="">
+   interface {{config.interface-id | copy('interface-id')}}
+    bfd fast-detect{{enable-bfd.config.enabled | set(True)}}
+    enable{{config.enabled | set(True)}}
+  </group>
+ !{{_end_}}
+</group>
+
+<!--                         -->
+<!-- OVERLAY SEGMENT-ROUTING -->
+<!--                         -->
+
+<doc>
+```
+segment-routing
+ global-block 16000 23999
+!
+```
+</doc>
+
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE**.segment-routing**.srgbs**.srgb' expand=''>
+segment-routing{{_start_}}
+ global-block {{config._start-label | to_int}} {{config._end-label | to_int}}
+</group>
+
+<!--                         -->
+<!--      OVERLAY MPLS       -->
+<!--                         -->
+
+<doc>
+```
+mpls ip-ttl-propagate disable
+!
+mpls ldp
+ log
+  neighbor
+  nsr
+  session-protection
+ !
+ nsr
+ graceful-restart
+ igp sync delay on-session-up 60
+ discovery
+  hello holdtime 3
+  hello interval 1
+ !
+ router-id 1.1.1.1
+ interface TenGigE0/0/0/0
+ !
+ interface TenGigE0/0/0/1
+ !
+!
+```
+</doc>
+
+<group name='root.network-instances.network-instance**.DEFAULT_INSTANCE**.mpls**.global**.config**' expand=''>
+mpls ip-ttl-propagate disable{{ttl-propagation | set(False) | default(True)}}
+</group>
+
+<group name='root.network-instances.network-instance**' expand=''>
+  <group name="DEFAULT_INSTANCE**.mpls**" expand=''>
+mpls ldp{{_start_}}
+    <group name="global**._logging-options" expand=''>
+ log{{_start_}}
+  {{log-option | joinmatches | split}}
+    </group>
+ nsr{{global.config._nsr | set(True)}}
+    <group name="signaling-protocols**.ldp**.interface-attributes.config**" expand='' method="table">
+ discovery{{_start_}}
+  hello holdtime {{hello-holdtime | to_int}}
+  hello interval {{hello-interval | to_int}}
+    </group>
+    <group name="signaling-protocols**.ldp**.neighbors.neighbor.{{lsr-id}} {{label-space-id}}" expand=''>
+ neighbor {{config.lsr-id | copy('lsr-id')}}:{{config.label-space-id | copy('label-space-id')}} password {{authentication.config.authentication-key | let('authentication.config.enable', True)}}
+    </group>
+ graceful-restart{{signaling-protocols.ldp.global.graceful-restart.config.enabled | set(True)}}
+ router-id {{signaling-protocols.ldp.global.config.lsr-id}}
+ igp sync delay on-session-up {{te-global-attributes.te-lsp-timers.config.install-delay | to_int}}
+    <group name="te-interface-attributes**.interface.{{interface-id}}" expand=''>
+ interface {{config.interface-id | copy('interface-id')}}
+    </group>
+  </group>
+</group>
+
+<!--                         -->
+<!--  ROUTING PROTOCOL ISIS  -->
+<!--                         -->
+
+<doc>
+```
+router isis ISIS
+ is-type level-2-only
+ set-overload-bit on-startup 360
+ net 49.0001.00000000.00
+ nsf cisco
+ log adjacency changes
+ lsp-gen-interval maximum-wait 5000 initial-wait 1 secondary-wait 50 level 2
+ lsp-refresh-interval 65000
+ max-lsp-lifetime 65535
+ address-family ipv4 unicast
+  segment-routing mpls
+  metric-style wide
+  spf-interval maximum-wait 5000 initial-wait 1 secondary-wait 50 level 2
+ !
+ interface loopback0
+  passive
+   address-family ipv4 unicast
+    prefix-sid absolute «loopback0_address»
+    fast-reroute per-prefix ti-lfa level 2
+ !
+ interface TenGigE0/«slot»/«sub_slot»/«port»
+  point-to-point
+  bfd minimum-interval 15
+  bfd multiplier 3
+  bfd fast-detect ipv4
+  hello-password keychain ISIS-KEY
+  address-family ipv4 unicast
+   metric «isis_metric» level 2
+   mpls ldp sync
+   fast-reroute per-prefix level 2
+   fast-reroute per-prefix ti-lfa level 2
+ !
+!
+```
+</doc>
+
+<group name='root.network-instances.network-instance**' expand=''>
+  <group name="DEFAULT_INSTANCE.protocols.protocol.ISIS {{name}}**" expand=''>
+router isis {{ config.name | copy('name') | let('config.identifier', 'ISIS')}}
+    <group name="isis.global.config**" expand='' method='table'>
+ is-type {{level-capability | lookup('network-instance.isis.level-capability') | default('LEVEL_1_2')}}
+ net {{net | re('[a-fA-F0-9]{2}(\.[a-fA-F0-9]{4}){3,9}\.[a-fA-F0-9]{2}') | to_list}}
+ log adjacency changes{{_log-adjacency-changes | set(True)}}
+    </group>
+    <group name="isis.global.lsp-bit.overload-bit**" expand=''>
+ set-overload-bit {{config.set-bit-on-boot | re('on-startup') | let(True) | _start_}} {{reset-triggers.reset-trigger.WAIT_FOR_BGP.config.reset-trigger | re('wait-for-bgp') | lookup('network-instance.isis.reset-trigger') | let('reset-triggers.reset-trigger.WAIT_FOR_SYSTEM.config.delay', 600)}}
+ set-overload-bit {{config.set-bit-on-boot | re('on-startup') | let(True) | _start_}} {{reset-triggers.reset-trigger.WAIT_FOR_SYSTEM.config.delay | re('\d+') | to_int | let('reset-triggers.reset-trigger.WAIT_FOR_SYSTEM.config.reset-trigger', 'WAIT_FOR_SYSTEM')}} {{reset-triggers.reset-trigger.WAIT_FOR_BGP.config.reset-trigger | re('wait-for-bgp') | lookup('network-instance.isis.reset-trigger')}}
+ set-overload-bit {{config.set-bit-on-boot | re('on-startup') | let(True) | _start_}} {{reset-triggers.reset-trigger.WAIT_FOR_SYSTEM.config.delay | re('\d+') | to_int}}
+ set-overload-bit {{config.set-bit-on-boot | re('on-startup') | let(True) | _start_}}
+    </group>
+    <group name="isis.global.nsr.config**" expand=''>
+ nsf {{enabled | re('cisco') | let(True) | let('_vendor', 'CISCO')}}
+ nsf {{enabled | re('ietf') | let(True)}}
+    </group>
+    <group name="isis.global.timers**" expand='' method="table">
+ lsp-gen-interval maximum-wait {{lsp-generation.config.lsp-max-wait-interval | to_int}} initial-wait {{lsp-generation.config.lsp-first-wait-interval | to_int}} secondary-wait {{lsp-generation.config.lsp-second-wait-interval | to_int}} level {{lsp-generation.config._level | to_int}}
+  spf-interval maximum-wait {{spf.config.spf-hold-interval | to_int}} initial-wait {{spf.config.spf-first-interval | to_int }} secondary-wait {{spf.config.spf-second-interval | to_int}} level {{spf.config._level | to_int}}
+  metric-style {{levels.level.2.config.metric-style | lookup('network-instance.isis.metric-style') | let('config.level-number', 2)}}
+      <group name="config**" expand='' method="table">
+ lsp-refresh-interval {{lsp-refresh-interval | to_int}}
+ max-lsp-lifetime {{lsp-lifetime-interval | to_int}}
+      </group>
+    </group>
+    <group name="isis.global.afi-safi.af.{{afi-name}} {{safi-name}}" expand='' method="table">
+ address-family {{config.afi-name | lookup('network-instance.afi-name') | copy('afi-name')}} {{config.safi-name | lookup('network-instance.safi-name') | copy('safi-name')}}
+    </group>
+
+    <group name='isis.interfaces.interface.{{interface-id}}**' expand="">
+ interface {{config.interface-id | copy('interface-id') | let('config.enabled', True) | _start_}}
+  passive{{config.passive | set(True) | default(False)}}
+  bfd minimum-interval {{bfd.config._minimum-interval | to_int}}
+  bfd multiplier {{bfd.config._multiplier | to_int}}
+  bfd fast-detect ipv4{{enable-bfd.config.enabled | set(True)}}
+  point-to-point{{config.circuit-type | set('POINT_TO_POINT') | default('BROADCAST')}}
+  hello-password keychain {{authentication.config.keychain}}
+   mpls ldp sync{{mpls.igp-ldp-sync.config.enabled | set(True)}}
+      <group name='levels.level.2**.afi-safi.af.{{afi-name}} {{safi-name}}' expand="">
+  address-family {{config.afi-name | lookup('network-instance.afi-name') | copy('afi-name')}} {{config.safi-name | lookup('network-instance.safi-name') | copy('safi-name') | let('config.enabled', True)}}
+      </group>
+      <group name='levels.level.{{level-number}}**' expand="">
+   fast-reroute per-prefix level {{config.level-number | copy('level-number') | to_int | let('_fast-reroute.per-prefix.enabled', True)}}
+   fast-reroute per-prefix ti-lfa level {{config.level-number | copy('level-number') | to_int | let('_fast-reroute.per-prefix-ti-lfa.enabled', True)}}
+   prefix-sid {{segment-routing._prefix-sid-type}} {{segment-routing._prefix-sid | to_int}}
+   metric {{config.metric | to_int}} level {{ config.level-number  | copy('level-number') | to_int}}
+   metric {{config.metric | to_int}}
+      </group>
+ !{{_end_}}
+    </group>
+!{{_end_}}
+  </group>
+</group>
+
+<!--                         -->
+<!--  ROUTING PROTOCOL BGP   -->
+<!--                         -->
+
+<doc>
+```
+router bgp 65000
+ bgp confederation peers
+  65001
+  65002
+ !
+ nsr
+ timers bgp 1 3
+ bgp confederation identifier 42894
+ bgp router-id 1.1.1.1
+ bgp update-delay 60
+ bgp graceful-restart
+ bgp log neighbor changes detail
+ bgp bestpath med confeds
+ address-family vpnv4 unicast
+ address-family ipv4 unicast
+ address-family ipv4 mdt
+  additional-paths selection route-policy POLICY
+ !
+ !
+ af-group AFG address-family vpnv4 unicast
+ af-group AFG address-family ipv4 unicast
+ af-group AFG address-family ipv4 mdt
+  maximum-prefix 1000 80
+  route-policy DEFAULT out
+  send-extended-community-ebgp
+  next-hop-self
+ !
+ session-group SG
+  remote-as 65000
+  timers 1 3
+  advertisement-interval 0
+  password encrypted xxxxxxxx
+  update-source Loopback0
+ !
+ neighbor-group NG
+  use session-group SG
+  bfd fast-detect
+  use af-group AFG
+  address-family vpnv4 unicast
+  address-family ipv4 unicast
+  address-family ipv4 mdt
+   use af-group AFG
+  !
+ !
+ vrf VRF
+  rd 1.1.1.1:10001
+  bgp bestpath med always
+  address-family ipv4 unicast
+   advertise best-external
+   network 0.0.0.0/0 route-policy DEFAULT
+   redistribute static route-policy DEFAULT
+  !
+  neighbor 10.127.16.38
+   use neighbor-group NG
+   description Link to neighbor
+  !
+ !
+!
+```
+</doc>
+
+<group name='root.network-instances.network-instance.DEFAULT_INSTANCE.protocols.protocol.BGP {{as}}' expand=''>
+router bgp {{bgp.global.config.as | copy('as') | to_int | copy('config.name') | let('config.identifier', 'BGP') |_start_}}
+  <group name="bgp.global.afi-safis.afi-safi.{{afi-safi-name}}**" expand=''>
+    <!-- Missing the default IPV4_UNICAST address family -->
+ address-family {{config.afi-safi-name | re('\S+ mdt') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+ address-family {{config.afi-safi-name | re('\S+ unicast') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+  additional-paths selection route-policy {{add-paths.config.eligible-prefix-policy}}
+  advertise best-external{{route-selection-options.config.advertise-best-external | set(True)}}
+  send-extended-community-ebgp {{ config._send-extended-community-ebgp | set(True) }}
+  </group>
+  <group name="bgp.global._timers**.config**" expand=''>
+ timers bgp {{keepalive-interval | to_int}} {{hold-time | to_int}}
+ timers {{keepalive-interval | to_int}} {{hold-time | to_int}}
+ bgp update delay {{update-delay | to_int}}
+  </group>
+  <group name="bgp.global.graceful-restart**" expand=''>
+ bgp graceful-restart{{config.enabled | set(True) | default(False)}}
+  </group>
+  <group name="bgp.global._bfd**" expand=''>
+ bfd multiplier {{config.multiplier | to_int}}
+ bfd minimum-interval {{config.minimum-interval | to_int}}
+  </group>
+  <group name="bgp.global.config**" expand='' method="table">
+ nsr{{_non-stop-routing | set(True) | default(false)}}
+ bgp router-id {{router-id}}
+ bgp log neighbor changes detail{{_log-neighbor-state-changes | set(True) | let('_log-neighbor-state-changes-mode', 'detail')}}
+ bgp log neighbor changes{{_log-neighbor-state-changes | set(True)}}
+  </group>
+  <group name="bgp.global.confederation.config**" expand=''>
+ bgp confederation identifier {{identifier | _start_}}
+ bgp confederation peers{{_start_}}
+  {{member-as | joinmatches | split}}
+  </group>
+  <group name="bgp.global.route-selection-options" expand=''>
+ bgp bestpath med confed{{config._confed-compare-med | set(True)}}
+ advertise best-external{{config.advertise-best-external | set(True)}}
+  </group>
+  <group name='bgp.neighbors**.neighbor**.{{ neighbor-address }}**' expand=''>
+ neighbor {{ config.neighbor-address | copy('neighbor-address') | _start_}}
+  description {{ config.description | re('.*')}}
+  use neighbor-group {{ config.peer-group }}
+  use session-group {{ config._session-group }}
+  local address {{ transport.config.local-address }}
+  bfd fast-detect{{enable-bfd.config.enabled | set(True) | default(False)}}
+  remote-as {{ config.peer-as }}
+  timers {{timers.config.keepalive-interval | to_int}} {{timers.config.hold-time | to_int}}
+  advertisement-interval {{timers.config.minimum-advertisement-interval | to_int}}
+  password encrypted {{config.auth-password}}
+    <group name='afi-safis.afi-safi.{{afi-safi-name}}**' expand=''>
+  address-family {{config.afi-safi-name | re('\S+ mdt') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+  address-family {{config.afi-safi-name | re('\S+ unicast') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+   use af-group {{config._afi-safi-group}}
+   additional-paths selection route-policy {{add-paths.config.eligible-prefix-policy}}
+   advertise best-external{{route-selection-options.config.advertise-best-external | set(True)}}
+   route-policy {{apply-policy.config.import-policy}} in
+   route-policy {{apply-policy.config.export-policy}} out
+   next-hop-self {{config._next-hop-self | set(True)}}
+   maximum-prefix {{afi.prefix-limit.config.max-prefixes | to_int}} {{afi.prefix-limit.config.warning-threshold-pct | to_int}}
+   redistribute {{_redistribute.protocol}} route-policy {{_redistribute.policy}}
+   redistribute {{_redistribute.protocol}}
+      <group name='_network-statements*' method="table">
+   network {{ip}}/{{ prefix-length | to_int}} route-policy {{policy}}
+   network {{ip}}/{{ prefix-length | to_int}}
+      </group>
+  !{{_end_}}
+    </group>
+ !{{_end_}}
+  </group>
+  <group name='bgp.peer-groups**.peer-group**.{{ peer-group-name }}**' expand=''>
+ neighbor-group {{ config.peer-group-name | copy('peer-group-name') | _start_}}
+  description {{ config.description | re('.*')}}
+  use session-group {{ config._session-group }}
+  local address {{ transport.config.local-address }}
+  bfd fast-detect{{enable-bfd.config.enabled | set(True) | default(False)}}
+  remote-as {{ config.peer-as }}
+  timers {{timers.config.keepalive-interval | to_int}} {{timers.config.hold-time | to_int}}
+  advertisement-interval {{timers.config.minimum-advertisement-interval | to_int}}
+  password encrypted {{config.auth-password}}
+    <group name='afi-safis.afi-safi.{{afi-safi-name}}**' expand=''>
+  address-family {{config.afi-safi-name | re('\S+ mdt') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+  address-family {{config.afi-safi-name | re('\S+ unicast') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+   use af-group {{config._afi-safi-group}}
+   additional-paths selection route-policy {{add-paths.config.eligible-prefix-policy}}
+   advertise best-external{{route-selection-options.config.advertise-best-external | set(True)}}
+   route-policy {{apply-policy.config.import-policy}} in
+   route-policy {{apply-policy.config.export-policy}} out
+   next-hop-self {{config._next-hop-self | set(True)}}
+   maximum-prefix {{afi.prefix-limit.config.max-prefixes | to_int}} {{afi.prefix-limit.config.warning-threshold-pct | to_int}}
+   redistribute {{_redistribute.protocol}} route-policy {{_redistribute.policy}}
+   redistribute {{_redistribute.protocol}}
+      <group name='_network-statements*' method="table">
+   network {{ip}}/{{ prefix-length | to_int}} route-policy {{policy}}
+   network {{ip}}/{{ prefix-length | to_int}}
+      </group>
+  !{{_end_}}
+    </group>
+  </group>
+  <group name='bgp._session-groups**.session-group**.{{ session-group-name }}**' expand=''>
+ session-group {{ config.session-group-name | copy('session-group-name') | _start_}}
+  remote-as {{ config.peer-as }}
+  timers {{timers.config.keepalive-interval | to_int}} {{timers.config.hold-time | to_int}}
+  advertisement-interval {{timers.config.minimum-advertisement-interval | to_int}}
+  password encrypted {{config.auth-password}}
+  </group>
+  <group name='bgp._af-groups**.af-group**.{{ af-group-name }}**' expand=''>
+ af-group {{ config.af-group-name | copy('af-group-name') | _start_}} address-family {{config.afi-safi-name | re('\S+ mdt') | lookup("network-instance.afi-safi-name") | _start_}}
+ af-group {{ config.af-group-name | copy('af-group-name') | _start_}} address-family {{config.afi-safi-name | re('\S+ unicast') | lookup("network-instance.afi-safi-name") | _start_}}
+  additional-paths selection route-policy {{add-paths.config.eligible-prefix-policy}}
+  route-policy {{apply-policy.config.import-policy}} in
+  route-policy {{apply-policy.config.export-policy}} out
+  send-extended-community-ebgp {{ config.send-extended-community-ebgp | set(True) }}
+  next-hop-self {{config._next-hop-self | set(True)}}
+  maximum-prefix {{afi.prefix-limit.config.max-prefixes | to_int}} {{afi.prefix-limit.config.warning-threshold-pct | to_int}}
+  redistribute {{_redistribute.protocol}} route-policy {{_redistribute.policy}}
+  redistribute {{_redistribute.protocol}}
+    <group name='_network-statements*' method="table">
+  network {{ip}}/{{ prefix-length | to_int}} route-policy {{policy}}
+  network {{ip}}/{{ prefix-length | to_int}}
+    </group>
+ !{{_end_}}
+  </group>
+</group>
+
+<group name='root.network-instances.network-instance.{{instance}}**' expand='' del="asn">
+router bgp {{asn | record('ASN')}}
+ vrf {{config.name | copy('instance') | _start_}}
+  <group name='config**' expand=''>
+  rd {{route-distinguisher}}
+  </group>
+  <group name='protocols.protocol.BGP {{ASN}}.bgp.global.route-selection-options**' expand=''>
+  bgp bestpath med always{{config.always-compare-med | set(True)}}
+  advertise best-external{{config.advertise-best-external | set(True)}}
+  </group>
+  <group name='protocols.protocol.BGP {{ASN}}.bgp.global.afi-safis.afi-safi.{{afi-safi-name}}**' expand=''>
+  address-family {{config.afi-safi-name | re('\S+ mdt') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+  address-family {{config.afi-safi-name | re('\S+ unicast') | lookup("network-instance.afi-safi-name") | copy('afi-safi-name') | _start_}}
+   additional-paths selection route-policy {{add-paths.config.eligible-prefix-policy}}
+   advertise best-external{{route-selection-options.config.advertise-best-external | set(True)}}
+   redistribute {{_redistribute.protocol}} route-policy {{_redistribute.policy}}
+   redistribute {{_redistribute.protocol}}
+    <group name='_network-statements*' method="table">
+   network {{ip}}/{{ prefix-length | to_int}} route-policy {{policy}}
+   network {{ip}}/{{ prefix-length | to_int}}
+    </group>
+  !{{_end_}}
+  </group>
+  <group name='protocols.protocol.BGP {{ASN}}.bgp.neighbors**.neighbor**.{{ neighbor-address }}**' expand=''>
+  neighbor {{ config.neighbor-address | copy('neighbor-address') | _start_ }}
+   description {{ config.description | re('.*') }}
+   use neighbor-group {{ config.peer-group }}
+   use session-group {{ config._session-group }}
+   local address {{ transport.config.local-address }}
+   bfd fast-detect{{enable-bfd.config.enabled | set(True) | default(False)}}
+   remote-as {{ config.peer-as }}
+   timers {{timers.config.keepalive-interval | to_int}} {{timers.config.hold-time | to_int}}
+   advertisement-interval {{timers.config.minimum-advertisement-interval | to_int}}
+   password encrypted {{config.auth-password}}
+  </group>
+ !{{_end_}}
+</group>
+
+
+<!-- Not correct yet, only does the full interface, not split interfaces or efps -->
+<group name='root.network-instances.network-instance**.{{name}}**.interfaces.interface.{{id}}' expand="">
+interface {{config.id | copy('id')}}
+ vrf {{ name | default('DEFAULT_INSTANCE') }}
+</group>

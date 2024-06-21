@@ -1,0 +1,146 @@
+<lookup name="network_objects" load="csv">
+name,network,mask
+any,0.0.0.0,0.0.0.0
+</lookup>
+
+<macro>
+def expand_acl(data):
+    data['test'] = str(data)
+</macro>
+
+<macro>
+import re
+test_ipv4 = re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+host_replace_standard = re.compile(r'^(permit|deny)\s+((?:\d{1,3}\.){3}\d{1,3})$')
+host_replace = re.compile(r'host ((?:\d{1,3}\.){3}\d{1,3})')
+set_protocol = re.compile(r"(permit|deny)\s+((?:\d{1,3}\.){3}\d{1,3})")
+
+L4_MAP = {
+    "biff": 512,
+    "bootpc": 68,
+    "bootps": 67,
+    "discard": 9,
+    "dnsix": 195,
+    "domain": 53,
+    "echo": 7,
+    "isakmp": 500,
+    "mobile-ip": 434,
+    "nameserver": 42,
+    "netbios-dgm": 138,
+    "netbios-ns": 137,
+    "netbios-ss": 139,
+    "non500-isakmp": 4500,
+    "ntp": 123,
+    "pim-auto-rp": 496,
+    "rip": 520,
+    "snmp": 161,
+    "snmptrap": 162,
+    "sunrpc": 111,
+    "syslog": 514,
+    "tacacs": 49,
+    "talk": 517,
+    "tftp": 69,
+    "time": 37,
+    "who": 513,
+    "xdmcp": 177
+}
+
+def expand_acl2(data):
+    acls = []
+    for aclname, acl in data[0].get('root',{}).get('acls',{}).get('acl',{}).items():
+        parsed_rules = []
+        for i, rule_item in enumerate(acl.get('rules',[])):
+            if isinstance(rule_item,dict) and 'rule' in rule_item:
+                seq_id = rule_item['sequence-id']
+                rule_item = rule_item['rule']
+
+            # check if the ACL is standard
+            try:
+                st_name = int(aclname)
+            except ValueError:
+                st_name = 0
+
+            # Replace standard ACL host IP with IP/mask combination
+            R = host_replace_standard.sub(r"\1 \2 0.0.0.0", rule_item)
+            # Replace any with IP and mask
+            R = R.replace('any','0.0.0.0 255.255.255.255')
+            # Replace host with IP and /32 wildcard mask equivalent
+            R = host_replace.sub(r'\1 0.0.0.0', R)
+            # If standard ACL, set protocol to IP
+            R = set_protocol.sub(r'\1 ipv4 \2', R)
+            # If standard ACL, set destination as well
+            if len(re.findall(r"(?:\d{1,3}\.){3}\d{1,3}", R)) == 2:
+                R = re.sub(r"(((?:\d{1,3}\.){3}\d{1,3}\s*?){2})", r"\1 0.0.0.0 255.255.255.255", R)
+
+            R = R.split()
+
+            try:
+                if R[-2].lower() == 'log':
+                    log_cookie = R[-1]
+                else:
+                    log_cookie = None
+            except Exception as e:
+                log_cookie = ''
+
+            if R[0] == 'remark':
+                rule = { 'sequence-id': seq_id, 'forwarding-action': R[0], 'description': ' '.join(R[1:]) }
+
+            else:
+                src_net, src_mask = R[2], R[3]
+                if R[4] == 'eq':
+                    src_prt = [L4_MAP.get(R[5], R[5])]
+                    dst_net, dst_mask = R[6], R[7]
+                else:
+                    src_prt = None
+                    dst_net, dst_mask = R[4], R[5]
+                if len(R) >= 7 and R[6] == 'eq':
+                    dst_prt = [L4_MAP.get(R[7], R[7])]
+                elif len(R) >= 9 and R[8] == 'eq':
+                    dst_prt = [L4_MAP.get(R[9], R[9])]
+                else:
+                    dst_prt = None
+
+                if R[1] == "ip":
+                    R[1] = "ipv4"
+
+                rule = { 'sequence-id': seq_id,
+                         'forwarding-action': R[0],
+                         'protocol': R[1],
+                         'source-address':src_net ,
+                         'source-mask':src_mask ,
+                         'source-port': src_prt,
+                         'destination-address': dst_net ,
+                         'destination-mask':dst_mask,
+                         'destination-port': dst_prt,
+                         'log-action': 'log' in R,
+                         'log-cookie': log_cookie
+                        }
+
+            parsed_rules.append(rule)
+
+        acl['rules'] = parsed_rules
+        acls.append (acl)
+                                                    <!--
+    if not data[0].get('root',{}).get('acls'):
+        data[0]['root']['acls'] = {}
+    data[0]['root']['acls']['acl'] = acls -->
+
+</macro>
+
+<group name="root.acls.acl.{{id}}**" expand="">
+ip access-list {{ignore}} {{config.name | copy('id')}}
+    <group name='rules*'>
+ {{sequence-id | DIGIT | to_int }} {{ rule | ROW }}
+    </group>
+{{ignore('\S+') }}{{ _end_ }}
+</group>
+
+<!-- <group name="root.acls.acl.{{id}}**" expand="">
+ip access-list standard {{config.name | DIGIT | copy('id')}}
+    <group name='rules*'>
+ {{sequence-id | DIGIT | to_int }} {{ rule | ROW }}
+    </group>
+{{ignore('^\S+') }}{{ _end_ }}
+</group> -->
+
+<output macro='expand_acl2' />

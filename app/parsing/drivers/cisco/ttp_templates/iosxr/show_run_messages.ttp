@@ -1,0 +1,19 @@
+<group name='root.system.config**'>
+    <group>
+banner login #{{ _start_ }}
+{{ login-banner | _line_ | joinmatches("\n") }}
+#{{ _end_ }}
+    </group>
+
+    <group>
+banner motd #{{ _start_ }}
+{{ motd-banner | _line_ | joinmatches("\n") }}
+#{{ _end_ }}
+    </group>
+
+    <group>
+banner exec #{{ _start_ }}
+{{ _exec-banner | _line_ | joinmatches("\n") }}
+#{{ _end_ }}
+    </group>
+</group>

@@ -1,0 +1,8 @@
+  <group name='root.trackers*'>
+track {{id}} {{type}} {{ interface }} {{method}}
+  </group>
+
+  <group name='root.trackers*'>
+track {{id}} ip {{type}} {{network}} {{mask}} {{test}}
+ delay up {{up_delay}}
+  </group>
