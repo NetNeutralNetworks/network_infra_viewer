@@ -1,0 +1,216 @@
+{% extends 'appbuilder/baselayout.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+crossorigin=""/>
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+{% endblock %}
+{% block head_js %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
+crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+crossorigin=""></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+crossorigin=""></script>
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+{% block body %}
+    {% block navbar %}
+    {{ super() }}
+    {% endblock %}
+     {% block messages %}
+     {{ super() }}
+      {% endblock %}
+      {% block content %}
+      <div id="map" style="float: left; width: 50%; height:800px"></div>
+      <div id="details" style="float: right; width: 50%">
+              <form method="post">
+                <label for="query">Title</label>
+                <br>
+                <input type="text" name="query"
+                       placeholder="Search"
+                       value="{{ request.form['query'] }}"></input>
+                <br>
+                <label for="span_status">Span status</label>
+                      <br>
+                      <select id="span_status" name="span_status">
+                        <option value="all">alles</option>
+                        <option value="0">(0) nog niet in gebruik</option>
+                        <option value="1">(1) in gebruik</option>
+                        <option value="2">(2) klaar voor opheffing</option>
+                    </select>
+                      <button type="submit">Filter</button>
+                  </form>
+              Object:
+              <div>
+                      <table id="object-table" class="display">
+                              
+                      </table>
+              </div>
+      </div>
+
+<script type="text/javascript">
+
+var stringToColour = function(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+              hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      var colour = '#';
+      for (var i = 0; i < 3; i++) {
+              var value = (hash >> (i * 8)) & 0xFF;
+              colour += ('00' + value.toString(16)).substr(-2);
+      }
+      return colour;
+}
+
+async function getapi(url, type) {
+  
+  // Storing response
+  const response = await fetch(url);
+  
+  // Storing data in form of JSON
+  var data = await response.json();
+  console.log(data);
+  if(type=='line'){
+        show_DFC(data);
+  }else if(type == 'node'){
+        show_Location(data);
+  }
+  return data
+}
+
+function show_DFC(data) {
+  let tab = 
+      `<thead><tr><td>Objects</tr></td></thead><tbody>`;
+  
+  // Loop to access all rows 
+  for (let r of data) {
+      tab += `<tr><td><a href="/mapoverview/dfc/?dfc=${r}" target="_blank">${r}</a></td></tr>`;
+  }
+  tab+=`</tbody>`
+  // Setting innerHTML as tab variable
+  document.getElementById("current_popup").innerHTML = tab;
+  document.getElementById("object-table").innerHTML = tab;
+  $('#object-table').DataTable({
+      scrollY: '400px',
+      scrollCollapse: true,
+      paging: false,
+      destroy: true,
+  });
+}
+function show_Location(data) {
+  let tab = 
+      `<thead><tr><td>Objects</tr></td></thead><tbody>`;
+  
+  // Loop to access all rows 
+  for (let r of data) {
+      tab += `<tr><td><a href="/deviceview/show/?hostname=${r}" target="_blank">${r}</a></td></tr>`;
+  }
+  tab+=`</tbody>`
+  // Setting innerHTML as tab variable
+  document.getElementById("current_popup").innerHTML = tab;
+  document.getElementById("object-table").innerHTML = tab;
+  $('#object-table').DataTable({
+      scrollY: '400px',
+      scrollCollapse: true,
+      paging: false,
+      destroy: true,
+  });
+}
+
+var map = L.map('map').setView([52.2, 5.4], 7);
+
+var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+var marker_group = L.markerClusterGroup();
+
+var markers = {{markers|safe}}
+for (var i = 0; i < markers.length; i++) {
+      var marker = L.marker([markers[i].lat, markers[i].lon]);
+      marker.location = markers[i].popup
+      marker_group.addLayer(marker)
+      marker.bindPopup(markers[i].popup + "<table id='current_popup' style='width: 600px'></table>");
+      marker.on('popupopen', function(e){
+              console.log(e.popup._source.location)
+              getapi("/mapoverview/location/?location=" + e.popup._source.location, 'node')
+
+      });
+}
+var spans = {{spans|safe}}
+
+for (var i = 0; i < spans.length; i++) {
+      var cable_color = '#b8bfb2'
+      if (spans[i].capacity <= 4 ){
+              cable_color = '#301cfa'
+      }else if (spans[i].capacity <= 8){
+              cable_color = '#1ce2fa'
+      }
+      else if (spans[i].capacity <= 16){
+              cable_color = '#1cfa7a'
+      }
+      else if (spans[i].capacity <= 32){
+              cable_color = '#7efa1c'
+      }
+      else if (spans[i].capacity <= 64){
+              cable_color = '#e9fa1c'
+      }
+      else if (spans[i].capacity <= 128){
+              cable_color = '#faa61c'
+      }
+      else if (spans[i].capacity > 128){
+              cable_color = '#fa371c'
+      }
+      var line = L.polyline(spans[i].coords, {
+              weight: 5,
+              color : cable_color
+      });
+      line.on('mouseover', function() {
+              this.setStyle({
+                      weight: 15,   //or whatever style you wish to use;
+              });
+      });
+      line.on('mouseout', function() {
+              this.setStyle({
+                      weight: 5
+              })
+              this.bringToBack()
+      });
+      line.span = spans[i].spanid
+      marker_group.addLayer(line)
+      line.bindPopup("<a href='/mapoverview/span/?span=" + spans[i].spanid + "'>" + spans[i].spanid + "</a><table id='current_popup' style='width: 600px'></table>",{
+              maxWidth : 560
+      });
+      line.on('popupopen', function(e){
+              console.log(e.popup._source.span)
+              getapi("/mapoverview/span/?span=" + e.popup._source.span, 'line')
+
+      });
+}
+map.addLayer(marker_group)
+
+
+</script>
+    {% endblock %}
+    {% block footer %}
+    {{ super() }}
+    {% endblock %}
+{% block tail_js %}
+{% endblock %}
+{% endblock %}

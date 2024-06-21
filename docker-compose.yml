@@ -3,9 +3,33 @@ version: "3.4"
 services:
   fab:
     build: ./
+    restart: always
     volumes:
+      - ./config.py:/var/appbuilder/config.py
       - ncubed_flask_base:/var/lib/appbuilder/data
-    ports:
-      - 5000:5000
+      - /opt/ncubed/data/configs/CSPC_exports/:/opt/ncubed/data/configs/CSPC_exports/:ro
+      - /opt/ncubed/data/configs/CSPC_exports/oc:/opt/ncubed/data/configs/CSPC_exports/oc:rw
+    networks:
+      - fab-visualiser
+      - netcube
+    labels:
+      # Frontend
+      - "traefik.enable=true"
+      - "traefik.docker.network=netcube"
+      - "traefik.http.routers.fabdv.tls=true"
+      #- "traefik.http.routers.authentik.rule=Host(`${DNS_NAME}`)"
+      - "traefik.http.routers.fabdv.rule=Host(`fab.c0001.ncubed.io`)"
+      - "traefik.http.routers.fabdv.priority=10"
+      - "traefik.http.routers.fabdv.entrypoints=websecure"
+      - "traefik.http.services.fabdv.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.fabdv.headers.sslProxyHeaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.fabdv.middlewares=fabdv"
 volumes:
   ncubed_flask_base:
+
+networks:
+  netcube:
+    name: netcube
+    external: true
+  fab-visualiser:
+    name: fab-visualiser

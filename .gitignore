@@ -1,0 +1,3 @@
+app/parsing/drivers/validators/
+app/parsing/render_templates/
+*.env
