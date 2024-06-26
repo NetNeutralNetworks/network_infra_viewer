@@ -151,7 +151,7 @@ class DeviceView(BaseView):
 
 
         """
-        device_network = Network(notebook=False, cdn_resources='in_line', height='800px', filter_menu=True)
+        device_network = Network(notebook=False, cdn_resources='in_line', height='800px')
         # device_network.show_buttons()
         for path in execute_query(q):
             # logging.getLogger().info('Response: %s', path[0])
@@ -176,7 +176,6 @@ class DeviceView(BaseView):
         l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
         l2_html = re.sub(r'row no-gutter', '', l2_html, 0, re.DOTALL)
         # logging.getLogger().info(l2_html)
-
 
 
         # Get device config:
@@ -400,3 +399,37 @@ class DeviceView(BaseView):
         l2_html = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html, 2, re.DOTALL)
         l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
         return self.render_template('l2_extended.html', device=device, html=l2_html)
+    
+    @expose('/l2_summary/', methods=['GET'])
+    @has_access
+    def l2_summary(self):
+        request_data = request.args
+        if not request_data.get('hostname'):
+            return self.render_template('single_device.html', html="")
+        hostname=request_data['hostname']
+        q = f"""
+            MATCH path=(d:Device)-[]-(i:Interface)-[]-(i2:Interface)-[]-(d2:Device)
+            where d.hostname =~ "{hostname}"
+            RETURN distinct d, d2;
+
+
+        """
+        device_network_short = Network(notebook=False, cdn_resources='in_line', height='800px')
+        # device_network.show_buttons()
+        for node1, node2 in execute_query(q):
+            for node in [node1, node2]:
+                if "Device" in node.labels:
+                    if "-CE" in node.properties["hostname"]:
+                        device_network_short.add_node(node.id, label=node.properties.get("hostname"), color="red")
+                    elif "-PE" in node.properties["hostname"]:
+                        device_network_short.add_node(node.id, label=node.properties.get("hostname"), color="purple")
+                    elif "-P4" in node.properties["hostname"] or "-P5" in node.properties["hostname"]:
+                        device_network_short.add_node(node.id, label=node.properties.get("hostname"), color="blue")
+                    else:
+                        device_network_short.add_node(node.id, label=node.properties.get("hostname"), color="yellow")
+            device_network_short.add_edge(node1.id, node2.id)
+        l2_html_short = device_network_short.generate_html()
+        l2_html_short = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html_short, 2, re.DOTALL)
+        l2_html_short = re.sub(r'<link\s*href.*?\/>', '', l2_html_short, 0, re.DOTALL)
+        l2_html_short = re.sub(r'row no-gutter', '', l2_html_short, 0, re.DOTALL)
+        return self.render_template('l2_extended.html', device=node1, html=l2_html_short)
