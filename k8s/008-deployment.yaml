@@ -1,0 +1,36 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: network-infra-viewer
+  namespace: network-infra-viewer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: network-infra-viewer
+  template:
+    metadata:
+      labels:
+        name: network-infra-viewer
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: network-infrastructure-viewer-rijkswaterstaat
+          image: network-infra-viewer:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: webserver-config
+            - secretRef:
+                name: network-infra-viewer-auth
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/appbuilder/data
+              name: network-infra-viewer-data
+      volumes:
+        - name: network-infra-viewer-data
+          persistentVolumeClaim:
+            claimName: network-infra-viewer-pvc
