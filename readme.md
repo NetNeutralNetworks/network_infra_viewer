@@ -32,3 +32,11 @@ Expects a date as foldername with a Network_1 folder inside ('/opt/ncubed/data/c
 
 `/opt/ncubed/data/configs/CSPC_exports/oc`  
 used to access OpenConfig data; Gets mounted to /opt/ncubed/data/configs/CSPC_exports/oc as read+write  
+
+# Building in MicroK8s
+This container image is not yet published in a container registry, so in order to use the image in MicroK8s run the following commands:
+```
+sudo docker build -t docker.io/library/network-infra-viewer:latest .
+sudo docker save network-infra-viewer > nivr.tar
+microk8s ctr image import nivr.tar
+```
