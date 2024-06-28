@@ -145,7 +145,7 @@ OAUTH_PROVIDERS = [{
             "client_secret": KEYCLOAK_CLIENT_SECRET,
             "api_base_url": f"{KEYCLOAK_DOMAIN}/realms/master/protocol/openid-connect",
             "client_kwargs": {
-                "scope": "email profile",
+                "scope": "email profile openid",
                 "verify": False
             },
             "access_token_url": f"{KEYCLOAK_DOMAIN}/realms/master/protocol/openid-connect/token",
