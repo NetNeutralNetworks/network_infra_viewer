@@ -30,6 +30,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/appbuilder/data
               name: network-infra-viewer-data
+      imagePullSecrets:
+        - name: registry-cred
       volumes:
         - name: network-infra-viewer-data
           persistentVolumeClaim:

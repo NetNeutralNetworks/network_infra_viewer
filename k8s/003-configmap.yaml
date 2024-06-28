@@ -13,4 +13,4 @@ data:
   WEBSERVER_PORT: '5000'
   DEBUG_MODE: 'True'
   AUTHENTIK_DOMAIN: '' 
-  KEYCLOAK_DOMAIN: https://secure-ui.k8s.datalake-poc.cnap-am4.intranet.rws.nl/
+  KEYCLOAK_DOMAIN: https://secure-ui.k8s.datalake-poc.cnap-am4.intranet.rws.nl
