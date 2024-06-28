@@ -37,7 +37,7 @@ db = SQLA(app)
 class MyIndexView(IndexView):
     index_template = 'home.html'
 
-appbuilder = AppBuilder(app, db.session, security_manager_class=MySecurityManager, indexview=MyIndexView)
+appbuilder = AppBuilder(app, db.session, indexview=MyIndexView)
 
 # appbuilder.add_view(ConnectionOverview, "Layer2", category='Network')
 
