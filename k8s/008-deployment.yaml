@@ -17,8 +17,8 @@ spec:
       restartPolicy: Always
       containers:
         - name: network-infrastructure-viewer-rijkswaterstaat
-          image: network-infra-viewer:latest
-          imagePullPolicy: Never
+          image: harbor.k8s.services.cnap-am4.intranet.rws.nl/datalake/network-infrastructure-viewer-rijkswaterstaat:1.1.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           envFrom:
