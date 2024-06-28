@@ -1,0 +1,12 @@
+---
+kind: Middleware
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: allow-in-iframe
+  namespace: network-infra-viewer
+spec:
+  headers:
+    customResponseHeaders:
+      content-security-policy: ''
+      x-frame-options: ''
+      # x-forwarded-proto: 'https'
