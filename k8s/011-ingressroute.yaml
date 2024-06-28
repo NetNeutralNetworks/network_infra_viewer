@@ -1,0 +1,21 @@
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: network-infra-viewer-ingress
+  namespace: network-infra-viewer
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`nivr-ui.k8s.datalake-poc.cnap-am4.intranet.rws.nl`)
+      middlewares:
+        - name: allow-in-iframe
+          namespace: network-infra-viewer
+      services:
+        - kind: Service
+          name: network-infra-viewer
+          namespace: network-infra-viewer
+          port: network-infra-viewer-ui
