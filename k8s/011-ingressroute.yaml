@@ -18,4 +18,4 @@ spec:
         - kind: Service
           name: network-infra-viewer
           namespace: network-infra-viewer
-          port: network-infra-viewer-ui
+          port: 80
