@@ -7,7 +7,7 @@ metadata:
   labels:
     name: webserver
 data:
-  MEMGRAPH_HOST: memgraph_memgraph-platform_1
+  MEMGRAPH_HOST: memgraph.memgraph
   MEMGRAPH_PORT: '7687' 
   WEBSERVER_LISTEN_IP: '0.0.0.0'
   WEBSERVER_PORT: '5000'
