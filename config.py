@@ -12,6 +12,14 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 CSRF_ENABLED = True
 SECRET_KEY = os.environ['APP_SECRET_KEY']
 
+KEYCLOAK_CLIENT_ID = os.environ['KEYCLOAK_CLIENT_ID']
+KEYCLOAK_CLIENT_SECRET = os.environ['KEYCLOAK_CLIENT_SECRET']
+KEYCLOAK_DOMAIN = os.environ['KEYCLOAK_DOMAIN']
+
+AUTHENTIK_CLIENT_ID = os.environ['AUTHENTIK_CLIENT_ID']
+AUTHENTIK_CLIENT_SECRET = os.environ['AUTHENTIK_CLIENT_SECRET']
+AUTHENTIK_DOMAIN = os.environ['AUTHENTIK_DOMAIN']
+
 #OAUTH_PROVIDERS = [{
 #  'name':'authentik',
 #    'token_key':'access_token',
@@ -117,15 +125,32 @@ OAUTH_PROVIDERS = [{
     'token_key':'access_token',
     'icon':'fa-fingerprint',
         'remote_app': {
-            'api_base_url':'https://authentik.c0001.ncubed.io',
+            'api_base_url':f'{AUTHENTIK_DOMAIN}',
             'client_kwargs':{
                 'scope': 'email profile'
             },
-            'access_token_url':'https://authentik.c0001.ncubed.io/application/o/token/',
-            'authorize_url':'https://authentik.c0001.ncubed.io/application/o/authorize/',
+            'access_token_url':f'{AUTHENTIK_DOMAIN}/application/o/token/',
+            'authorize_url':f'{AUTHENTIK_DOMAIN}/application/o/authorize/',
             'request_token_url': None,
-            'client_id': 'GcdobK52gKH5nNwpYefFxZCIAE4M7RcLhFURtvSl',
-            'client_secret': 'mAIEMVF36jeC47oegbyEs5xxrHrRIphDWCnlLAePpzTqiU8yi0AiabTg5MIDgJoYKuRiyM6IMbMFSkosax65ATMbyhLtTUaCQOAt1tYsWG4vpTJRgewhxiHffwdFXtnU',
+            'client_id': f'{AUTHENTIK_CLIENT_ID}',
+            'client_secret': f'{AUTHENTIK_CLIENT_SECRET}',
         }
    },
+       {
+        "name": "keycloak",
+        "icon": "fa-key",
+        "token_key": "access_token",
+        "remote_app": {
+            "client_id": KEYCLOAK_CLIENT_ID,
+            "client_secret": KEYCLOAK_CLIENT_SECRET,
+            "api_base_url": f"{KEYCLOAK_DOMAIN}/realms/master/protocol/openid-connect",
+            "client_kwargs": {
+                "scope": "email profile",
+                "verify": False
+            },
+            "access_token_url": f"{KEYCLOAK_DOMAIN}/realms/master/protocol/openid-connect/token",
+            "authorize_url": f"{KEYCLOAK_DOMAIN}/realms/master/protocol/openid-connect/auth",
+            "request_token_url": None,
+        },
+    },
 ]

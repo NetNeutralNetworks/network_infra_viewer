@@ -18,7 +18,7 @@ spec:
       containers:
         - name: network-infrastructure-viewer-rijkswaterstaat
           image: harbor.k8s.services.cnap-am4.intranet.rws.nl/datalake/network-infrastructure-viewer-rijkswaterstaat:1.1.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           envFrom:
@@ -30,6 +30,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/appbuilder/data
               name: network-infra-viewer-data
+      imagePullSecrets:
+        - name: registry-cred
       volumes:
         - name: network-infra-viewer-data
           persistentVolumeClaim:
