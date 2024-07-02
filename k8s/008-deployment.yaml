@@ -30,9 +30,14 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/appbuilder/data
               name: network-infra-viewer-data
+            - mountPath: /opt/ncubed/data/configs/CSPC_exports
+              name: network-infra-viewer-cspc-data
       imagePullSecrets:
         - name: registry-cred
       volumes:
         - name: network-infra-viewer-data
           persistentVolumeClaim:
             claimName: network-infra-viewer-pvc
+        - name: network-infra-viewer-cspc-data
+          persistentVolumeClaim:
+            claimName: network-infra-viewer-cspc-pvc

@@ -14,3 +14,19 @@ spec:
     requests:
       storage: 1Gi
   volumeName: network-infra-viewer-pv
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: network-infra-viewer-cspc-pvc
+  namespace: network-infra-viewer
+  labels:
+    app: webserver
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 6Gi
+  volumeName: network-infra-viewer-cspc-pv

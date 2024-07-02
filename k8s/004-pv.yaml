@@ -15,3 +15,20 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: "/home/ubuntu/data/"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: network-infra-viewer-cspc-pv
+  labels:
+    type: local
+    app: webserver
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 6Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/opt/ncubed/data/configs/CSPC_exports"
