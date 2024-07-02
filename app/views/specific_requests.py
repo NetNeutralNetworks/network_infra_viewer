@@ -1,5 +1,6 @@
 import json
 import logging, os, re, csv, traceback, glob, xmltodict
+from dotenv import load_dotenv
 from flask import request
 from flask_appbuilder import AppBuilder, BaseView, expose, has_access
 from pyvis.network import Network
@@ -9,6 +10,9 @@ from app.parsing.drivers.cisco import ios
 
 from ..scripts.memgraph import execute_query
 from ..scripts.location_calculations import get_GPS_from_RD, get_closest_point
+
+load_dotenv(override=True)
+config_date = os.environ.get('CSPC_FOLDER')
 
 def parse_xml_data(data):
             result = dict()
@@ -167,7 +171,7 @@ class InterfacesDevices(BaseView):
     def refresh(self):
         entries = []
         
-        path = os.path.join('/opt/ncubed/data/configs/CSPC_exports/20230301/Network_1/', 'DeviceList_*.xml')
+        path = os.path.join(f'/opt/ncubed/data/configs/CSPC_exports/{config_date}/Network_1/', 'DeviceList_*.xml')
 
         os_lookup_table = {
             'IOS': 'ios',
@@ -181,7 +185,7 @@ class InterfacesDevices(BaseView):
                 with open(filename, 'r') as f:
                     doc = xmltodict.parse(f.read())
                     meta_data = parse_xml_data(doc)
-                    config_file_path = '/opt/ncubed/data/configs/CSPC_exports/20230301/Network_1/' + "NetworkDevice_" + meta_data['device_id'] + "/CLI/_show running_config"
+                    config_file_path = f'/opt/ncubed/data/configs/CSPC_exports/{config_date}/Network_1/' + "NetworkDevice_" + meta_data['device_id'] + "/CLI/_show running_config"
                         # logging.getLogger().info('conf lines = %s', len(device_config))
                     oc = ios.parse(source=config_file_path, platform=os_lookup_table.get(meta_data['os_type']))
                     hostname = oc.get('root', {}).get('system', {}).get('config', {}).get('hostname')
@@ -202,7 +206,7 @@ class InterfacesDevices(BaseView):
         request_data = request.args
         entries = []
         
-        path = os.path.join('/opt/ncubed/data/configs/CSPC_exports/20230301/Network_1/', 'DeviceList_*.xml')
+        path = os.path.join(f'/opt/ncubed/data/configs/CSPC_exports/{config_date}/Network_1/', 'DeviceList_*.xml')
 
         os_lookup_table = {
             'IOS': 'ios',
