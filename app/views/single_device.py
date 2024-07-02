@@ -9,6 +9,8 @@ from app.parsing.drivers.cisco import ios
 
 from ..scripts.memgraph import execute_query
 
+from dotenv import load_dotenv
+
 def parse_xml_data(data):
             result = dict()
             result['device_id'] = data['NetworkDevice']['Id']
@@ -22,8 +24,12 @@ def parse_xml_data(data):
             return result
 
 class DeviceView(BaseView):
+    load_dotenv(override=True)
+    config_date = os.environ.get('CSPC_FOLDER')
+    
     default_view = 'main_page'
-    config_date = '20230301'
+    
+    
 
     @expose('/show/', methods=['GET'])
     @has_access

@@ -4,6 +4,7 @@ services:
   fab:
     build: ./
     restart: always
+    env_file: ".env"
     volumes:
       - ./config.py:/var/appbuilder/config.py
       - ncubed_flask_base:/var/lib/appbuilder/data
