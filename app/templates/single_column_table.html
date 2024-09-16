@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 {{ super() }}
@@ -78,17 +78,7 @@ crossorigin=""></script>
 </script>
     
 {% endblock %}
-
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block messages %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block content %}
+{% block content %}
     
 
     <div style="margin:20px;">
@@ -115,13 +105,6 @@ crossorigin=""></script>
         </tbody>
     </table>
   </div>
-    {% endblock %}
-
-    {% block footer %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block tail_js %}
-    {% endblock %}
-
 {% endblock %}
+
+    

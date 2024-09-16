@@ -72,5 +72,5 @@ class RecommendationView(BaseView):
             <p>The information provided can be used to decide where to focus on improvements</p>
             <p>This data is provided by the CSPC collector and partly by TOPdesk export.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Group</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Group</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, page_category='Network Components')
     

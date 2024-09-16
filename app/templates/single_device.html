@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 
@@ -147,14 +147,7 @@ crossorigin=""></script>
   
 </script>
 {% endblock %}
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-     {% block messages %}
-     {{ super() }}
-      {% endblock %}
-      {% block content %}
+{% block content %}
 
 
 <div id="details-header" style="width:100%;display: grid;grid: auto auto/ 50% 50%;">
@@ -614,11 +607,4 @@ function get_connection_type_color(x){
   
   
   </script>
-    {% endblock %}
-    <!-- {% block footer %}
-    {{ super() }}
-    {% endblock %} -->
-{% block tail_js %}
-
-{% endblock %}
 {% endblock %}

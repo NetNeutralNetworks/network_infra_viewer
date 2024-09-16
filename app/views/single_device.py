@@ -35,18 +35,20 @@ class DeviceView(BaseView):
     @has_access
     def main_page(self):
         request_data = request.args
-        if not request_data.get('hostname'):
+        hostname = request_data.get('hostname', '').upper()
+        if not hostname:
             return self.render_template('single_device.html', html="")
-        z = re.search(r'(.*-CE\d+R-).*',request_data["hostname"])
+        z = re.search(r'(.*-CE\d+R-).*',hostname)
         if z:
             hostname=z.groups()[0]+'.*'
         else:
-            hostname=request_data['hostname']
+            hostname=request_data['hostname'].upper()
+        # hostname = hostname.upper()
         logging.getLogger().info('Response: %s', hostname)
         # Get devicedata to show in the details view
         q = f"""
             MATCH (d:Device)
-            where d.hostname = "{request_data['hostname']}"
+            where d.hostname =~ "{hostname}"
             RETURN distinct d
 
 
@@ -59,7 +61,7 @@ class DeviceView(BaseView):
 
         q = f"""
             MATCH path=(l:Location)-[]-(d:Device)
-            where d.hostname = "{request_data['hostname']}"
+            where d.hostname =~ "{hostname}"
             RETURN distinct l,d
 
 
@@ -80,7 +82,7 @@ class DeviceView(BaseView):
 
         """
         lijnen = dict()
-        locations = [device]
+        locations = []
         spans = []
         connections=[]
         for line in execute_query(q):
@@ -203,7 +205,7 @@ class DeviceView(BaseView):
                 with open(filename, 'r') as f:
                     doc = xmltodict.parse(f.read())
                     meta_data = parse_xml_data(doc)
-                    if meta_data.get('hostname') == request_data['hostname']:
+                    if meta_data.get('hostname').upper() == request_data['hostname']:
                         logging.getLogger().info('Found config: as device: %s', meta_data['device_id'])
                         config_file_path = f'/opt/ncubed/data/configs/CSPC_exports/{self.config_date}/Network_1/' + "NetworkDevice_" + meta_data['device_id'] + "/CLI/_show running_config"
                         with open(config_file_path, 'r') as config_file:
@@ -211,6 +213,7 @@ class DeviceView(BaseView):
                             # logging.getLogger().info('conf lines = %s', len(device_config))
                         oc = ios.parse(source=config_file_path, platform=os_lookup_table.get(meta_data['os_type']))
                         oc_text = json.dumps(oc, indent=3)
+                        break
             except:
                 oc = {}
                 oc_text = '''Config not found in CSPC collector'''
@@ -218,7 +221,7 @@ class DeviceView(BaseView):
         # Get network components
         q = f"""
         MATCH path=((n:Device)--(v:VRF)--(i:Interface)--(v2:Vlan)--(i2:Interface))
-        WHERE n.hostname =~ '{request_data['hostname']}'
+        WHERE n.hostname =~ '{hostname}'
         return v, i, v2, i2
         """
         vrfs = []
@@ -294,7 +297,7 @@ class DeviceView(BaseView):
         request_data = request.args
         if not request_data.get('hostname'):
             return self.render_template('single_device.html', html="")
-        hostname=request_data['hostname']
+        hostname=request_data['hostname'].upper()
 
          # Get devicedata to show in the details view
         q = f"""
@@ -309,25 +312,29 @@ class DeviceView(BaseView):
         for line in execute_query(q):
             device = line[0].properties
         
+        # q=f"""
+        #     MATCH path=(d:Device)-[:HAS_INTERFACE|:HAS_NEIGHBOR*BFS..]-(d2:Device)
+        #     WHERE d.hostname = "{request_data['hostname']}" 
+        #     RETURN distinct path, d2.hostname
+        # """
         q=f"""
-            MATCH path=(d:Device)-[:HAS_INTERFACE|:HAS_NEIGHBOR*BFS..]-(d2:Device)
-            WHERE d.hostname = "{request_data['hostname']}" 
-            RETURN distinct path, d2.hostname
-        """
+            MATCH (n:Device)
+            WHERE n.hostname = "{hostname}"
+            CALL uplink_paths.get_path(n, 200, 5) YIELD * RETURN path, uplink.hostname"""
         # and d2.hostname =~ '.*CE.*'
-        valid_uplink_paths = []
-        for result in execute_query(q):
-            nodes = result[0].nodes
-            for node in nodes[1:-1]:
-                if "Device" in node.labels and "-CE" in node.properties.get("hostname"):
-                    break
-            else:
-                valid_uplink_paths.append({'nodes':nodes, 'relationships': result[0].relationships})
+        # valid_uplink_paths = []
+        # for result in execute_query(q):
+        #     nodes = result[0].nodes
+        #     for node in nodes[1:-1]:
+        #         if "Device" in node.labels and "-CE" in node.properties.get("hostname"):
+        #             break
+        #     else:
+        #         valid_uplink_paths.append({'nodes':nodes, 'relationships': result[0].relationships})
 
         
         device_network = Network(notebook=False, cdn_resources='in_line', height='800px')
-        for path in valid_uplink_paths:
-            for node in path['nodes']:
+        for path, uplink in execute_query(q):
+            for node in path.nodes:
                 
                 if "Device" in node.labels:
                     if node.properties["hostname"] == hostname:
@@ -344,7 +351,7 @@ class DeviceView(BaseView):
                     device_network.add_node(node.id, label=node.properties.get("name"), color="orange", shape="box", mass=1)
                 
 
-            edges = path['relationships']
+            edges = path.relationships
             for edge in edges:
                 device_network.add_edge(edge.start_id, edge.end_id)
         l2_html = device_network.generate_html()
@@ -412,7 +419,7 @@ class DeviceView(BaseView):
         request_data = request.args
         if not request_data.get('hostname'):
             return self.render_template('single_device.html', html="")
-        hostname=request_data['hostname']
+        hostname=request_data['hostname'].upper()
         q = f"""
             MATCH path=(d:Device)-[]-(i:Interface)-[]-(i2:Interface)-[]-(d2:Device)
             where d.hostname =~ "{hostname}"
