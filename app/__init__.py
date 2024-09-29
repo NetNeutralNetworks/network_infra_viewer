@@ -1,5 +1,5 @@
 import logging
-from .ncubed_security_manager import MySecurityManager
+from .cache import appCache
 from .views.overview import MapOverview
 from .views.devices import DevicesOverview
 from .views.connections import ConnectionOverview,CustomConnectionGraph,CEInterConnect
@@ -20,9 +20,11 @@ from .views.location_plotting import MatchDeviceToLocation
 
 from .api.location import LocationAPI
 from .api.span import SpanAPI
+from .api.line_name import LineNameAPI
 
 from flask import Flask
 from flask_appbuilder import AppBuilder, SQLA, IndexView
+
 
 
 """
@@ -32,10 +34,14 @@ logging.basicConfig(format="%(asctime)s:%(levelname)s:%(name)s:%(message)s")
 logging.getLogger().setLevel(logging.DEBUG)
 
 
+
 app = Flask(__name__)
 app.config.from_object("config")
+
 db = SQLA(app)
 
+
+appCache.init_app(app)
 
 class MyIndexView(IndexView):
     index_template = 'home.html'
@@ -44,15 +50,15 @@ appbuilder = AppBuilder(app, db.session, indexview=MyIndexView)
 
 # appbuilder.add_view(ConnectionOverview, "Layer2", category='Network')
 
-appbuilder.add_view(MapOverview, "Overview", category='Network Components', category_icon='fa-network-wired', icon='fa-map')
+appbuilder.add_view(MapOverview, "Overview", category='Network Components', category_icon='fa-chart-network', icon='fa-map')
 appbuilder.add_view(DevicesOverview, "All devices", category='Network Components', icon='fa-display')
 appbuilder.add_view(ServiceView, "All services", category='Network Components', icon='fa-circle-nodes')
 appbuilder.add_view(LocationView, "All locations", category='Network Components', icon='fa-location-dot')
 appbuilder.add_view(HardwareView, "All hardware", category='Network Components', icon='fa-server')
-appbuilder.add_view(ObjectTypeView, "All object types", category='Network Components', icon='fa-layer-group')
+appbuilder.add_view(ObjectTypeView, "All object types", category='Network Components', icon='fa-grid')
 appbuilder.add_view(RecommendationView, "Recommendations", category='Network Components', icon='fa-lightbulb')
 
-appbuilder.add_view(DualHoming, "Dualhoming mistakes", category='Anomalies', category_icon='fa-triangle-exclamation')
+appbuilder.add_view(DualHoming, "Dualhoming mistakes", category='Anomalies', category_icon='fa-hexagon-exclamation')
 appbuilder.add_view(Redundancy, "Redundancy mistakes", category='Anomalies')
 appbuilder.add_view(LineRedundancy, "Redundant uplink overlap", category='Anomalies')
 appbuilder.add_view(LineRedundancyMap, "Line redundancy mistakes plotted on a map", category='Anomalies')
@@ -82,3 +88,4 @@ appbuilder.add_view_no_menu(GenerateFakeScores)
 
 appbuilder.add_view_no_menu(LocationAPI)
 appbuilder.add_view_no_menu(SpanAPI)
+appbuilder.add_view_no_menu(LineNameAPI)

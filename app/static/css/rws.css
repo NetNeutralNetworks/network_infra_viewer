@@ -347,6 +347,7 @@
 body {
     height: 100vh;
     font-family: RijksoverheidSansWebText;
+    -webkit-font-smoothing: antialiased;
 }
 
 .hidden {
@@ -465,9 +466,7 @@ body {
 
 .nav-category {
     display: flex;
-    padding: var(--sizes-spacings-xsmall, 8px);
     /* align-items: center; */
-    gap: var(--sizes-spacings-xsmall, 8px);
     align-self: stretch;
     flex-direction: column;
     
@@ -505,11 +504,15 @@ body {
     background: var(--color-surface-primary-card, #2C5581);
     color: var(--color-text-body-onPrimary, #FFF);
 }
+.nav-item > .nav-link {
+    padding-left: 0px;
+}
 
 .nav-link {
     display: flex;
     /* padding: 6px 36px; */
     align-items: center;
+    padding: var(--sizes-spacings-xsmall, 8px);
     gap: var(--sizes-spacings-xsmall, 8px);
     color: var(--color-text-inactive, #B9C6D5);
     /* Body/Large */
@@ -561,7 +564,7 @@ body {
 }
 
 .current-menu-selected .nav-link{
-    margin: var(--sizes-spacings-xsmall, 8px) 0px 8px 36px;
+    margin: 0px 0px 0px 36px;
 
 }
 
@@ -574,10 +577,6 @@ body {
     margin-top: -8px;
     width: var(--sizes-sidebar-width, 256px);
     padding: 8px;
-}
-.menu-not-selected .nav-link{
-    margin: var(--sizes-spacings-xsmall, 8px) 0px var(--sizes-spacings-xsmall, 8px) 16px;
-
 }
 
 .marker-cluster-small {
@@ -617,29 +616,15 @@ font-family: RijksoverheidSansWebText;
     background: var(--color-surface-card, #FFF);
 }
 
-.leaflet-popup-content{
-    background: var(--color-surface-card, #FFF);
+.leaflet-left .leaflet-control {
+    margin-left: 24px;
+  }
+.leaflet-top .leaflet-control {
+    margin-top: 24px;
 }
-
-.popup-header{
-    color: var(--color-text-label-onDefault, #535353);
-    /* Forms/Label */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-forms-label, 11px);
-    font-style: normal;
-    font-weight: 700;
-    line-height: 16px; /* 145.455% */
-    letter-spacing: 0.88px;
-    text-transform: uppercase;
-}
-
-.popup-content{
-    color: var(--color-text-link, #01689B);
-    /* Heading/H3 */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-heading-H3, 19px);
-    font-style: normal;
-    font-weight: 700;
-    line-height: 24px; /* 126.316% */
-    text-transform: uppercase;
+.leaflet-right .leaflet-control {
+    margin-right: 24px;
+  }
+.leaflet-bottom .leaflet-control {
+    margin-bottom: 24px;
 }
