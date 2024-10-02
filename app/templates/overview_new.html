@@ -28,6 +28,9 @@ crossorigin=""></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
 crossorigin=""></script>
 <script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+<script src="https://unpkg.com/leaflet.markercluster.freezable@1.0.0/dist/leaflet.markercluster.freezable.js"></script>
+
+
 {% endblock %}
 
 {% block page_title %}
@@ -84,7 +87,7 @@ async function getapi(url, type) {
   
   // Storing data in form of JSON
   var data = await response.json();
-  console.log(data);
+//   console.log(data);
   if(type=='line'){
         show_DFC(data);
   }else if(type == 'node'){
@@ -94,6 +97,8 @@ async function getapi(url, type) {
 }
 var map = L.map('map', {zoomControl: false}).setView([52.2, 5.4], 7);
 
+var features = {}
+
 L.control.zoom({
     position: 'bottomright'
 }).addTo(map);
@@ -102,8 +107,10 @@ function render_markers(filter){
         marker_group.clearLayers()
         if (filter) {
                 filtered_markers = all_markers.filter((item)=> item.name.toUpperCase().includes(filter.toUpperCase()));
+                marker_group.disableClustering()
         } else {
                 filtered_markers = all_markers;
+                marker_group.enableClustering()
         }
         
         for (var i = 0; i < filtered_markers.length; i++) {
@@ -117,7 +124,7 @@ function render_markers(filter){
                 '
                 marker.bindPopup(popup_content);
                 marker.on('popupopen', function(e){
-                        console.log(e.popup._source.location)
+                        // console.log(e.popup._source.location)
                         fetch("/mapoverview/location/?location=" + e.popup._source.location)
                         .then(response => response.json())
                         .then(devices => {
@@ -129,10 +136,12 @@ function render_markers(filter){
                                         content += '<li><a href="\/deviceview\/show\/?hostname='+ devices[i] + '">'+devices[i] +'<\/a><\/li>'
                                 }
                                 content += '<\/ul><\/div>'
-                                document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
+                                // document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
+                                e.popup.setContent(content) ;
                         })
 
                 });
+                features[filtered_markers[i].name] = marker;
         }
         map.addLayer(marker_group)
 
@@ -202,7 +211,7 @@ function render_lines(filter){
                         maxWidth : 560
                 });
                 line.on('popupopen', function(e){
-                        console.log(e.popup._source.span)
+                        // console.log(e.popup._source.span)
                         fetch("/mapoverview/span/?span=" + e.popup._source.span)
                         .then(response => response.json())
                         .then(lines => {
@@ -215,29 +224,50 @@ function render_lines(filter){
                                         content += '<li><a href="#" onclick="set_filter(\''+ lines[i] +'\');return false;">'+lines[i]+'<\/a><\/li>'
                                          } }
                                 content += '<\/ul><\/div>'
-                                document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
+                                // document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
+                                e.popup.setContent(content) ;
                         })
 
                 });
+
+                features[span.spanid] = line;
         })
         map.addLayer(line_group)
         
 }
 
+function open_popup(id){
+        features[id].openPopup()
+}
+function close_popup(id){
+        // features[id].closePopup()
+}
+
 function loadTable(tableId, fields, data) {
-    //$('#' + tableId).empty(); //not really necessary
-    var rows = '';
-    $.each(data, function(index, item) {
-        var row = '<tr>';
-        $.each(fields, function(index, field) {
-            row += '<td>' + item[field+''] + '</td>';
+
+        // Clear Table
+        $('#' + tableId + ' tbody').html('');
+        $.each(data, function(index, item) {
+                var element = document.createElement("tr");
+                $.each(fields, function(index, field) {
+                        var table_data = document.createElement("td");
+                        table_data.innerHTML = item[field+'']
+                        element.appendChild(table_data)
+                });
+                element.addEventListener('mouseover', (function () {
+                        setTimeout(open_popup(item['id']), 400)
+                        
+                }));
+                element.addEventListener('mouseout', (function () {
+                        close_popup(item['id']);
+                }));
+                $('#' + tableId + ' tbody').append(element)
         });
-        rows += row + '<\/tr>';
-    });
-    $('#' + tableId + ' tbody').html(rows);
+    
 }
 
 function filter_search_results(){
+        features = {}
         filter = $('#overview-search-input')[0].value;
         if (filter) {
                 $('.filter-results-wrapper')[0].classList.remove('hidden')
@@ -257,12 +287,14 @@ function filter_search_results(){
         var search_results = []
         filtered_markers.forEach((element) => {
                 search_results.push({
+                        'id': element.name,
                         'name': element.name,
                         'type': 'Location'
                 })
         })
         filtered_lines.forEach((element) => {
                 search_results.push({
+                        'id': element.spanid,
                         'name': '<a href="/mapoverview/span/?span=' + element.spanid + '">' + element.spanid + '</a>',
                         'type': 'Fiber bundle'
                 })
