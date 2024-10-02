@@ -87,7 +87,6 @@ async function getapi(url, type) {
   
   // Storing data in form of JSON
   var data = await response.json();
-//   console.log(data);
   if(type=='line'){
         show_DFC(data);
   }else if(type == 'node'){
@@ -124,7 +123,6 @@ function render_markers(filter){
                 '
                 marker.bindPopup(popup_content);
                 marker.on('popupopen', function(e){
-                        // console.log(e.popup._source.location)
                         fetch("/mapoverview/location/?location=" + e.popup._source.location)
                         .then(response => response.json())
                         .then(devices => {
@@ -136,7 +134,6 @@ function render_markers(filter){
                                         content += '<li><a href="\/deviceview\/show\/?hostname='+ devices[i] + '">'+devices[i] +'<\/a><\/li>'
                                 }
                                 content += '<\/ul><\/div>'
-                                // document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
                                 e.popup.setContent(content) ;
                         })
 
@@ -263,7 +260,7 @@ function loadTable(tableId, fields, data) {
                 }));
                 $('#' + tableId + ' tbody').append(element)
         });
-    
+        $('#search-results-table thead tr th')[0].innerHTML = 'Objects ('+ data.length +')';
 }
 
 function filter_search_results(){
@@ -280,10 +277,6 @@ function filter_search_results(){
         var endTime = performance.now()
 
         console.log(`Call to filter took ${endTime - startTime} milliseconds`)
-        // let table = new DataTable('#search-results-table', {
-        //         paging: false,
-        //         searching: false,
-        // });
         var search_results = []
         filtered_markers.forEach((element) => {
                 search_results.push({
@@ -326,7 +319,9 @@ function debounce(callback, wait) {
       timeout = setTimeout(function () { callback.apply(this, args); }, wait);
   };
 }
-
+function toggleFilters(){
+        $('.filter-options-wrapper')[0].classList.toggle('hidden');
+}
 
 function generateSearchBarHTML(){
         var html = "<div class='search-panel-container'>\
@@ -336,9 +331,14 @@ function generateSearchBarHTML(){
                                         <input id='overview-search-input' type='text' placeholder='Search devices or line names' autofocus='true'><\/input>\
                                         <span onclick='clear_filter()'><i class='fa fa-close search-bar-icon search-bar-trailing-icon'><\/i><\/span>\
                                 <\/div>\
-                                <div class='filter-button'>\
+                                <div class='filter-button' onclick='toggleFilters()'>\
                                         <i class='fa-solid fa-bars-filter search-bar-filter-icon'><\/i>\
                                 <\/div>\
+                                <div class='filter-options-wrapper hidden'>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Not yet in use</div></div>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>In use</div></div>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Ready for removal</div></div>\
+                                                <\/div>\
                         <\/div>\
                         <div class='filter-results-wrapper hidden'>\
                                 <table class='table table-striped' id='search-results-table'>\
