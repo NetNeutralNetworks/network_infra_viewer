@@ -1,0 +1,131 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all aaa information.
+##################################################################################################
+
+```
+! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ users @@@@
+!
+username confscp
+ group root-lr
+ group cisco-support
+ secret «last_resort_password»
+!
+username rescue
+ group root-lr
+ group cisco-support
+ secret «last_resort_password»
+!
+! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Radius @@@@
+!
+aaa group server radius RADIUS-SRV
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!! Two Radius servers - same 2 IP's on every device !!!!
+!
+ server-private «radius_primary_address» auth-port 1645 acct-port 1646 key «radius_key»
+ server-private «radius_secondary_address» auth-port 1645 acct-port 1646 key «radius_key»
+ source-interface loopback0
+radius source-interface loopback0
+!
+! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ AAA @@@@
+aaa authentication login ADMINS group RADIUS-SRV
+aaa authentication login CONSOLE local
+aaa authorization exec ADMINS group RADIUS-SRV none
+aaa authorization exec CONSOLE local
+aaa authorization eventmanager default local
+aaa authorization commands ADMINS none
+aaa authorization commands CONSOLE none
+aaa accounting network ADMINS start-stop none
+aaa accounting exec CONSOLE start-stop none
+aaa accounting system ADMINS start-stop none
+aaa accounting commands default start-stop none
+```
+</doc>
+
+<macro>
+def pop_group(data):
+    [data.remove(x) for x in data if x == "group"]
+
+</macro>
+
+<lookup load='yaml' name='aaa'>
+server:
+  type:
+    radius: RADIUS
+    tacacs: TACACS
+source-network-instance:
+  default: DEFAULT_INSTANCE
+</lookup>
+
+<group name='root.system.aaa'>
+  <group name='authentication.users.user*' expand=''>
+username {{config.username}}
+ group {{config._roles | to_list | joinmatches(',')}}
+ secret {{config._encryption-level|to_int}} {{config.password-hashed}}
+  </group>
+</group>
+
+<group name='root.system.aaa.authentication.config' expand="" method="table">
+aaa authentication login default {{config.authentication-method | ORPHRASE | split(' ')}}
+</group>
+<group name='root.system.aaa.authentication._groups.group.{{group}}' expand="" method="table">
+aaa authentication login {{config.group-name | copy('group') | _start_ }} group {{config.authentication-method | ORPHRASE | split(' ') | macro('pop_group')}}
+aaa authentication login {{config.group-name | copy('group') | _start_ }} {{config.authentication-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>
+
+<group name='root.system.aaa.authorization.events.event**.{{event_type}}.config**' expand="" method="table" del="_drop">
+aaa authorization {{event-type | copy('event_type')}}
+aaa authorization {{event-type | copy('event_type')}} {{_drop | re('.*')}}
+</group>
+<group name='root.system.aaa.authorization.events.event**.{{event_type}}**._groups.group.{{group-name}}**' expand="" method="table">
+aaa authorization {{event_type}} {{config.group-name | copy('group-name')}} {{config.authorization-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>
+
+<group name='root.system.aaa.accounting.config**' expand="" method="table">
+aaa accounting send stop-record authentication failure{{_send-stop-on-auth-failure | set(True)}}
+aaa accounting update newinfo{{_send-update-on-new-info | set(True)}}
+aaa accounting update periodic {{_send-update-on-interval | to_int}}
+</group>
+<group name='root.system.aaa.accounting.events.event**.{{event_type}}**.config**' expand="" method="table" del="_drop">
+aaa accounting {{event-type | re('(?!send)\S+') | copy('event_type')}} {{ignore}} {{record | lookup('aaa.accounting.record')}} {{_drop | re('.*')}}
+</group>
+<group name='root.system.aaa.accounting.events.event**.{{event_type}}**._groups.group.{{group-name}}**' expand="" method="table">
+aaa accounting {{event_type | re('(?!send)\S+')}} {{config.group-name | copy('group-name')}} {{ignore}} {{config.accounting-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>
+
+<doc>
+##################################################################################################
+This part should capture all radius servers conforming to the example below
+##################################################################################################
+
+```
+aaa group server radius RADIUS-SRV
+ vrf Mgmt-intf
+ server-private 1.2.3.4 auth-port 1645 acct-port 1646
+  key 7 xxxxxxxx
+ !
+ server-private 1.2.3.5 auth-port 1645 acct-port 1646
+  key 7 xxxxxxxx
+ !
+ source-interface Loopback1
+!
+radius source-interface Loopback1 vrf Mgmt-intf
+```
+</doc>
+
+<group name='root.system.aaa**' expand=''>
+radius source-interface {{_radius.global.source-interface}} vrf {{_radius.global.network-instance | lookup('aaa.source-network-instance')}}
+radius source-interface {{_radius.global.source-interface}}
+</group>
+<group name='root.system.aaa.server-groups.server-group*' expand=''>
+aaa group server {{config.type | lookup('aaa.server.type')}} {{config.name}}
+ vrf {{config._network-instance | default('DEFAULT_INSTANCE')}}
+  <group name='servers.server*' expand=''>
+    <!-- {{radius.config._source-interface | set("RADIUS_GRP_SOURCE_ADDR")}}
+ {{radius.config._network-instance | set("RADIUS_GRP_SOURCE_NI")}} -->
+ server-private {{config.address | copy('config.name')}} auth-port {{radius.config.auth-port | to_int}} acct-port {{radius.config.acct-port | to_int}}
+  key {{radius.config._encryption_level|to_int}} {{radius.config.secret-key-hashed}}
+  </group>
+ source-interface {{config._source-interface}}
+!{{_end_}}
+</group>

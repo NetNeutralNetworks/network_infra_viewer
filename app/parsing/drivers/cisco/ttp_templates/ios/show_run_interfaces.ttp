@@ -1,0 +1,107 @@
+<vars>
+# template variable with custom regular expression:
+RE_INT = "(\S+Ethernet\S+|Serial\S+|Loopback\d+|Tunnel\d+)"
+</vars>
+
+<macro>
+def trunk_vlans_list(data):
+  vlans = data.get('trunk-vlans', '').split(',')
+  if vlans == ['none'] or vlans == ['']:
+    data["trunk-vlans"] = [None]
+  elif vlans:
+    vlans = list(map(int, vlans))
+    data["trunk-vlans"] = vlans
+  else:
+    data["trunk-vlans"] = []
+
+def trunk_vlans_all(data):
+  for name, interface in data[0]['root']['interfaces'].items():
+    if 'ethernet' in interface:
+      mode = interface.get('ethernet', {}).get('switched-vlan',{}).get('config', {})
+      if mode.get('interface-mode', "") == 'trunk' and 'trunk-vlans' not in mode:
+        mode['trunk-vlans'] = list(range(0,4096))
+        pass
+</macro>
+
+<group name='root.interfaces**.{{name}}**' expand="">
+interface {{ config.name | copy('name') | _start_ }}
+ description {{ config.description | _exact_space_ | ORPHRASE }}
+ shutdown{{config.enabled | set(False) | default(True)}}
+ speed {{config.port-speed | lookup('interface.speed')}}
+ duplex {{config.duplex-mode | lookup('interface.duplex')}}
+ negotiation auto{{config.auto-negotiate | set(True) | default(False)}}
+ udld port {{ config.udld.mode }}
+ ip vrf forwarding {{ config.vrf }}
+ ip address {{ config.ip | IP }} {{config.prefix-length | to_cidr}}
+ ip mtu {{ config.mtu | to_int }}
+ ip tcp adjust-mss {{ config.mss | to_int }}
+ dampening{{ config.dampening | set(True) | default(False)}}
+ carrier-delay msec {{config._carrier-delay-msec | to_int}}
+ spanning-tree {{config._spanning-tree | ORPHRASE}}
+ service-policy output {{config._service-policy-out}}
+ no ip directed-broadcast {{config.__.icmp.directed-broadcast | set(False) | default(True) }}
+ no ip redirects {{config.__.icmp.redirects | set(False) | default(True) }}
+ no ip unreachables {{config.__.icmp.unreachables | set(False) | default(True) }}
+ no ip proxy-arp {{ config.__.icmp.proxy-arp | set(False) | default(True) }}
+     <!-- <group name='config**.__.acls.acl'> -->
+ ip access-group {{ config.__.acls.acl.name }} {{ config.__.acls.acl.direction }}
+     <!-- </group> -->
+
+  <group name='config._hsrp.hsrp-group.{{virtual-router-id}}' expand=''>
+ standby {{virtual-router-id}} ip {{config.virtual-address}}
+ standby {{virtual-router-id}} timers {{config.advertisement-interval | to_int}} {{config._hold-time | to_int}}
+ standby {{virtual-router-id}} priority {{config.priority | to_int}}
+ standby {{virtual-router-id}} {{config.preempt | re("preempt") | let(True) | default(False)}} delay minimum {{config.preempt-delay | to_int}} reload {{config._preempt-delay-reload | to_int}}
+ standby {{virtual-router-id}} {{config.preempt | re("preempt") | let(True) | default(False)}} delay minimum {{config.preempt-delay | to_int}}
+ standby {{virtual-router-id}} {{config.preempt | re("preempt") | let(True) | default(False)}}
+ standby {{virtual-router-id}} track {{interface-tracking.config.track-interface | re("RE_INT")}} decrement {{interface-tracking.config.priority-decrement | to_int}}
+ standby {{virtual-router-id}} track {{interface-tracking.config._track-object | re("\d+")}} decrement {{interface-tracking.config.priority-decrement | to_int}}
+  </group>
+
+  <group name='config.logging.events*' itemize="event">
+ logging event {{event | ORPHRASE}}
+  </group>
+
+  <group name='aggregation'>
+ channel-group {{interface}} mode {{mode}}
+ lacp rate {{lacp.speed}}
+  </group>
+
+  <group name='tunnel'>
+ tunnel source {{source}}
+ tunnel destination {{ destination | IP }}
+ tunnel key {{ key_id | to_int }}
+ tunnel vrf {{ vrf }}
+  </group>
+
+  <group name="ethernet.switched-vlan.config**" expand="" functions="macro('trunk_vlans_list')">
+ switchport trunk allowed vlan {{trunk-vlans | unrange(rangechar='-', joinchar=',') | joinmatches(',') }}
+ switchport trunk allowed vlan add {{trunk-vlans | unrange(rangechar='-', joinchar=',') | joinmatches(',')}}{{_start_}}
+
+  </group>
+
+  <group name='ethernet.switched-vlan.config**' method='table'>
+ switchport mode {{interface-mode}}
+ switchport access vlan {{access-vlan | to_int}}
+  </group>
+
+  <group name='service*' expand=''>
+ service instance {{ name }} {{ type }}
+  description {{ config.description | ORPHRASE }}
+  encapsulation dot1q {{ vlan.config.vlan-id | to_int }}
+  encapsulation untagged {{ vlan.config.vlan-id | default(0) | to_int}}
+  l2protocol peer {{ vlan.config.l2-protocol }}
+  rewrite ingress tag {{ vlan.ingress-mapping.config.vlan-stack-action}} {{ vlan.ingress-mapping.config.__stack-action-count | to_int}} {{ vlan.ingress-mapping.config.__stack-action-direction}}
+  bridge-domain {{ bridge-domain }} split-horizon group 0
+ ##  {{ _ | _line_ | to_list }}
+   {{ignore('^\s\S')}}
+   {{ _end_ }}
+  </group>
+
+ {{ignore('description')}}
+##{{ _ | _line_ | to_list }}
+{{ignore('^\S')}}
+{{ _end_ }}
+</group>
+
+<output macro='trunk_vlans_all' />

@@ -1,0 +1,83 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all aaa information.
+##################################################################################################
+
+```
+aaa new-model
+!
+aaa authentication login NO_LOGIN none
+aaa authentication login ADMINS group radius local
+aaa authentication login CONSOLE local
+aaa authorization console
+aaa authorization exec NO_AUTHOR none
+aaa authorization exec ADMINS group radius local
+aaa authorization exec CONSOLE local
+aaa authorization network default group radius local
+aaa accounting send stop-record authentication failure
+aaa accounting update newinfo
+aaa accounting exec default start-stop group radius
+aaa accounting network default start-stop group radius
+aaa accounting connection default start-stop group radius
+aaa accounting system default start-stop group radius
+!
+aaa session-id common
+```
+</doc>
+
+<macro>
+def pop_group(data):
+    [data.remove(x) for x in data if x == "group"]
+
+</macro>
+
+<lookup load='yaml' name='aaa'>
+server:
+  type:
+    radius: RADIUS
+    tacacs: TACACS
+accounting:
+  record:
+    start-stop: START_STOP
+    stop-only: STOP
+</lookup>
+
+<group name='root.system.aaa**' expand='' method="table">
+ip radius source-interface {{_radius.global.source-interface}}
+</group>
+
+<group name='root.system.aaa.config**' expand="">
+aaa new-model {{_enabled | set(True) | default(False)}}
+aaa session-id {{_session-id}}
+</group>
+
+<group name='root.system.aaa.authentication.users.user*' expand="">
+username {{config.username}} privilege {{config.role|to_int}} secret {{config._encryption-level| to_int | lookup('crypto.algorithm')}} {{config.password-hashed}}
+</group>
+<group name='root.system.aaa.authentication.config' expand="" method="table">
+aaa authentication login default {{config.authentication-method | ORPHRASE | split(' ')}}
+</group>
+<group name='root.system.aaa.authentication._groups.group.{{group}}' expand="" method="table">
+aaa authentication login {{config.group-name | copy('group') | _start_ }} group {{config.authentication-method | ORPHRASE | split(' ') | macro('pop_group')}}
+aaa authentication login {{config.group-name | copy('group') | _start_ }} {{config.authentication-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>
+
+<group name='root.system.aaa.authorization.events.event**.{{event_type}}.config**' expand="" method="table" del="_drop">
+aaa authorization {{event-type | copy('event_type')}}
+aaa authorization {{event-type | copy('event_type')}} {{_drop | re('.*')}}
+</group>
+<group name='root.system.aaa.authorization.events.event**.{{event_type}}**._groups.group.{{group-name}}**' expand="" method="table">
+aaa authorization {{event_type}} {{config.group-name | copy('group-name')}} {{config.authorization-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>
+
+<group name='root.system.aaa.accounting.config**' expand="" method="table">
+aaa accounting send stop-record authentication failure{{_send-stop-on-auth-failure | set(True)}}
+aaa accounting update newinfo{{_send-update-on-new-info | set(True)}}
+aaa accounting update periodic {{_send-update-on-interval | to_int}}
+</group>
+<group name='root.system.aaa.accounting.events.event**.{{event_type}}**.config**' expand="" method="table" del="_drop">
+aaa accounting {{event-type | re('(?!send)\S+') | copy('event_type')}} {{ignore}} {{record | lookup('aaa.accounting.record')}} {{_drop | re('.*')}}
+</group>
+<group name='root.system.aaa.accounting.events.event**.{{event_type}}**._groups.group.{{group-name}}**' expand="" method="table">
+aaa accounting {{event_type | re('(?!send)\S+')}} {{config.group-name | copy('group-name')}} {{ignore}} {{config.accounting-method | ORPHRASE | split(' ') | macro('pop_group')}}
+</group>

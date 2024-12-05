@@ -1,0 +1,37 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running-config" and extract all QOS information.
+##################################################################################################
+```
+class-map match-all ALL_TRAFFIC
+ match qos-group 20
+!
+policy-map EXTEND_OUTPUT_QUEUE
+ class ALL_TRAFFIC
+ class class-default
+  queue-limit 491520 bytes
+```
+</doc>
+
+<group name='qos.maps*'>
+class-map match-{{type}} {{name}}
+ <group name='match*' itemize="match">
+ match {{match | re('vlan\s+\d+') }}
+ match {{match | ORPHRASE }}
+ </group>
+</group>
+
+<group name='qos.policies*'>
+policy-map {{name}}
+ <group name='classes*'>
+ class {{name}}
+  shape average {{shape-average-kbps}}
+   service-policy {{service-policy}}
+  bandwidth {{bandwidth}}
+  queue-limit {{queue_limit}} {{queue_limit_units}}
+  <group name='unforseen_commands*' itemize="command">
+  {{ command | _line_ | _exact_space_ }}
+  </group>
+ {{ignore('\S+') }}{{ _end_ }}
+</group>
+</group>

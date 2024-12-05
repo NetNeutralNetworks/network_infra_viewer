@@ -1,0 +1,19 @@
+<group name='root.lldp**.config**' expand="">
+lldp run {{enabled | set(True) | default(False)}}
+</group>
+
+<group name='root.lldp**.interfaces.interface.{{name_id}}.config**' expand="">
+interface {{name | copy('name_id') | _start_}}
+ no lldp transmit{{_transmit-enabled | set(False)}}
+ no lldp receive{{_receive-enabled | set(False)}}
+</group>
+
+<group name='root._cdp**.config**'>
+no cdp run {{enabled | set(False) | default(True)}}
+</group>
+
+<group name='root._cdp**.interfaces.interface.{{name_id}}.config**' expand="">
+interface {{name | copy('name_id') | _start_}}
+ no cdp run {{enabled | set(False)}}
+ no cdp enable {{enabled | set(False)}}
+</group>

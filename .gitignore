@@ -1,0 +1,8 @@
+app/parsing/drivers/validators/
+app/parsing/render_templates/
+*.env
+app/parsing/_deprecated/
+app/parsing/docs/
+app/parsing/drivers/tests/validators/
+__pycache__/
+*.pyc

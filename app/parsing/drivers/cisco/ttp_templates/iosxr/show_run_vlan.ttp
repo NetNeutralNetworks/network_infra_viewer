@@ -1,0 +1,31 @@
+<macro>
+def expand_vlan(data):
+    vlans = data[0].get('root', {}).get('vlans', {})
+    vlan_ranges = data[0].get('root', {}).get('temp_vlans', [])
+    for vlan_range in vlan_ranges:
+        vlan_name = vlan_range.get('name')
+        for vlan in vlan_range['vlan_ids'].split(','):
+            vlans[vlan] = {'config': {'vlan-id': int(vlan)}}
+            if vlan_name:
+                vlans[vlan].update({'name': vlan_name})
+                vlans[vlan]['config']['name'] = vlan_name
+
+    data[0].get('root', {}).pop('temp_vlans', None)
+</macro>
+
+<group name='root.bridge-domain.{{bd-id}}**'>
+bridge-domain {{bd-id}}
+</group>
+
+<group name='root.vlans.{{vlan-id}}**' expand=''>
+vlan {{config.vlan-id | | re('\\d+') | to_int | copy('vlan-id')}}
+ name {{config.name | copy('name')}}
+</group>
+
+
+<group name='root.temp_vlans*'>
+vlan {{vlan_ids | re('\\d+-\\d+') | unrange('-',',')}}
+ name {{name}}
+</group>
+
+<output macro='expand_vlan' />

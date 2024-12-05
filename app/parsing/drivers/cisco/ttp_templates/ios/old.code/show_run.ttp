@@ -1,0 +1,317 @@
+<macro>
+def out_move_management_servers(data):
+    servers = data[0].get('__system', {}).get('servers', {})
+    data[0]['system'].update(servers)
+    return data
+
+def out_remove_groups_lookup(data):
+    grp_list = []
+    for group in data[0].keys():
+        if group.startswith('__'):
+            grp_list.append(group)
+
+    for grp in grp_list:
+        data[0].pop(grp)
+
+    return data
+
+def move_vrf_interface(data):
+    for interface in data[0].get('interfaces', {}).get('interface', []):
+      vrf_info = interface.get('__vrf_instance')
+      
+      if vrf_info:
+        for network_instance in data[0].get('network-instances', {}).get('network-instance', []):
+          if network_instance.get('name') == vrf_info.get('vrf'):
+            if network_instance.get('interfaces', {}).get('interface'):
+              network_instance['interfaces']['interface'].append(interface['name'])
+            else:
+              network_instance['interfaces'] = {'interface': [interface['name']]}
+        del interface['__vrf_instance']
+    return data
+
+def copy_name(data):
+    return data, {'name': data}
+
+</macro>
+
+<lookup load='yaml' name='aaa'>
+server:
+  type:
+    radius: RADIUS
+    tacacs: TACACS
+</lookup>
+
+<lookup load='yaml' name='crypto'>
+algorithm:
+  0: UNENCRYPTED
+  4: SHA-256
+  5: MD5
+  7: VIGENERE
+  8: PBKDF2-SHA-256
+  9: SCRYPT
+</lookup>
+
+<lookup load='yaml' name='logging'>
+severity:
+  debug: DEBUG
+  debugging: DEBUG
+  info: INFORMATIONAL
+</lookup>
+
+<lookup load='yaml' name='network_instances'>
+protocol_id:
+  bgp: BGP
+  isis: ISIS
+isis_level:
+  level-1-only: level-1
+  level-1: level-1
+  level-2-only: level-2
+  level-2: level-2
+  level-1-2: level-1-2
+afi_type:
+  ipv4: IPV4
+  ipv6: IPV6
+safi_type:
+  unicast: UNICAST
+  multicast: MULTICAST
+</lookup>
+
+<lookup load='yaml' name='ntp'>
+key-type:
+  md5: NTP_AUTH_MD5
+</lookup>
+
+<lookup load='yaml' name='snmp'>
+access_type:
+  RO: UNIDIRECTIONAL
+  RW: BIDIRECTIONAL
+auth_protocol:
+  md5: MD5
+  sha: SHA-1
+priv_protocol:
+  aes-128: AES-128
+</lookup>
+
+<vars load='yaml'>
+banner_regex_start: '\^C'
+banner_regex_end: '\^C'
+</vars>
+
+
+<group name='__system.aaa.authorization.{{ name }}**' expand=''>
+aaa authorization exec {{ name | _start_ }} group {{ authorization-method | ORPHRASE | split() }}
+aaa authorization exec {{ name | _start_ }} {{ authorization-method | to_list }}
+</group>
+
+<group name='__system.aaa.authentication.{{ name }}**' expand=''>
+aaa authentication login {{ name }} group {{ authentication-method | ORPHRASE | split() }}
+aaa authentication login {{ name | _start_ }} {{ authentication-method | to_list }}
+</group>
+
+<group name='system.aaa' expand=''>
+line vty 0 4 {{_start_ | _exact_}}
+    <group name='authorization**' expand='' lookup='"config", group="__system.aaa.authorization"'>
+ authorization exec {{ config }}
+    </group>
+    <group name='authentication**' expand='' lookup='"config", group="__system.aaa.authentication"'>
+ login authentication {{ config }}
+    </group>
+</group>
+
+<group name='system.aaa._console_authorization' expand=''>
+aaa authorization console {{ enabled | set(True) | default(False)}}
+</group>
+
+
+<group name='system.aaa.authentication.users.user*' expand=''>
+username {{username}} privilege {{config.role}} secret {{config._crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm' ) }} {{ config.password-hashed }}
+</group>
+<group name='system.aaa.authentication.admin-user' expand=''>
+enable secret {{config._crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm' ) }} {{ config.password-hashed }}
+</group>
+
+
+<group name='system.aaa.server-groups.server-group*' expand=''>
+aaa group server radius {{name}}
+{{ config.type | set('RADIUS')}}
+  <group name='servers.server*' method='table' expand=''>
+ server-private {{address}} key {{radius.config._crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm' ) }} {{ radius.config.secret-key-hashed }}
+##TODO: Add radius source to all servers
+  </group>
+
+
+  <group name='servers.server*' method='table' expand=''>
+radius-server host {{address}}
+radius-server host {{address}} auth-port {{radius.config.auth-port}} acct-port {{radius.config.acct-port}}
+radius-server host {{address}} acct-port {{radius.config.acct-port}} auth-port {{radius.config.auth-port}}
+  </group>
+ 
+</group>
+
+
+<group name='system.config' expand=''>
+## Separate group to capture the login banner.
+  <group name='_'>
+banner login {{ ignore("banner_regex_start") }}{{ _start_ }}
+banner login {{ _start_ }}
+{{ login-banner | _line_ | joinmatches("\n") }}
+^C{{ _end_ }}
+!{{ _end_ }}
+  </group>
+
+## Separate group to capture the motd banner.
+    <group name='_'>
+banner motd {{ ignore("banner_regex_start") }}{{ _start_ }}
+banner motd {{ _start_ }}
+{{ motd-banner | _line_ | joinmatches("\n") }}
+^C{{ _end_ }}
+!{{ _end_ }}
+    </group>
+  <group name='_'>
+hostname {{ hostname | resuball('','"') | record("host")}}
+  </group>
+
+  <group name='_'>
+ip domain name {{ domain-name | _start_}}
+ip domain-name {{ domain-name | _start_}}
+  </group>
+
+  <group name='_' expand=''>
+no service pad {{ _pad | set(False) | default(True)}}
+  </group>
+  
+  <group name='_' expand=''>
+no vstack {{_zero-touch-install | set(False) | default(True)}}
+  </group>
+
+  <group name='_' expand=''>
+no service password-recovery {{ _password-recovery | set(False) | default(True)}}
+  </group>
+
+
+
+  <group name='_' expand=''>
+no service config {{ _tftp-config-lookup | set(False) | default(True)}}
+  </group>
+
+  <group name='_' expand=''>
+memory reserve console {{ _reserved-console-memory | default(None)}}
+  </group>
+
+  <group name='_' expand=''>
+service password-encryption {{ _password-encryption | set(True) | default(False)}}
+  </group>
+  <group name='_' expand=''>
+aaa local authentication attempts max-fail {{ _max-fail-local_login}}
+  </group>
+
+
+
+</group>
+
+<group name='__system.servers' expand=''>
+line vty 0 4 {{_start_}}{{_exact_}}
+ transport input ssh {{telnet-server.config.enabled | set(False) | default(True)}} {{ssh-server.config.enabled | set(True) | default(False)}}
+</group>
+
+
+
+
+<group name='system.logging.remote-servers.remote-server*' method='table' expand=''>
+logging {{ host | re('IP') | record(log_host)}} 
+logging host {{ host | re('IP') | record(log_host)}} 
+</group>
+
+<group name='system.ntp' expand=''>
+    <group name='config' expand=''>
+ntp authenticate {{enable-ntp-auth | set(True) | default(False)}}
+ntp source {{ntp-source-address}}
+    </group>
+    <group name='ntp-keys.ntp-key*' expand=''>
+ntp authentication-key {{key-id}} {{ config.key-type | lookup('ntp.key-type') }} {{config.key-value}} {{ config._crypto-algorithm | re('DIGIT') | to_int | lookup('crypto.algorithm') }}
+    </group>
+    <group name='servers.server*' expand=''>
+ntp server {{address}} key 1 {{config.prefer | re('prefer') | let(True)}}
+ntp server {{address | _start_}} key 1
+    </group>
+</group>
+
+<group name='system.dns' expand=''>
+    <group name='config' expand=''>
+no ip domain lookup {{enabled | set (False) | default(True)}}
+    </group>
+    <group name='servers.server*' expand=''>
+ip name-server {{address | re('IP') }}
+    </group>
+</group>
+
+
+
+<group name='lldp.config' expand="">
+lldp run {{enable | set(True) | default(False)}}
+</group>
+
+<group name='lldp.interfaces.interface*' expand="">
+interface {{name | _start_}}
+ no lldp transmit {{config.enabled | set(False) | default(True)}} {{config._transmit-enabled | set(False) | default(True)}}
+ no lldp receive {{config.enabled | set(False) | default(True)}} {{config._receive-enabled | set(False) | default(True)}}
+</group>
+
+<group name='_cdp.config' expand="">
+{{enable | _start_ | let(enable, False) | default(True)}} cdp run
+</group>
+
+<group name='snmp.contact' expand="">
+snmp-server location {{location | ORPHRASE}}
+snmp-server contact {{name | ORPHRASE}}
+</group>
+
+<group name='network-instances.network-instance*' expand=''>
+ip vrf {{config.name | macro("copy_name")}}
+ rd {{config.route-distinguisher}}
+</group>
+
+  
+<group name='interfaces.interface*' expand=''>
+interface {{name}}
+ description {{config.description | ORPHRASE}}
+  <group name='__vrf_instance' expand=''>
+ ip vrf forwarding {{ vrf }}
+  </group>
+  <group name='ethernet' expand=''>
+ switchport access vlan {{switched-vlan.config.access-vlan}}
+ switchport mode access {{switched-vlan.config.interface-mode | set("ACCESS")}}
+ switchport mode trunk {{switched-vlan.config.interface-mode | set("TRUNK")}}
+  </group>
+  <group name='routed-vlan.ipv4.addresses.address*' expand=''>
+## If devices has an IP it is of type: oc-vlan
+ ip address {{config.ip | IP | let("config.type","oc-vlan")}} {{config.prefix-length | to_cidr}}
+  </group>
+## no ip redirects
+## no ip proxy-arp
+ shutdown {{ disabled | set("True") }}
+!{{_end_}}
+</group>
+
+<group name='vlans*' expand=''>
+vlan {{id}}
+ name {{name}}
+</group>
+
+<group name='vuln' expand=''>
+
+</group>
+
+<group name='' expand=''>
+</group>
+<group name='' expand=''>
+</group>
+
+## Move telnet/ssh servers
+<output name='move_management_servers' macro='out_move_management_servers'/>
+
+## Move interface.vrf to vrf.interface
+<output name='move_vrf_interface' macro='move_vrf_interface'/>
+
+## Remove groups used to preparse data. These groups start with '__' (double underscore).
+<output name='remove_groups_lookup' macro='out_remove_groups_lookup'/>

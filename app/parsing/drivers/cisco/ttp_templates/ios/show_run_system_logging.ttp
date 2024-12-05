@@ -1,0 +1,41 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all basic system information.
+##################################################################################################
+
+```
+logging buffered 500000 informational       (non-critical / minor)
+no logging console                          (non-critical / minor)
+!
+logging trap debugging                      (non-critical / minor)
+logging source-interface Loopback0          (critical / minor)
+!
+logging host 145.50.42.7                    (critical / minor)
+logging host 145.50.42.135                  (critical / minor)
+!
+```
+</doc>
+
+##############################################
+## system.logging
+##############################################
+<group name='root.system.logging._global**' expand=''>
+logging trap {{trap-level | default("INFORMATIONAL") }}
+</group>
+<group name='root.system.logging._global**' expand='' method="table">
+logging source-interface {{source-interface}}
+logging source-interface {{source-interface}} vrf {{network-instance }}
+</group>
+
+<group name='root.system.logging.console**' expand=''>
+no logging console {{config._enabled | set(False) | default(True) }}
+</group>
+
+<group name='root.system.messages**' expand=''>
+logging buffered {{config._log-size | to_int}} {{config.severity}}
+</group>
+
+<group name='root.system.logging.remote-servers.remote-server.{{host}}**' expand='' method='table'>
+logging host {{config.host | copy('host')}}
+logging {{config.host | copy('host')}}
+</group>

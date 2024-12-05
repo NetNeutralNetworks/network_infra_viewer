@@ -1,0 +1,41 @@
+<group name='root._snmp**'>
+snmp-server contact {{contact | ORPHRASE}}
+</group>
+
+<group name='root._snmp**'>
+snmp-server location {{location | ORPHRASE}}
+</group>
+
+<group name='root._snmp**'>
+snmp-server trap-source {{source_interface}}
+</group>
+
+<group name='root._snmp**'>
+snmp-server queue-length {{queue_length | to_int}}
+</group>
+
+<group name='root._snmp**'>
+snmp-server system-shutdown {{system_shutdown| set(True) | default(False)}}
+</group>
+
+<group name='root._snmp**'>
+snmp-server ifindex persist {{ifindex_persist| set(True) | default(False)}}
+</group>
+
+<group name='root._snmp**' >
+snmp-server ifmib stats cache {{ifmib_stats_cache| set(True) | default(False)}}
+</group>
+
+<group name='root._snmp**.hosts.{{host}}' method="table">
+snmp-server host {{host}} {{community}}
+snmp-server host {{host}} traps {{community}}
+</group>
+
+<group name='root._snmp.communities*' method="table">
+snmp-server community {{name}} {{access_type}} IPv4 {{acl}}
+</group>
+
+<group name='root._snmp.traps**.{{service}}*' method="table" itemize="items">
+snmp-server traps {{service | let('items', '')}}
+snmp-server traps {{service}} {{ items | ORPHRASE}}
+</group>

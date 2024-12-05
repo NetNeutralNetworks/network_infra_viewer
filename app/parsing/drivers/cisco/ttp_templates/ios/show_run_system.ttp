@@ -1,0 +1,134 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all basic system information.
+##################################################################################################
+
+```
+version 15.5
+no service pad
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+platform bfd allow-svi
+platform qos policer cpu queue 14 1000000 100000
+platform qos policer cpu queue 16 4000000 4000000
+platform qos policer cpu queue 18 112000 11200
+!
+hostname AMG-LDK2-CE69R-002
+!
+ip bgp-community new-format                 (critical / minor)
+!
+```
+</doc>
+
+<lookup name='system' load="yaml">
+ssh-server:
+  version:
+    '1': V1
+    '2': V2
+</lookup>
+
+<group name='root.system.config**' method="table">
+hostname {{hostname}}
+version {{cli_version}}
+</group>
+
+<group name='root.system.clock.config'>
+clock timezone {{timezone}} {{_hours-offset | to_int}} {{_minutes-offset | to_int}}
+</group>
+<group name='root.system.clock._daylight-saving-time.config'>
+clock summer-time {{timezone}} recurring {{start}} {{start-day}} {{start-month}} {{start-time}} {{end}} {{end-day}} {{end-month}} {{end-time}}
+</group>
+
+<group name='root.system.dns.config**' expand='' method="table">
+no ip domain lookup{{_enabled | set (False)}}
+<!-- TODO: This is partially broken. if both name and list is defined, only one of them is parsed -->
+ip domain list {{search | re(".*") | split}}
+ip domain name {{search | to_list}}
+</group>
+<group name='root.system.dns.servers.server' expand=''>
+ip name-server {{config.address | re(".*") | split(" ")}}
+</group>
+
+<group name='root.system.ssh-server.config**'>
+ip ssh version {{protocol-version | lookup('system.ssh-server.version') | let('enable', True)}}
+{{protocol-version | set('V1_V2')}}
+{{enable | set(True)}}
+</group>
+<group name='root.system._ssh-client.config**'>
+ip ssh source-interface {{source-interface}}
+</group>
+
+<group name='root.system._services'>
+    <group name='ftp**' method="table">
+ip ftp source-interface {{source_interface}}
+ip ftp username {{username}}
+ip ftp password {{ignore}} {{password}}
+    </group>
+    <group name='tftp'>
+ip tftp source-interface {{source_interface}}
+    </group>
+    <group name='dhcp-server**'>
+no service dhcp {{enabled | set(False) | default(True)}}
+    </group>
+    <group name='bootp-server**'>
+no ip bootp server{{enabled | set(False) | default(True)}}
+    </group>
+</group>
+
+<group name='root._web-server' expand=''>
+no ip http server {{http.enabled | set(False) | default(True)}}
+no ip http secure-server {{https.enabled | set(False) | default(True)}}
+</group>
+
+<!-- TODO: Refactor BFD to the correct location -->
+<group name='root.bfd**'>
+platform bfd allow-svi {{bfd_allow-svi | set(True)}}
+</group>
+<!-- TODO: move platform qos over to copp in OC -->
+<group name='root.platform_qos'>
+platform qos policer cpu queue {{queue|to_int }} {{continuous_rate|to_int }} {{burst_rate|to_int }}
+platform qos-policer queue {{queue|to_int| _start_}} {{continuous_rate|to_int }} {{burst_rate|to_int }}
+</group>
+
+<group name='root._cisco-specific**' method="table" expand="">
+enable secret {{enable-secret.encryption-level | to_int}} {{enable-secret.password-hashed}}
+no service pad{{x25-packet-assembly-disassembly | set(False)}}
+service password-encryption{{password-encryption| set(True)}}
+no service password-recovery{{password-recovery | set(False)}}
+<!-- IOS XE -->
+system disable password recovery switch {{password-recovery | let(False)}}
+ip bgp-community new-format{{bgp-community-new-format | set(True)}}
+ip finger{{accept-finger-protocol | set(True)}}
+    <group name='_' >
+no vstack{{_insecure-zero-touch-install | set(False)}}
+    </group>
+</group>
+
+<group name='root._cisco-specific.message-timestamps.{{message_type}}**' method="table" expand="">
+service timestamps {{message-type | copy('message_type')}} {{timestamp-type | re('datetime')}} {{options | ORPHRASE | split(' ')}}
+service timestamps {{message-type | copy('message_type')}} {{timestamp-type | re('uptime')}}
+</group>
+
+<group name='root._cisco-specific.tcp_keepalive**' method="table">
+service tcp-keepalives-in {{in | set(True)}}
+service tcp-keepalives-out {{out | set(True)}}
+</group>
+
+<group name='root._cisco-specific.udld**' method="table">
+udld {{mode}}
+udld message time {{message-time | to_int}}
+</group>
+
+<group name='root._cisco-specific.routing**' method="table">
+no ip source-route{{ipv4-source-routing | set(False)}}
+no ip routing{{ipv4-routing | set(False)}}
+</group>
+
+<group name='root.igmp**' method="table">
+ip igmp limit {{max_routes | to_int}}
+<group name='snooping**' method="table">
+no ip igmp snooping{{enabled | set(False) | default(True)}}
+ip igmp snooping tcn query solicit {{solicit| set(True) | default(False)}}
+</group>
+</group>

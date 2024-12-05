@@ -1,0 +1,25 @@
+
+<lookup load='yaml' name='interfaces'>
+admin_status:
+  administratively down: DOWN
+  down: DOWN
+  up: UP
+oper_status:
+  down: DOWN
+  up: UP
+</lookup>
+
+<group name="interfaces.interface">
+{{name|_start_}}.{{sub_int| isdigit | to_int}} is {{oper_status | lookup('interfaces.oper_status')}}
+{{name|_start_}} is {{oper_status | lookup('interfaces.oper_status')}} ({{ignore | ORPHRASE}})
+{{name|_start_}} is {{oper_status | lookup('interfaces.oper_status')}}
+admin state is {{admin_status | lookup('interfaces.admin_status')}}, [parent interface is {{ignore}}]
+admin state is {{admin_status | lookup('interfaces.admin_status')}}, Dedicated Interface
+admin state is {{admin_status | lookup('interfaces.admin_status')}}
+{{name|_start_}} is {{admin_status | lookup('interfaces.admin_status')}}, line protocol is {{oper_status | lookup('interfaces.oper_status')}}, autostate enabled
+{{name|_start_}} is {{admin_status | lookup('interfaces.admin_status')}} (Administratively down), line protocol is {{oper_status | lookup('interfaces.oper_status')}}, autostate enabled
+  Description: {{description | ORPHRASE}} Internet Address is {{ignore}}
+  Description: {{description | ORPHRASE}}
+
+{{_end_}}
+</group>

@@ -1,0 +1,30 @@
+<group name='root.routing-policy.policy-definitions.policy-definition.{{name}}.statements.statement.{{s_name }}' expand=''>
+route-map {{ name }} {{actions.config.policy-result | lookup('routing-policy-poldef-action')}} {{s_name}}
+  <group name='conditions**' expand=''>
+ match ip address prefix-list {{match-prefix-set.config.prefix-set}}
+  </group>
+  <group name='actions.bgp-actions.set-community' expand=''>
+ set community {{inline.config.communities | re(".*") | split() | _start_}} {{ config.options | re("additive") | lookup("routing-policy-poldef-bgp-community")}}
+ set community {{inline.config.communities | re(".*") | split() | _start_}} {{ config.options | re("delete") | lookup("routing-policy-poldef-bgp-community")}}
+ set community {{inline.config.communities | re(".*") | split() | _start_}}
+{{config.method | set('INLINE')}}
+{{config.options | set('REPLACE')}}
+  </group>
+  <group name='actions.bgp-actions.config' expand=''>
+ set metric {{set-med | to_int() }}
+  </group>
+</group>
+
+<vars>
+<!--
+ip prefix-list ALLOW-ONLY-CUCM-PREFIX seq 20 permit 10.0.0.0/8 le 28
+ ..28 | 10.0.0.0/8..28 | ["10.0.0.0", "8..28"] | "8..28"
+-->
+get_le_prefix = "prepend('prefix') | split('/') | item(-1)"
+</vars>
+<group name='root.routing-policy.defined-sets.prefix-sets.prefix-set.{{name}}.prefixes.prefix**.{{ip-prefix}} {{masklength-range}}**' expand='' method="table">
+ip prefix-list {{name}} seq {{config._sequence-id | to_int}} {{config._action}} {{config.ip-prefix | copy('ip-prefix') | let('config.masklength-range', 'exact') | let('masklength-range', 'exact')}}
+ip prefix-list {{name}} seq {{config._sequence-id | to_int}} {{config._action}} {{config.ip-prefix | copy('ip-prefix')}} {{config.masklength-range | re('ge \d+') | resub('ge (\d+)','\\1..32') | copy('masklength-range')}}
+ip prefix-list {{name}} seq {{config._sequence-id | to_int}} {{config._action}} {{config.ip-prefix | copy('ip-prefix')}} {{config.masklength-range | re('ge \d+ le \d+') | resub('ge (\d+) le (\d+)','\\1..\\2') | copy('masklength-range')}}
+ip prefix-list {{name}} seq {{config._sequence-id | to_int}} {{config._action}} {{config.ip-prefix | copy('ip-prefix') | record('prefix')}} {{config.masklength-range | re('le \d+') | resub('le (\d+)','..\\1') | chain('get_le_prefix') | copy('masklength-range')}}
+</group>

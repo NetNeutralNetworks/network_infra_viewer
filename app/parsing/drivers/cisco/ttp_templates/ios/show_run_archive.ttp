@@ -1,0 +1,26 @@
+<doc>
+```
+archive                     (non-critical / minor)
+ log config
+  logging enable
+  notify syslog contenttype plaintext
+  hidekeys
+ path tftp://145.50.42.25/$h-$t.cfg
+ write-memory
+ time-period 10000
+!
+```
+</doc>
+
+<group name='root.system._archival**'>
+archive{{_start_}}
+    <group name='log.{{command}}' expand="">
+ log {{command}}
+  logging enable{{enabled | set(True) | default(False)}}
+  notify {{notify.type}} contenttype {{notify.contenttype}}
+  hidekeys{{hidekeys | set(True)}}
+    </group>
+ path {{archive-sites | joinmatches(',')| split(',')}}
+ write-memory{{transfer-on-save | set(True)}}
+ time-period {{transfer-on-interval | to_int}}
+</group>

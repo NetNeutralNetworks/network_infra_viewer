@@ -1,0 +1,59 @@
+---
+version: "3.4"
+services:
+  fab:
+    build: ./
+    restart: always
+    env_file: "../env/.env"
+    volumes:
+      - ../env/config.py:/var/appbuilder/config.py
+      - ./:/var/appbuilder
+      - ncubed_flask_base:/var/lib/appbuilder/data
+    ports:
+      - 5000:5000
+    labels:
+      # Frontend
+      - "traefik.enable=true"
+      - "traefik.docker.network=netcube"
+      - "traefik.http.routers.fabdv.tls=true"
+      #- "traefik.http.routers.authentik.rule=Host(`${DNS_NAME}`)"
+      - "traefik.http.routers.fabdv.rule=Host(`fab.c0001.ncubed.io`)"
+      - "traefik.http.routers.fabdv.priority=10"
+      - "traefik.http.routers.fabdv.entrypoints=websecure"
+      - "traefik.http.services.fabdv.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.fabdv.headers.sslProxyHeaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.fabdv.middlewares=fabdv"
+  memgraph-platform:
+    restart: unless-stopped
+    image: "memgraph/memgraph-platform:latest"
+    ports:
+      - "7687:7687"
+      - "3000:3000"
+      - "7444:7444"
+    volumes:
+      - mg_lib:/var/lib/memgraph
+      - mg_log:/var/log/memgraph
+      - mg_etc:/etc/memgraph
+      - ./data:/etc/memgraph/data
+    environment:
+      - MEMGRAPH="--log-level=TRACE"
+    entrypoint: ["/usr/bin/supervisord"]
+    labels:
+      # Frontend
+      - "traefik.enable=true"
+      - "traefik.docker.network=netcube"
+      - "traefik.http.routers.memgraph.tls=true"
+      - "traefik.http.routers.memgraph.rule=Host(`memgraph.c0001.ncubed.io`)"
+      - "traefik.http.routers.memgraph.priority=10"
+      - "traefik.http.routers.memgraph.entrypoints=websecure"
+      - "traefik.http.services.memgraph.loadbalancer.server.port=3000"
+volumes:
+  ncubed_flask_base:
+  mg_lib:
+  mg_log:
+  mg_etc:
+
+
+networks:
+  fab-visualiser:
+    name: fab-visualiser

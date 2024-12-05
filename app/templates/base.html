@@ -1,0 +1,62 @@
+{% extends 'appbuilder/init.html' %}
+{% import 'appbuilder/baselib.html' as baselib %}
+
+{% block head_css%}
+{{ super() }}
+<link href="{{ url_for('static', filename='fontawesome/css/fontawesome.css') }}" rel="stylesheet" />
+<link href="{{ url_for('static', filename='fontawesome/css/brands.css') }}" rel="stylesheet" />
+<link href="{{ url_for('static', filename='fontawesome/css/solid.css') }}" rel="stylesheet" />
+<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block body %}
+        {% include 'appbuilder/general/confirm.html' %}
+        {% include 'appbuilder/general/alert.html' %}
+
+    {% block header %}
+    <div class="NIVR-header">
+        <div class="logo-wrapper">
+            <a href="{{appbuilder.get_url_for_index}}">
+                <img src="{{ url_for('static', filename='img/ncubed-large.png') }}" id="header_logo">
+            </a>
+        </div>
+        <div class="page-title-left">
+            <div class="main-title">
+                {% block page_title %}
+                {{ page_title|default('Page title')}}
+                {% endblock %}
+            </div>
+            <div class="sub-title">
+                {% block page_sub_title %}
+                Last updated: 23/01/2015 - 13/04-2024
+                {% endblock %}
+            </div>
+        </div>
+        <div class="page-title-right">
+            
+        </div>
+    </div>
+    {% endblock %}
+
+    
+
+    <div class="site-content">
+          
+
+        {% block navbar %}
+            {% include 'navbar.html' %}
+        {% endblock %}
+        {% block messages %}
+        {% include 'appbuilder/flash.html' %}
+        {% endblock %}
+        <div class="content">
+        {% block content %}
+        {% endblock %}
+        </div>
+
+    </div>
+
+    {% block footer %}
+    {% endblock %}
+{% endblock %}

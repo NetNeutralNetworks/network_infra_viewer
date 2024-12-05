@@ -1,0 +1,51 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all aaa information.
+##################################################################################################
+
+```
+ntp
+ authentication-key 1 md5 encrypted xxxxxxxx
+ authenticate
+ trusted-key xxxxxxxx
+ server vrf Mgmt-intf 145.50.42.21 key 1 prefer
+ server vrf Mgmt-intf 145.50.42.149 key 1
+ access-group ipv4 peer 96
+ source Loopback1
+ update-calendar
+!
+ntp
+ authentication-key 1 md5 clear «ntp_key»
+ authenticate
+ trusted-key 1
+ access-group ipv4 peer 96
+ update-calendar
+ source loopback0
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!! Two NTP servers - same 2 IP's on every device !!!!
+ server «ntp_primary_address» key 1 prefer
+ server «ntp_secondary_address» key 1
+!
+```
+</doc>
+
+<group name='root.system.ntp' expand='' record='NTP_SOURCE_ADDR' del='source_address'>
+ntp{{config.enabled | set(True)}}
+  <group name='ntp-keys.ntp-key.{{key-id}}**' expand=''>
+ authentication-key {{config.key-id | to_int | copy('key-id') | _start_}} {{ config.key-type | lookup('system-ntp.key-type') }} {{ignore}} {{config.key-value}}
+  </group>
+ authenticate{{config.enable-ntp-auth | set(True) | default(False)}}
+  <group name='ntp-keys.ntp-key.{{key-id}}.config**' expand=''>
+ trusted-key {{key-id | let('_trusted-key', True)}}
+  </group>
+  <group name='servers.server.{{address}}' expand=''>
+ server vrf {{config.network-instance }} {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }} {{config.prefer | re('prefer') | let(True)}}
+ server vrf {{config.network-instance }} {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }}
+ server {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }} {{config.prefer | re('prefer') | let(True)}}
+ server {{config.address | copy('address') | _start_}} key {{ config._key-id | to_int }}
+{{config.source-address | set("NTP_SOURCE_ADDR")}}
+  </group>
+ access-group ipv4 peer {{config._peer-acl}}
+ access-group ipv4 serve {{config._serve-acl}}
+ source {{source_address | record("NTP_SOURCE_ADDR")}}
+ update-calendar{{config._update-calendar | set(True)}}
+</group>

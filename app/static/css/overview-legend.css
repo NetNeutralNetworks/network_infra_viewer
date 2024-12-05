@@ -1,0 +1,84 @@
+.legend-panel-container{
+    display: flex;
+    width: 176px;
+    padding: var(--sizes-spacings-small, 16px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sizes-spacings-xsmall, 8px);
+
+    background: var(--color-surface-card, #FFF);
+    /* Elevation 3 */
+    box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.06);
+}
+
+.legend-header{
+    color: var(--color-text-label-onDefault, #535353);
+    /* Forms/Label */
+    font-family: 'Open Sans';
+    font-size: var(--typography-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+}
+
+.legend-body{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.legend-item{
+    display: flex;
+    height: var(--typography-heading-H4, 16px);
+    align-items: center;
+    gap: var(--sizes-spacings-xsmall, 8px);
+    align-self: stretch;
+}
+
+.legend-icon{
+    width: 6px;
+    height: 6px;
+    transform: rotate(-45deg);
+}
+
+.legend-description{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    flex: 1 0 0;
+    overflow: hidden;
+    color: var(--color-text-label-onDefault, #535353);
+    text-overflow: ellipsis;
+
+    /* Body/Small */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-small, 11px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 145.455% */
+}
+
+.legend-class-1{
+    background: var(--color-border-map-line-40, #EA99BE);
+}
+.legend-class-2{
+    background: var(--color-border-map-line-50, #DF669E);
+}
+.legend-class-3{
+    background: var(--color-border-map-line-60, #DF669D);
+}
+.legend-class-4{
+    background: var(--color-border-map-line-70, #DA4D8E);
+}
+.legend-class-5{
+    background: var(--color-border-map-line-80, #D5337D);
+}
+.legend-class-6{
+    background: var(--color-border-map-line-90, #CF1A6D);
+}
+.legend-class-7{
+    background: var(--color-border-map-line-100, #CA005D);
+}

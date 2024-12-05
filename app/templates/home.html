@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style>
+    body{
+        background-image: url("https://media.licdn.com/dms/image/C4D1BAQHJ8R07nh3m2Q/company-background_10000/0/1629376574519?e=1685952000&v=beta&t=HplkFwQmwnQMe_lnL69ap373iT4Km6-3sV5CLCuAYqA");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position-y: 25%;
+    }
+</style>
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+
+
+
+{% block content %}
+<!-- <img src="https://media.licdn.com/dms/image/C4D1BAQHJ8R07nh3m2Q/company-background_10000/0/1629376574519?e=1685952000&v=beta&t=HplkFwQmwnQMe_lnL69ap373iT4Km6-3sV5CLCuAYqA"> -->
+{% endblock %}

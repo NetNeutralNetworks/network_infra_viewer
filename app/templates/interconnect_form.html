@@ -1,0 +1,71 @@
+{% extends 'appbuilder/baselayout.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+
+{% endblock %}
+
+{% block body %}
+    {% block navbar %}
+    {{ super() }}
+    {% endblock %}
+
+    {% block messages %}
+    {{ super() }}
+    {% endblock %}
+
+    {% block content %}
+    <div style="margin:20px;">
+    
+        <form method="post">
+        
+          <fieldset>
+            <legend>Devices</legend>
+    
+            <label for="device_a">Device A:</label>
+            <select id="device_a" name="device_a">
+                {% for device in devices %}
+                  <option value="{{device}}">{{device}}</option>
+                {% endfor %}
+            </select>
+            <label for="device_b">Device B:</label>
+            <select id="device_b" name="device_b">
+                {% for device in devices %}
+                  <option value="{{device}}">{{device}}</option>
+                {% endfor %}
+            </select>
+          </fieldset>
+          <button type="submit" name="submit" value="plot">Plot!</button>
+    
+
+        </form>
+        
+      </div>
+      <script>
+        $(document).ready(function () {
+            $('select').selectize({
+                sortField: 'text'
+            });
+        });
+      </script>
+    {% endblock %}
+
+    {% block footer %}
+    {{ super() }}
+    {% endblock %}
+
+    {% block tail_js %}
+    {% endblock %}
+
+{% endblock %}

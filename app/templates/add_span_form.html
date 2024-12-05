@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block head_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+crossorigin=""/>
+{{ super() }}
+{% endblock %}
+{% block head_js %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
+crossorigin=""></script>
+{% endblock %}
+{% block content %}
+<div id="map" style="width:100%; height:50%; z-index:1;"></div>
+    
+<form method="post">
+
+  <fieldset>
+    
+    <legend>Add Span</legend>
+
+    <label for="span_id">Span id:</label>
+    <input type="text" id="span_id" name="span_id"><br />
+
+    <label for="path">Path:</label>
+    <input type="text" id="path" name="path"><br />
+
+    <label for="capacity">Number of fibers:</label>
+    <input type="number" id="capacity" name="capacity"><br />
+
+  </fieldset>
+  <button type="submit" name="submit" value="Add">Add!</button>
+
+
+</form>
+
+<script type="text/javascript">
+  var map = L.map('map', {zoomControl: false}).setView([52.2, 5.4], 7);
+  var path = [];
+  var line = L.polyline(
+        path,
+        {"color":"blue"}
+    ).addTo(map);
+
+  L.control.zoom({
+      position: 'bottomright'
+  }).addTo(map);
+
+  var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  map.on('click', function(e) {
+    var lat = e.latlng.lat.toFixed(6);
+    var lon = e.latlng.lng.toFixed(6);
+    
+    path.push([lat,lon]);
+    map.removeLayer(line)
+    line = L.polyline(
+        path,
+        {"color":"blue"}
+    ).addTo(map)
+
+    document.getElementById('path').value = JSON.stringify(path);;
+
+  });
+  </script>
+  
+{% endblock %}

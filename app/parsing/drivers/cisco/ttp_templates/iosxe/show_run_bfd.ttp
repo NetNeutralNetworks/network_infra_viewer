@@ -1,0 +1,5 @@
+<group name='root.bfd**.interfaces.interface.{{id}}' expand=''>
+interface {{config.id | copy('id')}}
+ bfd interval {{config.desired-minimum-tx-interval | to_int | let('config.enabled', True)}} min_rx {{config.required-minimum-receive | to_int}} multiplier {{config.detection-multiplier | to_int}}
+ no bfd echo{{config.enable-echo-mode | set(False)}}
+</group>

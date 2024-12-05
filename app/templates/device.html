@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block head_js %}
+{{ super() }}
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+      <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+      <div id="device" style="margin:20px;">
+        <!-- <datalist id="hostnames">
+          {% for hostname in hostnames %}
+          <option>{{hostname}}</option>
+          {% endfor %}
+        </datalist> -->
+              <form action="/connectionoverview/list/" method="get">
+                      <label for="query">Hostname</label>
+                      <br>
+                      <input type="text" name="query"
+                             placeholder="Search"
+                             value="{{ request.form['query'] }}"></input>
+                      <br>
+                      <button type="submit">Filter</button>
+                  </form>
+              <div style="width: 50%; float: left;">
+                {{html|safe}}
+              </div>
+              <div style="width: 50%; float: right;">
+                <form action="/l2pathoverview/show/" method="get">
+                  <label for="query">L2 path</label>
+                  <br>
+                  <input type="text" name="d1"
+                         placeholder="Device 1"
+                         value="{{ request.form['d1'] }}"></input>
+                  <input type="text" name="d2"
+                         placeholder="Device 2"
+                         value="{{ request.form['d2'] }}"></input>
+                  <br>
+                  <button type="submit">Find path</button>
+              </form>
+              </div>
+      </div>
+{% endblock %}

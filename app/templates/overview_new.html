@@ -1,0 +1,538 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+crossorigin=""/>
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/searchbox.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/overview-legend.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet-popup.css') }}">
+{{ super() }}
+{% endblock %}
+{% block head_js %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
+crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+crossorigin=""></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+crossorigin=""></script>
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+<script src="https://unpkg.com/leaflet.markercluster.freezable@1.0.0/dist/leaflet.markercluster.freezable.js"></script>
+
+
+{% endblock %}
+
+{% block page_title %}
+Network components - Overview
+{% endblock %}
+
+{% block content %}
+<div id="map" style="float: left; width:100%; height:100%; z-index:1;"></div>
+      <!-- <div id="details" style="float: right; width: 50%">
+              <form method="post">
+                <label for="query">Title</label>
+                <br>
+                <input type="text" name="query"
+                       placeholder="Search"
+                       value="{{ request.form['query'] }}"></input>
+                <br>
+                <label for="span_status">Span status</label>
+                      <br>
+                      <select id="span_status" name="span_status">
+                        <option value="all">alles</option>
+                        <option value="0">(0) nog niet in gebruik</option>
+                        <option value="1">(1) in gebruik</option>
+                        <option value="2">(2) klaar voor opheffing</option>
+                    </select>
+                      <button type="submit">Filter</button>
+                  </form>
+              Object:
+              <div>
+                      <table id="object-table" class="display">
+                              
+                      </table>
+              </div>
+      </div> -->
+
+<script type="text/javascript">
+
+var stringToColour = function(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+              hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      var colour = '#';
+      for (var i = 0; i < 3; i++) {
+              var value = (hash >> (i * 8)) & 0xFF;
+              colour += ('00' + value.toString(16)).substr(-2);
+      }
+      return colour;
+}
+
+async function getapi(url, type) {
+  
+  // Storing response
+  const response = await fetch(url);
+  
+  // Storing data in form of JSON
+  var data = await response.json();
+  if(type=='line'){
+        show_circuit(data);
+  }else if(type == 'node'){
+        show_Location(data);
+  }
+  return data
+}
+var map = L.map('map', {zoomControl: false}).setView([52.2, 5.4], 7);
+
+var features = {}
+
+L.control.zoom({
+    position: 'bottomright'
+}).addTo(map);
+
+function render_markers(filter){
+        marker_group.clearLayers()
+        if (filter) {
+                filtered_markers = all_markers.filter((item)=> item.name.toUpperCase().includes(filter.toUpperCase()));
+                marker_group.disableClustering()
+        } else {
+                filtered_markers = all_markers;
+                marker_group.enableClustering()
+        }
+        
+        for (var i = 0; i < filtered_markers.length; i++) {
+                var marker = L.marker([filtered_markers[i].latitude, filtered_markers[i].longtitude], { icon: svgIcon });
+                marker.location = filtered_markers[i].name
+                marker_group.addLayer(marker)
+                var popup_content = '<div class="popup-header">'+ filtered_markers[i].name +'<\/div>\
+                <div id="popup-content">\
+                        Getting data....\
+                <\/div>\
+                '
+                marker.bindPopup(popup_content);
+                marker.on('popupopen', function(e){
+                        fetch("/mapoverview/location/?location=" + e.popup._source.location)
+                        .then(response => response.json())
+                        .then(devices => {
+                                var content = '<div class="popup-header">\
+                                                        Location: ' + e.popup._source.location + '\
+                                                <\/div>\
+                                                <div class="popup-content">Device(s)<ul class="popup-list">'
+                                for (var i = 0; i < devices.length; i++) {
+                                        content += '<li><a href="\/deviceview\/show\/?hostname='+ devices[i] + '">'+devices[i] +'<\/a><\/li>'
+                                }
+                                content += '<\/ul><\/div>'
+                                e.popup.setContent(content) ;
+                        })
+
+                });
+                features[filtered_markers[i].name] = marker;
+        }
+        map.addLayer(marker_group)
+
+}
+function render_lines(filter){
+        line_group.clearLayers()
+        if (filter) {
+                filtered_lines = all_lines.filter((item) => item.spanid.includes(filter));
+                line_name_info.forEach(element => {
+                        if (element.line_name.includes(filter)) {
+                                filtered_lines = filtered_lines.concat(all_lines.filter((item2) => item2.spanid.includes(element.spanid)));
+                        }   
+                });
+        } else {
+                filtered_lines = all_lines;
+        }
+        
+        filtered_lines.forEach((span) =>{
+                var cable_color = '#CA005D'
+                // var cable_color = '#b8bfb2'
+                if (span.capacity <= 4 ){
+                        // opacity = 0.4
+                        cable_color = '#EA99BE'
+                }else if (span.capacity <= 8){
+                        // opacity = 0.5
+                        cable_color = '#DF669E'
+                }
+                else if (span.capacity <= 16){
+                        // opacity = 0.6
+                        cable_color = '#DF669D'
+                }
+                else if (span.capacity <= 32){
+                        // opacity = 0.7
+                        cable_color = '#DA4D8E'
+                }
+                else if (span.capacity <= 64){
+                        // opacity = 0.8
+                        cable_color = '#D5337D'
+                }
+                else if (span.capacity <= 128){
+                        // opacity = 0.9
+                        cable_color = '#CF1A6D'
+                }
+                else if (span.capacity > 128){
+                        // opacity = 1
+                        cable_color = '#CA005D'
+                }
+                var line = L.polyline(span.coords, {
+                        weight: 5,
+                        color : cable_color,
+                        // opacity: opacity
+                });
+                line.on('mouseover', function() {
+                        this.setStyle({
+                                weight: 15,   //or whatever style you wish to use;
+                        });
+                });
+                line.on('mouseout', function() {
+                        this.setStyle({
+                                weight: 5
+                        })
+                        this.bringToBack()
+                });
+                line.span = span.spanid
+                line_group.addLayer(line)
+                line.bindPopup("<a href='/mapoverview/span/?span=" + span.spanid + "'>" + span.spanid + "</a><table id='current_popup' style='width: 600px'></table>",{
+                        maxWidth : 560
+                });
+                line.on('popupopen', function(e){
+                        // console.log(e.popup._source.span)
+                        fetch("/mapoverview/span/?span=" + e.popup._source.span)
+                        .then(response => response.json())
+                        .then(lines => {
+                                var content = '<div class="popup-header">\
+                                                        Bundle: ' + e.popup._source.span + '\
+                                                <\/div>\
+                                                <div class="popup-content">Line(s)<ul class="popup-list">'
+                                for (var i = 0; i < lines.length; i++) {
+                                        if (lines[i] != ' '){
+                                        content += '<li><a href="#" onclick="set_filter(\''+ lines[i] +'\');return false;">'+lines[i]+'<\/a><\/li>'
+                                         } }
+                                content += '<\/ul><\/div>'
+                                // document.getElementsByClassName("leaflet-popup-content")[0].innerHTML = content;
+                                e.popup.setContent(content) ;
+                        })
+
+                });
+
+                features[span.spanid] = line;
+        })
+        map.addLayer(line_group)
+        
+}
+
+function open_popup(id){
+        features[id].openPopup()
+}
+function close_popup(id){
+        // features[id].closePopup()
+}
+
+function loadTable(tableId, fields, data) {
+
+        // Clear Table
+        $('#' + tableId + ' tbody').html('');
+        $.each(data, function(index, item) {
+                var element = document.createElement("tr");
+                $.each(fields, function(index, field) {
+                        var table_data = document.createElement("td");
+                        table_data.innerHTML = item[field+'']
+                        element.appendChild(table_data)
+                });
+                element.addEventListener('mouseover', (function () {
+                        setTimeout(open_popup(item['id']), 400)
+                        
+                }));
+                element.addEventListener('mouseout', (function () {
+                        close_popup(item['id']);
+                }));
+                $('#' + tableId + ' tbody').append(element)
+        });
+        $('#search-results-table thead tr th')[0].innerHTML = 'Objects ('+ data.length +')';
+}
+
+function filter_search_results(){
+        features = {}
+        filter = $('#overview-search-input')[0].value;
+        if (filter) {
+                $('.filter-results-wrapper')[0].classList.remove('hidden')
+        } else {
+                $('.filter-results-wrapper')[0].classList.add('hidden')
+        }
+        var startTime = performance.now()
+        render_lines(filter)
+        render_markers(filter)
+        var endTime = performance.now()
+
+        console.log(`Call to filter took ${endTime - startTime} milliseconds`)
+        var search_results = []
+        filtered_markers.forEach((element) => {
+                search_results.push({
+                        'id': element.name,
+                        'name': element.name,
+                        'type': 'Location'
+                })
+        })
+        filtered_lines.forEach((element) => {
+                search_results.push({
+                        'id': element.spanid,
+                        'name': '<a href="/mapoverview/span/?span=' + element.spanid + '">' + element.spanid + '</a>',
+                        'type': 'Fiber bundle'
+                })
+        })
+        loadTable('search-results-table', ['name','type'], search_results)
+        var bounds1 = line_group.getBounds();
+        var bounds2 = marker_group.getBounds();
+
+        map.flyToBounds(bounds1.extend(bounds2), {
+                animate: true,
+                duration:1
+        });
+}
+
+function set_filter(filter) {
+        $('#overview-search-input')[0].value = filter;
+        filter_search_results() 
+}
+
+function clear_filter(){
+        $('#overview-search-input')[0].value = '';
+        filter_search_results()
+}
+
+function debounce(callback, wait) {
+  let timeout;
+  return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(function () { callback.apply(this, args); }, wait);
+  };
+}
+function toggleFilters(){
+        $('.filter-options-wrapper')[0].classList.toggle('hidden');
+}
+
+function generateSearchBarHTML(){
+        var html = "<div class='search-panel-container'>\
+                        <div class='filter-wrapper'>\
+                                <div class='search-input'>\
+                                        <i class='fa fa-search search-bar-icon'><\/i>\
+                                        <input id='overview-search-input' type='text' placeholder='Search devices or line names' autofocus='true'><\/input>\
+                                        <span onclick='clear_filter()'><i class='fa fa-close search-bar-icon search-bar-trailing-icon'><\/i><\/span>\
+                                <\/div>\
+                                <div class='filter-button' onclick='toggleFilters()'>\
+                                        <i class='fa-solid fa-bars-filter search-bar-filter-icon'><\/i>\
+                                <\/div>\
+                                <div class='filter-options-wrapper hidden'>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Not yet in use</div></div>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>In use</div></div>\
+                                                        <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Ready for removal</div></div>\
+                                                <\/div>\
+                        <\/div>\
+                        <div class='filter-results-wrapper hidden'>\
+                                <table class='table table-striped' id='search-results-table'>\
+                                        <thead>\
+                                                <tr>\
+                                                <th scope='col'>Objects<\/th>\
+                                                <th scope='col'>Type<\/th>\
+                                                <\/tr>\
+                                        <\/thead>\
+                                        <tbody>\
+                                                <tr>\
+                                                <td>No data found<\/td>\
+                                                <td>No data found<\/td>\
+                                                <\/tr>\
+                                        <\/tbody>\
+                                <\/table>\
+                        <\/div>\
+                <\/div>";
+        return html
+}
+L.Control.SearchBar = L.Control.extend({
+        onAdd: function (map) {
+                var container = L.DomUtil.create('div');
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
+                container.id = "controlcontainer";
+                var headerTitle = this._sideBarHeaderTitle;
+                var menuItems = this._sideBarMenuItems;
+                var searchCallBack = this._searchfunctionCallBack;  
+                $(container).html(generateSearchBarHTML)
+                return container
+        }
+})
+
+L.control.searchbar = function(opts) {
+        return new L.Control.SearchBar(opts);
+}
+
+L.control.searchbar({
+    position: 'topleft'
+}).addTo(map);
+
+function generateLegendHTML(){
+        var html = "<div class='legend-panel-container'>\
+                        <div class='legend-header'>\
+                                fibre lines per bundle\
+                        <\/div>\
+                        <div class='legend-body'>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-1'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 4\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-2'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 8\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-3'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 16\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-4'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 32\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-5'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 64\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-6'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                Up to 128\
+                                        <\/div>\
+                                <\/div>\
+                                <div class='legend-item'>\
+                                        <div class='legend-icon legend-class-7'>\
+                                        <\/div>\
+                                        <div class='legend-description'>\
+                                                128+\
+                                        <\/div>\
+                                <\/div>\
+                        <\/div>\
+                <\/div>";
+        return html
+}
+L.Control.Legend = L.Control.extend({
+        onAdd: function (map) {
+                var container = L.DomUtil.create('div');
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
+                container.id = "controlcontainer";
+                var headerTitle = this._sideBarHeaderTitle;
+                var menuItems = this._sideBarMenuItems;
+                var searchCallBack = this._searchfunctionCallBack;  
+                $(container).html(generateLegendHTML)
+                return container
+        }
+})
+
+L.control.legend= function(opts) {
+        return new L.Control.Legend(opts);
+}
+
+L.control.legend({
+    position: 'topright'
+}).addTo(map);
+
+var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+var marker_group = L.markerClusterGroup();
+var line_group = L.markerClusterGroup();
+
+var all_markers
+var all_lines
+var filtered_markers
+var filtered_lines
+var line_name_info
+
+const svgIcon = L.divIcon({
+  html: `
+<svg width="32" height="35" viewBox="0 0 32 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_dd_2179_49776)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M23.6042 24.284C26.2881 22.0833 28.0005 18.7416 28.0005 15C28.0005 8.37258 22.6279 3 16.0005 3C9.37307 3 4.00049 8.37258 4.00049 15C4.00049 18.7188 5.6921 22.0425 8.34782 24.2436C8.50264 24.4437 8.67184 24.6362 8.85543 24.8198L11.7539 27.7183C14.0971 30.0614 17.8961 30.0614 20.2392 27.7183L23.0939 24.8636C23.2786 24.679 23.4486 24.4853 23.6042 24.284Z" fill="white"/>
+</g>
+<circle cx="16.0005" cy="15" r="7" fill="white" stroke="#154273" stroke-width="6"/>
+<defs>
+<filter id="filter0_dd_2179_49776" x="0.000488281" y="0" width="32" height="34.4756" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.24 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2179_49776"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="0.5"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.24 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_2179_49776" result="effect2_dropShadow_2179_49776"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_2179_49776" result="shape"/>
+</filter>
+</defs>
+</svg>`,
+  className: "",
+  iconSize: [32, 35],
+  iconAnchor: [16, 30],
+});
+
+
+
+$('#overview-search-input').keyup(debounce(filter_search_results, 500));
+
+fetch('/api/locations/v1/list')
+        .then(response => response.json())
+        .then(markers => {
+                all_markers=markers
+                render_markers()
+        }); 
+
+fetch('/api/spans/v1/list')
+        .then(response => response.json())
+        .then(spans => {
+                all_lines=spans
+                render_lines()                
+        });
+
+fetch('/api/line_names/v1/list')
+        .then(response => response.json())
+        .then(line_info => {
+                line_name_info=line_info              
+        })
+</script>
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

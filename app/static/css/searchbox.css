@@ -1,0 +1,178 @@
+.search-panel-container {
+    display: flex;
+    width: 360px;
+    flex-direction: column;
+    align-items: flex-start;
+    top:14px;
+    left:14px;
+    background: var(--color-surface-card, #FFF);
+    box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.06);
+}
+
+.search-input {
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    flex-grow:10;
+    border-right: 1px solid var(--color-border-light, #E6E6E6);
+}
+
+.search-bar-icon{
+    width: var(--typography-heading-H4, 16px);
+    height: var(--typography-heading-H4, 16px);
+    font-size: 13px;
+    justify-content: center;
+    align-items: center;
+}
+.search-bar-filter-icon{
+    width: var(--typography-heading-H4, 16px);
+    height: var(--typography-heading-H4, 16px);
+    font-size: 13px;
+    justify-content: center;
+    align-items: center;
+    padding-left: 2px;
+    padding-top: 2px;
+}
+
+.fa-search{
+    position: absolute;
+    font-size: 13px;
+    top:15px;
+    left:16px;
+}
+
+.search-bar-trailing-icon {
+    text-align: center;
+    font-size: 13px;
+    top: 15px;
+    position: absolute;
+    right: 48px;
+}
+
+.filter-button {
+    width:40px;
+    height:40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type=text] {
+    border: 2px solid transparent !important;
+}
+
+input[type=text]:focus {
+    outline: none;
+    border: 2px solid var(--color-border-selected-onDefault, #007BC7) !important;
+    background: var(--color-surface-card, #FFF) !important;
+    box-shadow: 0px 0px 0px 2px rgba(0, 123, 199, 0.25) !important;
+}
+
+#search-results-table{
+    color: var(--color-text-title-onDefault, #000);
+    margin: var(--sizes-spacings-medium, 24px);
+    /* Body/Regular - Bold */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-regular, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+#search-results-table th{
+    color: var(--color-text-title-onDefault, #000);
+    /* Body/Regular - Bold */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-regular, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+#search-results-table tr{
+    overflow: hidden;
+    /* color: var(--color-text-link, #01689B); */
+    text-overflow: ellipsis;
+    /* Body/Regular */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-regular, 13px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 123.077% */
+}
+#search-results-table tr:hover{
+    background: var(--color-surface-light-hovered, #E6E6E6);
+}
+
+
+#search-results-table > thead > tr > th {
+    border-bottom: 1px solid #000;
+}
+
+#search-results-table > tbody > tr > td {
+    border-bottom: none;
+}
+
+#overview-search-input {
+    flex-grow: 10;
+    border: none;
+    color: var(--color-text-body-onDefault, #000);
+    padding: var(--sizes-spacings-xsmall, 8px) 16px 8px 40px;
+    /* Forms/Value */
+    font-family: 'Open Sans';
+    font-size: var(--typography-forms-value, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+}
+
+.filter-wrapper {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    border-bottom: 1px solid var(--color-border-light, #E6E6E6);
+}
+
+.filter-results-wrapper {
+    display: flex;
+    align-items: flex-start;
+    align-self: stretch;
+    max-height: calc(100vh - 80px - 40px - var(--sizes-spacings-medium, 24px) - var(--sizes-spacings-medium, 24px));
+    overflow: scroll;
+}
+
+.filter-options-wrapper {
+    display: flex;
+    width: 240px;
+    flex-direction: column;
+    align-items: flex-start;
+
+    position: absolute;
+    top: 45px;
+    right: 0px;
+
+    border: 2px solid var(--color-border-selected-onDefault, #007BC7);
+    background: var(--color-surface-card, #FFF);
+    box-shadow: 0px 0px 0px 2px rgba(0, 123, 199, 0.25);
+}
+.filter-checkbox{
+    display: flex;
+    padding: 4px 12px;
+    align-items: center;
+    gap: var(--density-spacings-xsmall, 8px);
+    align-self: stretch;
+}
+.filter-checkbox input:checked{
+    border-radius: 2px;
+    background: var(--color-icon-primary, #154273);  
+}
+.filter-checkbox{
+    color: var(--color-text-body-onDefault, #000);
+    /* Body/Large */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-large, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+}

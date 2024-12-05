@@ -1,0 +1,31 @@
+<vars>
+# template variable with custom regular expression:
+RE_INT = "(\S+Ethernet\S+|Serial\S+|Loopback\d+|Tunnel\d+)"
+</vars>
+
+<group name='root.stp**' method="table" expand="">
+spanning-tree mode {{global.config.enabled-protocol | default('_PVST') | lookup('stp.mode') | to_list}}
+spanning-tree bridge assurance{{global.config.bridge-assurance | set(True) | default(False)}}
+spanning-tree etherchannel guard misconfig{{global.config.etherchannel-misconfig-guard | set(True) | default(False)}}
+spanning-tree guard loop{{global.config.loop-guard | set(True) | default(False)}}
+spanning-tree portfast bpduguard default{{global.config.bpdu-guard | set(True) | default(False)}}
+spanning-tree portfast bpdufilter default{{global.config.bpdu-filter | set(True) | default(False)}}
+spanning-tree mst max-hops {{mstp.config.max-hop | to_int}}
+<!-- bpduguard-timeout-recovery -->
+</group>
+
+<group name='root.stp.mstp.mst-instances.mst-instance.{{mst-id}}' method="table" expand="">
+spanning-tree mst {{config.mst-id | copy('mst-id')}} priority {{config.bridge-priority | to_int}}
+</group>
+
+<group name='root.stp.interfaces.interface.{{name}}' expand="">
+interface {{ config.name | copy('name') }}
+ spanning-tree guard {{config.guard | lookup('stp.guard') | default('NONE')}}
+ <!-- EDGE_DISABLE, EDGE_AUTO -->
+ spanning-tree portfast{{config.edge-port | set('EDGE_ENABLE') | let('config.link-type', 'P2P')}}
+ spanning-tree portfast trunk{{config.edge-port | set('_EDGE_TRUNK_ENABLE') | let('config.link-type', 'P2P')}}
+{{config.edge-port | set('EDGE_AUTO')}}
+ spanning-tree link-type point-to-point{{config.link-type | set('P2P') | default('SHARED')}}
+ spanning-tree bpduguard enable{{config.bpdu-guard | set(True) | default(False)}}
+ spanning-tree bpdufilter enable{{config.bpdu-filter | set(True) | default(False)}}
+</group>

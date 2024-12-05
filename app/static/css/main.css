@@ -1,0 +1,618 @@
+:root {
+    /* THEMES */
+    --sizes-sidebar-width-default: 256px;
+    --sizes-sidebar-width-rem-default: 16rem;
+    --sizes-sidebar-width-power-bi: 256px;
+    --sizes-sidebar-width-rem-power-bi: 16rem;
+    --typography-font-family-default: "Calibri";
+    --typography-font-family-power-bi: "Calibri";
+    --typography-heading-h1-default: 27px;
+    --typography-heading-h1-rem-default: 1.6875rem;
+    --typography-heading-h1-power-bi: 27px;
+    --typography-heading-h1-rem-power-bi: 1.6875rem;
+    --typography-heading-h2-default: 23px;
+    --typography-heading-h2-rem-default: 1.4375rem;
+    --typography-heading-h2-power-bi: 23px;
+    --typography-heading-h2-rem-power-bi: 1.4375rem;
+    --typography-heading-h3-default: 19px;
+    --typography-heading-h3-rem-default: 1.1875rem;
+    --typography-heading-h3-power-bi: 19px;
+    --typography-heading-h3-rem-power-bi: 1.1875rem;
+    --typography-heading-h4-default: 16px;
+    --typography-heading-h4-rem-default: 1rem;
+    --typography-heading-h4-power-bi: 16px;
+    --typography-heading-h4-rem-power-bi: 1rem;
+    --typography-heading-h5-default: 14px;
+    --typography-heading-h5-rem-default: 0.875rem;
+    --typography-heading-h5-power-bi: 14px;
+    --typography-heading-h5-rem-power-bi: 0.875rem;
+    --typography-body-small-default: 11px;
+    --typography-body-small-rem-default: 0.6875rem;
+    --typography-body-small-power-bi: 11px;
+    --typography-body-small-rem-power-bi: 0.6875rem;
+    --typography-body-regular-default: 13px;
+    --typography-body-regular-rem-default: 0.8125rem;
+    --typography-body-regular-power-bi: 13px;
+    --typography-body-regular-rem-power-bi: 0.8125rem;
+    --typography-body-large-default: 15px;
+    --typography-body-large-rem-default: 0.9375rem;
+    --typography-body-large-power-bi: 15px;
+    --typography-body-large-rem-power-bi: 0.9375rem;
+    --typography-forms-label-default: 11px;
+    --typography-forms-label-rem-default: 0.6875rem;
+    --typography-forms-label-power-bi: 11px;
+    --typography-forms-label-rem-power-bi: 0.6875rem;
+    --typography-forms-value-default: 15px;
+    --typography-forms-value-rem-default: 0.9375rem;
+    --typography-forms-value-power-bi: 15px;
+    --typography-forms-value-rem-power-bi: 0.9375rem;
+    --typography-button-regular-default: 14px;
+    --typography-button-regular-rem-default: 0.875rem;
+    --typography-button-regular-power-bi: 15px;
+    --typography-button-regular-rem-power-bi: 0.9375rem;
+    --typography-button-large-default: 15px;
+    --typography-button-large-rem-default: 0.9375rem;
+    --typography-button-large-power-bi: 16px;
+    --typography-button-large-rem-power-bi: 1rem;
+    --typography-forms-link-default: 13px;
+    --typography-forms-link-rem-default: 0.8125rem;
+    --typography-forms-link-power-bi: 13px;
+    --typography-forms-link-rem-power-bi: 0.8125rem;
+    --typography-forms-placeholder-default: 15px;
+    --typography-forms-placeholder-rem-default: 0.9375rem;
+    --typography-forms-placeholder-power-bi: 15px;
+    --typography-forms-placeholder-rem-power-bi: 0.9375rem;
+    --color-text-pagetitle-default: var(--lintblauw-100);
+    --color-text-pagetitle-power-bi: var(--lintblauw-100);
+    --color-text-title-ondefault-default: var(--neutraal-zwart);
+    --color-text-title-ondefault-power-bi: var(--neutraal-zwart);
+    --color-text-subtitle-default: var(--neutraal-grijs-6);
+    --color-text-subtitle-power-bi: var(--neutraal-grijs-6);
+    --color-text-body-ondefault-default: var(--neutraal-zwart);
+    --color-text-body-ondefault-power-bi: var(--neutraal-zwart);
+    --color-text-placeholder-ondefault-default: var(--neutraal-grijs-5);
+    --color-text-placeholder-ondefault-power-bi: var(--neutraal-grijs-5);
+    --color-text-label-ondefault-default: var(--neutraal-grijs-7);
+    --color-text-label-ondefault-power-bi: var(--neutraal-grijs-7);
+    --color-text-link-default: var(--overige-donkerblauw-100);
+    --color-text-link-power-bi: var(--overige-donkerblauw-100);
+    --color-text-action-ondefault-default: var(--neutraal-zwart);
+    --color-text-action-ondefault-power-bi: var(--neutraal-zwart);
+    --color-text-action-onprimary-default: var(--neutraal-wit);
+    --color-text-action-onprimary-power-bi: var(--neutraal-wit);
+    --color-text-link-hover-default: var(--lintblauw-100);
+    --color-text-link-hover-power-bi: var(--lintblauw-100);
+    --color-text-disabled-default: var(--neutraal-grijs-4);
+    --color-text-disabled-power-bi: var(--neutraal-grijs-4);
+    --color-surface-base-default: var(--neutraal-grijs-2);
+    --color-surface-base-power-bi: var(--neutraal-grijs-2);
+    --color-surface-card-default: var(--neutraal-wit);
+    --color-surface-card-power-bi: var(--neutraal-wit);
+    --color-surface-primary-default: var(--lintblauw-100);
+    --color-surface-primary-power-bi: var(--lintblauw-100);
+    --color-surface-action-blue-default: var(--overige-donkerblauw-100);
+    --color-surface-action-blue-power-bi: var(--overige-donkerblauw-100);
+    --color-surface-action-yellow-default: var(--overige-geel-100);
+    --color-surface-action-yellow-power-bi: var(--overige-geel-100);
+    --color-surface-action-purple-default: var(--overige-paars-100);
+    --color-surface-action-purple-power-bi: var(--overige-paars-100);
+    --color-surface-disabled-default: var(--neutraal-grijs-2);
+    --color-surface-disabled-power-bi: var(--neutraal-grijs-2);
+    --color-surface-light-default: var(--neutraal-grijs-1);
+    --color-surface-light-power-bi: var(--neutraal-grijs-1);
+    --color-border-default-default: var(--lintblauw-30);
+    --color-border-default-power-bi: var(--lintblauw-30);
+    --color-border-light-default: var(--neutraal-grijs-2);
+    --color-border-light-power-bi: var(--neutraal-grijs-2);
+    --color-border-primary-default: var(--lintblauw-60);
+    --color-border-primary-power-bi: var(--lintblauw-60);
+    --color-border-dark-default: var(--neutraal-zwart);
+    --color-border-dark-power-bi: var(--neutraal-zwart);
+    --color-border-focused-ondefault-default: var(--neutraal-zwart);
+    --color-border-focused-ondefault-power-bi: var(--neutraal-zwart);
+    --color-text-success-default: var(--overige-groen-100);
+    --color-text-success-power-bi: var(--overige-groen-100);
+    --color-text-error-default: var(--overige-rood-100);
+    --color-text-error-power-bi: var(--overige-rood-100);
+    --color-surface-chart-blue-default: var(--overige-hemelblauw-100);
+    --color-surface-chart-blue-power-bi: var(--overige-hemelblauw-100);
+    --color-surface-chart-darkblue-default: var(--lintblauw-100);
+    --color-surface-chart-darkblue-power-bi: var(--lintblauw-100);
+    --color-surface-chart-purple-default: var(--overige-paars-100);
+    --color-surface-chart-purple-power-bi: var(--overige-paars-100);
+    --color-surface-chart-violet-default: var(--overige-violet-100);
+    --color-surface-chart-violet-power-bi: var(--overige-violet-100);
+    --color-surface-chart-ruby-default: var(--overige-robijnrood-100);
+    --color-surface-chart-ruby-power-bi: var(--overige-robijnrood-100);
+    --color-surface-chart-orange-default: var(--overige-oranje-100);
+    --color-surface-chart-orange-power-bi: var(--overige-oranje-100);
+    --color-surface-chart-darkyellow-default: var(--overige-donkergeel-100);
+    --color-surface-chart-darkyellow-power-bi: var(--overige-donkergeel-100);
+    --color-surface-chart-yellow-default: var(--overige-geel-100);
+    --color-surface-chart-yellow-power-bi: var(--overige-geel-100);
+    --color-surface-chart-green-default: var(--overige-groen-100);
+    --color-surface-chart-green-power-bi: var(--overige-groen-100);
+    --color-surface-chart-darkgreen-default: var(--overige-donkergroen-100);
+    --color-surface-chart-darkgreen-power-bi: var(--overige-donkergroen-100);
+    --color-surface-card-hovered-default: var(--neutraal-grijs-1);
+    --color-surface-card-hovered-power-bi: var(--neutraal-grijs-1);
+    --color-surface-success-default: var(--overige-groen-15);
+    --color-surface-success-power-bi: var(--overige-groen-15);
+    --color-surface-warning-default: var(--overige-donkergeel-15);
+    --color-surface-warning-power-bi: var(--overige-donkergeel-15);
+    --color-surface-error-default: var(--overige-rood-15);
+    --color-surface-error-power-bi: var(--overige-rood-15);
+    --color-surface-info-default: var(--overige-hemelblauw-15);
+    --color-surface-info-power-bi: var(--overige-hemelblauw-15);
+    --color-icon-info-default: var(--overige-hemelblauw-100);
+    --color-icon-info-power-bi: var(--overige-hemelblauw-100);
+    --color-icon-success-default: var(--overige-groen-100);
+    --color-icon-success-power-bi: var(--overige-groen-100);
+    --color-icon-warning-default: var(--overige-donkergeel-100);
+    --color-icon-warning-power-bi: var(--overige-donkergeel-100);
+    --color-icon-error-default: var(--overige-rood-100);
+    --color-icon-error-power-bi: var(--overige-rood-100);
+    --color-surface-primary-card-default: var(--lintblauw-90);
+    --color-surface-primary-card-power-bi: var(--lintblauw-90);
+    --color-surface-primary-card-hovered-default: var(--lintblauw-75);
+    --color-surface-primary-card-hovered-power-bi: var(--lintblauw-75);
+    --color-border-default-hovered-default: var(--lintblauw-60);
+    --color-border-default-hovered-power-bi: var(--lintblauw-60);
+    --color-border-error-default: var(--overige-rood-100);
+    --color-border-error-power-bi: var(--overige-rood-100);
+    --color-border-focused-onprimary-default: var(--neutraal-wit);
+    --color-border-focused-onprimary-power-bi: var(--neutraal-wit);
+    --color-border-selected-ondefault-default: var(--overige-hemelblauw-100);
+    --color-border-selected-ondefault-power-bi: var(--overige-hemelblauw-100);
+    --color-border-selected-onprimary-default: var(--overige-lichtblauw-100);
+    --color-border-selected-onprimary-power-bi: var(--overige-lichtblauw-100);
+    --color-text-body-onprimary-default: var(--neutraal-wit);
+    --color-text-body-onprimary-power-bi: var(--neutraal-wit);
+    --color-text-label-onprimary-default: var(--neutraal-grijs-2);
+    --color-text-label-onprimary-power-bi: var(--neutraal-grijs-2);
+    --color-text-placeholder-onprimary-default: var(--neutraal-grijs-3);
+    --color-text-placeholder-onprimary-power-bi: var(--neutraal-grijs-3);
+    --color-icon-light-default: var(--neutraal-wit);
+    --color-icon-light-power-bi: var(--neutraal-wit);
+    --color-icon-dark-default: var(--neutraal-zwart);
+    --color-icon-dark-power-bi: var(--neutraal-zwart);
+    --color-icon-active-default: var(--overige-geel-100);
+    --color-icon-active-power-bi: var(--overige-geel-100);
+    --color-icon-inactive-default: var(--lintblauw-30);
+    --color-icon-inactive-power-bi: var(--lintblauw-30);
+    --color-icon-primary-default: var(--lintblauw-100);
+    --color-icon-primary-power-bi: var(--lintblauw-100);
+    --color-text-title-onprimary-default: var(--neutraal-wit);
+    --color-text-title-onprimary-power-bi: var(--neutraal-wit);
+    --color-border-primary-hovered-default: var(--lintblauw-45);
+    --color-border-primary-hovered-power-bi: var(--lintblauw-45);
+    --color-surface-light-hovered-default: var(--neutraal-grijs-2);
+    --color-surface-light-hovered-power-bi: var(--neutraal-grijs-2);
+    --color-text-inactive-default: var(--lintblauw-30);
+    --color-text-inactive-power-bi: var(--lintblauw-30);
+    --sizes-spacings-medium-default: 24px;
+    --sizes-spacings-medium-rem-default: 1.5rem;
+    --sizes-spacings-medium-power-bi: 24px;
+    --sizes-spacings-medium-rem-power-bi: 1.5rem;
+    --sizes-spacings-small-default: 16px;
+    --sizes-spacings-small-rem-default: 1rem;
+    --sizes-spacings-small-power-bi: 16px;
+    --sizes-spacings-small-rem-power-bi: 1rem;
+    --sizes-spacings-xsmall-default: 8px;
+    --sizes-spacings-xsmall-rem-default: 0.5rem;
+    --sizes-spacings-xsmall-power-bi: 8px;
+    --sizes-spacings-xsmall-rem-power-bi: 0.5rem;
+    --sizes-spacings-large-default: 32px;
+    --sizes-spacings-large-rem-default: 2rem;
+    --sizes-spacings-large-power-bi: 32px;
+    --sizes-spacings-large-rem-power-bi: 2rem;
+    --color-surface-dark-default: var(--neutraal-grijs-7);
+    --color-surface-dark-power-bi: var(--neutraal-grijs-7);
+    --sizes-sidebar-collapsed-default: 64px;
+    --sizes-sidebar-collapsed-rem-default: 4rem;
+    --sizes-sidebar-collapsed-power-bi: 64px;
+    --sizes-sidebar-collapsed-rem-power-bi: 4rem;
+  
+    /* PRIMITIVES */
+    --lintblauw-100: #154273;
+    --lintblauw-90: #2c5581;
+    --lintblauw-75: #507196;
+    --lintblauw-60: #738eab;
+    --lintblauw-45: #96aac0;
+    --lintblauw-30: #b9c6d5;
+    --lintblauw-15: #dce3ea;
+    --neutraal-zwart: #000000;
+    --neutraal-grijs-7: #535353;
+    --neutraal-grijs-6: #696969;
+    --neutraal-grijs-5: #999999;
+    --neutraal-grijs-4: #b4b4b4;
+    --neutraal-grijs-3: #cccccc;
+    --neutraal-grijs-2: #e6e6e6;
+    --neutraal-grijs-1: #f3f3f3;
+    --neutraal-wit: #ffffff;
+    --overige-paars-100: #42145f;
+    --overige-paars-75: #714f87;
+    --overige-paars-60: #8d729f;
+    --overige-paars-45: #a995b7;
+    --overige-paars-30: #c6b8ce;
+    --overige-paars-15: #e3dce7;
+    --overige-violet-100: #a90061;
+    --overige-violet-75: #be4088;
+    --overige-violet-60: #cb66a0;
+    --overige-violet-45: #d88cb7;
+    --overige-violet-30: #e5b2cf;
+    --overige-violet-15: #f2d9e7;
+    --overige-robijnrood-100: #ca005d;
+    --overige-robijnrood-75: #d74085;
+    --overige-robijnrood-60: #df669d;
+    --overige-robijnrood-45: #e78cb6;
+    --overige-robijnrood-30: #efb2ce;
+    --overige-robijnrood-15: #f7d9e7;
+    --overige-roze-100: #f092cd;
+    --overige-roze-75: #f4add9;
+    --overige-roze-60: #f6bde1;
+    --overige-roze-45: #f8cee8;
+    --overige-roze-30: #fbdef0;
+    --overige-roze-15: #fdeff8;
+    --overige-rood-100: #d52b1e;
+    --overige-rood-75: #df6056;
+    --overige-rood-60: #e67f78;
+    --overige-rood-45: #ec9f99;
+    --overige-rood-30: #f2bfbb;
+    --overige-rood-15: #f9dfdd;
+    --overige-oranje-100: #e17000;
+    --overige-oranje-75: #e89440;
+    --overige-oranje-60: #eda966;
+    --overige-oranje-45: #f1be8c;
+    --overige-oranje-30: #f6d4b2;
+    --overige-oranje-15: #fbead9;
+    --overige-donkergeel-100: #ffb612;
+    --overige-donkergeel-75: #fdc84d;
+    --overige-donkergeel-60: #fdd370;
+    --overige-donkergeel-45: #fdde94;
+    --overige-donkergeel-30: #fee9b7;
+    --overige-donkergeel-15: #fef4db;
+    --overige-geel-100: #f9e11e;
+    --overige-geel-75: #fae856;
+    --overige-geel-60: #fbed78;
+    --overige-geel-45: #fcf199;
+    --overige-geel-30: #fdf6bb;
+    --overige-geel-15: #fefbdd;
+    --overige-donkerbruin-100: #673327;
+    --overige-donkerbruin-75: #8d665d;
+    --overige-donkerbruin-60: #a3847d;
+    --overige-donkerbruin-45: #baa39d;
+    --overige-donkerbruin-30: #d1c1bd;
+    --overige-donkerbruin-15: #e8e0df;
+    --overige-bruin-100: #94710a;
+    --overige-bruin-75: #af9447;
+    --overige-bruin-60: #bfa96c;
+    --overige-bruin-45: #cfbf90;
+    --overige-bruin-30: #dfd4b5;
+    --overige-bruin-15: #efeada;
+    --overige-donkergroen-100: #275937;
+    --overige-donkergroen-75: #5d8269;
+    --overige-donkergroen-60: #7d9b87;
+    --overige-donkergroen-45: #9db4a4;
+    --overige-donkergroen-30: #bdcdc2;
+    --overige-donkergroen-15: #dee6e1;
+    --overige-groen-100: #39870c;
+    --overige-groen-75: #6aa549;
+    --overige-groen-60: #88b76d;
+    --overige-groen-45: #a5c991;
+    --overige-groen-30: #c3dbb5;
+    --overige-groen-15: #e1edda;
+    --overige-mosgroen-100: #777b00;
+    --overige-mosgroen-75: #999c40;
+    --overige-mosgroen-60: #adaf66;
+    --overige-mosgroen-45: #c1c38c;
+    --overige-mosgroen-30: #d6d7b2;
+    --overige-mosgroen-15: #ebebd9;
+    --overige-mintgroen-100: #76d2b6;
+    --overige-mintgroen-75: #98ddc8;
+    --overige-mintgroen-60: #ace4d3;
+    --overige-mintgroen-45: #c1ebde;
+    --overige-mintgroen-30: #d5f1e9;
+    --overige-mintgroen-15: #eaf8f4;
+    --overige-donkerblauw-100: #01689b;
+    --overige-donkerblauw-75: #408eb4;
+    --overige-donkerblauw-60: #66a4c3;
+    --overige-donkerblauw-45: #8cbbd2;
+    --overige-donkerblauw-30: #b2d1e1;
+    --overige-donkerblauw-15: #d9e8f0;
+    --overige-hemelblauw-100: #007bc7;
+    --overige-hemelblauw-75: #409cd5;
+    --overige-hemelblauw-60: #66afdd;
+    --overige-hemelblauw-45: #8cc3e6;
+    --overige-hemelblauw-30: #b2d7ee;
+    --overige-hemelblauw-15: #d9ebf7;
+    --overige-lichtblauw-100: #8fcae7;
+    --overige-lichtblauw-75: #abd7ed;
+    --overige-lichtblauw-60: #bcdff0;
+    --overige-lichtblauw-45: #cce7f4;
+    --overige-lichtblauw-30: #ddeff8;
+    --overige-lichtblauw-15: #eef7fc;
+    --design-library-component-regular: #9747ff;
+    --design-library-component-light: #f8f2ff;
+  }
+
+body {
+    height: 100vh;
+    font-family: 'Open Sans';
+    -webkit-font-smoothing: antialiased;
+}
+
+.hidden {
+    display: none;
+}
+
+.NIVR-header {
+    display: flex;
+    position:sticky;
+    top:0px;
+    z-index:2;
+    width: 100%;
+    align-items: flex-start;
+    background: var(--color-surface-card, #FFF);
+    /* Elevation 2 */
+    box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.page-title-left {
+    display: flex;
+    justify-content: center;
+    height: 80px;
+    padding: 0px var(--sizes-spacings-medium, 24px);
+    gap: 0px 0px;
+    align-items: center;
+    flex: 1 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+}
+
+.main-title {
+    color: #154273;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 32px;
+    word-wrap: break-word
+
+}
+
+.sub-title {
+    color: #696969;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+    word-wrap: break-word
+}
+
+#header_logo {
+    width: 231px;
+    height: 65px;
+    flex-shrink: 0;
+}
+
+.logo-wrapper {
+    display: flex;
+    width: var(--sizes-sidebar-width, 256px);
+    height: 80px;
+    padding-left: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sizes-spacings-xsmall, 8px);
+    flex-shrink: 0;
+
+}
+
+.float-bottom {
+    margin-top: auto;
+}
+
+.page-title {
+    display: flex;
+    height: 80px;
+    padding: 0px var(--sizes-spacings-medium, 24px);
+    align-items: center;
+    gap: var(--sizes-spacings-small, 16px);
+    flex: 1 0 0;
+}
+
+.NIVR-navigation {
+    position: sticky;
+    z-index:10;
+    top: 80px;
+    display: flex;
+    width: var(--sizes-sidebar-width, 256px);
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.NIVR-dropdown:hover {
+    background: var(--color-surface-primary-card, #2C5581);
+}
+
+.navbar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+    padding: 16px var(--sizes-spacings-xsmall, 8px);
+
+    background: var(--color-surface-primary, #154273);
+    /* Elevation 2 */
+    box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-sites {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-category {
+    display: flex;
+    /* align-items: center; */
+    align-self: stretch;
+    flex-direction: column;
+    
+}
+
+.active-category {
+    color: var(--color-text-body-onPrimary, #FFF) !important;
+    /* Body/Large - Bold */
+    font-size: var(--typography-body-large, 15px) !important;
+    font-style: normal!important;
+    font-weight: 700 !important;
+    line-height: 24px !important /* 160% */
+}
+
+.active-category > i:nth-child(1){
+    color: var(--color-icon-active, #F9E11E);
+}
+
+.nav-item {
+    display: flex;
+    
+    align-items: center;
+    gap: var(--sizes-spacings-xsmall, 8px);
+    color: var(--color-text-inactive, #B9C6D5);
+    /* Body/Large */
+    font-size: var(--typography-body-large, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+    align-self: stretch;
+    /* padding: 6px 0px; */
+}
+.nav-item:hover {
+    background: var(--color-surface-primary-card, #2C5581);
+    color: var(--color-text-body-onPrimary, #FFF);
+}
+.nav-item > .nav-link {
+    padding-left: 0px;
+}
+
+.nav-link {
+    display: flex;
+    /* padding: 6px 36px; */
+    align-items: center;
+    padding: var(--sizes-spacings-xsmall, 8px);
+    gap: var(--sizes-spacings-xsmall, 8px);
+    color: var(--color-text-inactive, #B9C6D5);
+    /* Body/Large */
+    font-size: var(--typography-body-large, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+    align-self: stretch;
+}
+.nav-link:hover{
+    background: var(--color-surface-primary-card, #2C5581);
+    color: var(--color-text-body-onPrimary, #FFF) !important;
+    text-decoration: none;
+}
+
+.nav-item:hover a{
+    background: var(--color-surface-primary-card, #2C5581);
+    color: var(--color-text-body-onPrimary, #FFF) !important;
+    text-decoration: none;
+}
+
+.site-content {
+    display: flex;
+    flex-direction: row;
+    height: calc(100% - 80px);
+    width:100%;
+    position: fixed;
+    top: 80px;
+}
+
+.content {
+    /* display: flex; */
+    width: calc(100% - 256px);
+    z-index: 1;
+    overflow-y: scroll;
+    /* align-self: stretch; */
+    /* font-family: sans-serif; */
+}
+
+.dropdown-menu {
+    position: static
+}
+
+.current-menu-selected {
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.current-menu-selected .nav-link{
+    margin: 0px 0px 0px 36px;
+
+}
+
+
+.menu-not-selected {
+    position: absolute;
+    left: 248px;
+    background-color: var(--color-surface-primary, #154273);
+    z-index: 15;
+    margin-top: -8px;
+    width: var(--sizes-sidebar-width, 256px);
+    padding: 8px;
+}
+
+.marker-cluster-small {
+background-color: #154273;
+}
+.marker-cluster-small div {
+background-color: #154273;
+color:#FFF;
+font-family: 'Open Sans';
+}
+.marker-cluster-medium {
+background-color: #154273;
+}
+.marker-cluster-medium div {
+background-color: #154273;
+color:#FFF;
+font-family: 'Open Sans';
+}
+
+.marker-cluster-large {
+background-color: #154273;
+}
+.marker-cluster-large div {
+background-color: #154273;
+color:#FFF;
+font-family: 'Open Sans';
+}
+
+.leaflet-popup-content-wrapper{
+    border-radius: 0;
+    display: flex;
+    /* padding: 12px 16px; */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    background: var(--color-surface-card, #FFF);
+}
+
+.leaflet-left .leaflet-control {
+    margin-left: 24px;
+  }
+.leaflet-top .leaflet-control {
+    margin-top: 24px;
+}
+.leaflet-right .leaflet-control {
+    margin-right: 24px;
+  }
+.leaflet-bottom .leaflet-control {
+    margin-bottom: 24px;
+}

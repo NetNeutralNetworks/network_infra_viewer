@@ -1,0 +1,61 @@
+/* Wrapper for entire popup*/
+.leaflet-popup-content{
+    background: var(--color-surface-card, #FFF);
+    width: 320px;
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    margin:0px;
+    max-height: 300px;
+}
+
+.popup-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+
+    color: var(--color-text-label-onDefault, #535353);
+    /* Forms/Label */
+    font-family: 'Open Sans';
+    font-size: var(--typography-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+}
+
+.popup-content{
+    color: var(--color-text-label-onDefault, #535353);
+
+    /* Forms/Label */
+    font-family: 'Open Sans';
+    font-size: var(--typography-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    overflow: scroll;
+    width: 100%;
+}
+
+.popup-content li{
+    color: var(--color-text-link, #01689B);
+
+    /* Body/Regular */
+    font-family: 'Open Sans';
+    font-size: var(--typography-body-regular, 13px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 123.077% */
+}
+
+.popup-list{
+    list-style-position: inside;
+    padding-left: 0;
+}

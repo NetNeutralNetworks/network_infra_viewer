@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.1.2/css/searchPanes.dataTables.min.css"
+crossorigin=""/>
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.dataTables.min.css"
+crossorigin=""/>
+
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"
+crossorigin=""></script>
+
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#object-table').DataTable({
+            dom: 'Plfrtip',
+            searchPanes: {
+                initCollapsed: true,
+                cascadePanes: true
+            }
+        });
+    });
+    
+</script>
+    
+{% endblock %}
+
+    {% block content %}
+    <div style="margin:20px; width: 100%;">
+    <h1>Devices</h1>
+    <table id="object-table">
+        <thead><tr><td>Device</td><td>Location</td><td>Location group</td></tr></thead>
+        <tbody>
+            {% for entry in devices %}
+            <tr><td><a href='/deviceview/show/?hostname={{entry.device}}'>{{entry.device}}</a></td><td>{{entry.location}}</td><td>{{entry.object_group}}</td></tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+    </div>
+
+{% endblock %}

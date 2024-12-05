@@ -1,0 +1,104 @@
+<vars>
+# template variable with custom regular expression:
+RE_INT = "(\S+Ethernet\S+|Serial\S+|Loopback\d+|Tunnel\d+)"
+</vars>
+
+<group name='root.interfaces**.{{name}}**' expand="">
+interface {{ config.name | copy('name') | _start_ }}
+ description {{ config.description | re('.*') }}
+ shutdown{{config.enabled | set(False) | default(True)}}
+ speed {{config.port-speed | lookup('interface.speed')}}
+ duplex {{config.duplex-mode | lookup('interface.duplex')}}
+ negotiation auto{{config.auto-negotiate | set(True) | default(False)}}
+          <!-- udld port {{ config.udld.mode }} -->
+ vrf {{ config._vrf }}
+ ipv4 address {{ config.ip | IP }}/{{config.prefix-length | to_int}}
+ encapsulation dot1q {{_vlan.single-tagged.vlan-id | to_int}}
+ encapsulation dot1q {{_vlan.double-tagged.outer-vlan-id | to_int}} second-dot1q {{_vlan.double-tagged.inner-vlan-id | to_int}}
+ ipv4 verify unicast source reachable-via {{config._ipv4-rpf.mode}}
+ mtu {{ config.mtu | to_int }}
+          <!-- ip tcp adjust-mss {{ config.mss | to_int }} -->
+ dampening{{ config.dampening | set(True) | default(False)}}
+ carrier-delay up {{config._carrier-delay-msec.up | to_int()}} down {{config._carrier-delay-msec.down | to_int()}}
+          <!-- spanning-tree {{config._spanning-tree | ORPHRASE}} -->
+ service-policy output {{config._service-policy-out}}
+ service-policy output {{config._service-policy-out}} shared-policy-instance {{config._service-policy-shared-out}}
+ ipv4 directed-broadcast {{config._icmp.directed-broadcast | set(True) | default(False) }}
+ ipv4 redirects {{config._icmp.redirects | set(True) | default(False) }}
+ ipv4 unreachables disable{{config._icmp.unreachables | set(False) | default(True) }}
+ proxy-arp {{ config._icmp.proxy-arp | set(True) | default(False) }}
+ ipv4 access-group {{ config._acls.acl.name }} {{ config._acls.acl.direction }}
+
+
+
+          <!-- <group name='config.logging.events*' itemize="event">
+ logging event {{event}}
+  </group> -->
+
+  <group name='aggregation'>
+ bundle id {{interface}} mode {{mode}}
+ lacp rate {{lacp.speed}}
+ bundle port-priority {{port-priority | to_int}}
+  </group>
+
+  <group name="tunnel**" expand="" method="table">
+    <group name="ipv4**.unnumbered" expand="" method="table">
+ ipv4 unnumbered {{interface-ref.config.interface | let('config.enabled', True)}}
+    </group>
+    <group name="ipv4**.config**" expand="" method="table">
+ tunnel mode gre ipv4{{enabled | set(True)}}
+    </group>
+    <group name="config**" expand="" method="table">
+ tunnel source {{_src-interface}}
+ keepalive {{_keepalive-interval | to_int}} {{_keepalive-retries | to_int}}
+ tunnel vrf {{_src-network-instance}}
+ tunnel destination {{dst}}
+    </group>
+  </group>
+
+  <!-- <group name='ethernet.switched-vlan.config'>
+ switchport trunk allowed vlan {{trunk-vlans | unrange(rangechar='-', joinchar=',') | split(',')}}
+ switchport mode {{interface-mode }}
+  </group> -->
+
+  <!-- <group name='service*' expand=''>
+ service instance {{ name }} {{ type }}
+  description {{ config.description | ORPHRASE }}
+  encapsulation dot1q {{ vlan.config.vlan-id }}
+  encapsulation untagged {{ vlan.config.vlan-id | default(0) }}
+  l2protocol peer {{ vlan.config.l2-protocol }}
+  rewrite ingress tag {{ vlan.ingress-mapping.config.vlan-stack-action}} {{ vlan.ingress-mapping.config.__stack-action-count | to_int()}} {{ vlan.ingress-mapping.config.__stack-action-direction}}
+  bridge-domain {{ bridge-domain }} split-horizon group 0
+ ##  {{ _ | _line_ | to_list }}
+   {{ignore('^\s\S')}}
+   {{ _end_ }}
+  </group> -->
+
+ {{ignore('description')}}
+##{{ _ | _line_ | to_list }}
+{{ignore('^\S')}}
+!{{ _end_ }}
+</group>
+
+<group name='root.interfaces**' expand="">
+router hsrp{{_start_}}
+  <group name='{{name}}.config._hsrp' expand=''>
+ interface {{name}}
+  hsrp bfd minimum-interval {{_config.bfd-minimum-interval}}
+  hsrp bfd multiplier {{_config.bfd-multiplier}}
+  hsrp delay minimum {{_config.preempt-delay | to_int}} reload {{_config._preempt-delay-reload | to_int}}
+  hsrp delay minimum {{_config.preempt-delay | to_int}}
+  address-family {{ignore}}
+    <group name='hsrp-group.{{virtual-router-id}}' expand=''>
+   hsrp {{config.virtual-router-id | copy('virtual-router-id')}}
+    {{config.preempt | re("preempt") | let(True) | default(False)}} delay {{config.preempt-delay | to_int}}
+    {{config.preempt | re("preempt") | let(True) | default(False)}}
+    priority {{config.priority | to_int}}
+    address {{config.virtual-address}}
+    timers {{config.advertisement-interval | to_int}} {{config._hold-time | to_int}}
+    track {{interface-tracking.config.track-interface | re("RE_INT")}} decrement {{interface-tracking.config.priority-decrement | to_int}}
+    track {{interface-tracking.config._track-object | re("\d+")}} decrement {{interface-tracking.config.priority-decrement | to_int}}
+    bfd fast-detect{{config._bfd-fast-detect | set(True) | default(False)}}
+    </group>
+  </group>
+</group>

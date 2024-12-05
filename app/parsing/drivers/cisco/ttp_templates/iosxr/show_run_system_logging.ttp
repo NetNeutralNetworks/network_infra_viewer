@@ -1,0 +1,74 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all basic system information.
+##################################################################################################
+
+```
+##############################################
+## root.system.logging
+##############################################
+!
+#logging trap debug
+#logging console disable
+#logging buffered 2100000
+#logging buffered informational
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!! Two Logging servers - same 2 IP's on every device !!!!
+#logging 145.50.42.7 vrf default severity info
+#logging 145.50.42.135 vrf default severity info
+#!
+configuration display interface slot-order
+ipv4 netmask-format bit-count
+#logging events link-status software-interfaces
+#logging source-interface Loopback 0
+#logging source-interface Loopback1 vrf Mgmt-intf
+service timestamps log datetime localtime msec show-timezone
+service timestamps debug datetime localtime msec show-timezone
+#logging suppress rule SUPPRESS-DDTS_CSCug62553
+# alarm OS RT_CHECK INCONSISTENCY_DETECTED
+logging suppress apply rule SUPPRESS-DDTS_CSCug62553
+ all-of-router
+!
+```
+</doc>
+
+<lookup load='yaml' name='logging'>
+source-network-instance:
+  default: DEFAULT_INSTANCE
+</lookup>
+
+<group name="root.system.logging**" expand="">
+logging trap {{_global.trap-level | default("INFORMATIONAL") }}
+logging source-interface {{_global.source-interface}}
+logging source-interface {{_global.source-interface}} vrf {{_global.network-instance | lookup('logging.source-network-instance')}}
+logging events {{_global.events | ORPHRASE | split(' ')}}
+</group>
+
+<group name="root.system.logging._global.suppress-rules*">
+logging suppress apply rule {{suppress-rule-name}}
+  <group name="sources*" expand="" method='table' itemize='source'>
+ source location {{source}}
+ all-of-router{{source | set('ALL')}}
+  </group>
+</group>
+
+<group name='root.system.logging.console' expand=''>
+logging console disable{{config._enabled | set(False) | default(True) }}
+</group>
+
+<group name='root.system.messages**' expand=''>
+logging buffered {{config._log-size | DIGIT | to_int}}
+logging buffered {{config.severity}}
+</group>
+
+<group name='root.system.logging.remote-servers.remote-server.{{host}}' expand='' method='table'>
+logging {{config.host | copy('host') }} vrf {{config.network-instance | lookup('logging.source-network-instance')}} severity {{selectors.selector.severity}}
+logging {{config.host | copy('host')}} severity {{selectors.selector.severity}}
+</group>
+
+<group name="root.system.logging._suppress-rules.suppress-rule.{{suppress-rule-name}}" expand="">
+logging suppress rule {{suppress-rule-name}}
+  <group name="rules" expand="" method='table'>
+ alarm {{alarms| ORPHRASE | split(' ')}}
+ all-alarms{{alarms | set(['ALL'])}}
+  </group>
+</group>

@@ -1,0 +1,57 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all interface information.
+##################################################################################################
+
+```
+line con 0
+ exec-timeout 15 0
+ authorization exec CONSOLE
+ logging synchronous
+ login authentication CONSOLE
+ transport preferred none
+ transport output none
+ stopbits 1
+line vty 0 4
+ access-class 12 in
+ exec-timeout 15 0
+ authorization exec ADMINS
+ logging synchronous
+ login authentication ADMINS
+ transport preferred none
+ transport input ssh
+ transport output none
+line vty 5 15
+ access-class 12 in
+ exec-timeout 15 0
+ authorization exec ADMINS
+ logging synchronous
+ login authentication ADMINS
+ transport preferred none
+ transport input ssh
+ transport output none
+!
+```
+</doc>
+
+<group name='root._terminals*' expand="">
+line {{name | _start_ }} {{start | to_int}}
+line {{name | _start_ }} {{start | to_int}} {{stop | to_int}}
+ exec-timeout {{timeout.minutes|to_int}} {{timeout.seconds|to_int}}
+ authorization {{authorization.type}} {{authorization.group}}
+ logging synchronous{{logging.synchronous | set(True) | default(False) }}
+ access-class {{acl.name}} {{acl.direction}}
+ login authentication {{login.authentication}}
+ stopbits {{stopbits|to_int}}
+
+   <group name='transport'>
+ transport preferred {{preferred}}
+ transport input {{input|to_list}}
+ transport output {{output|to_list}}
+   </group>
+
+   <group name='unforseen_commands*' itemize="command">
+ {{ command | _line_ | _exact_space_ }}
+   </group>
+{{ignore('\S+') }}{{ _end_ }}
+</group>

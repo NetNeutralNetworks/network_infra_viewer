@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+

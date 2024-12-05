@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block head_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+crossorigin=""/>
+{{ super() }}
+{% endblock %}
+{% block head_js %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
+crossorigin=""></script>
+{% endblock %}
+{% block content %}
+<div id="map" style="width:100%; height:50%; z-index:1;"></div>
+    
+<form method="post">
+
+  <fieldset>
+    
+    <legend>Add Site</legend>
+
+    <label for="site_name">Site name:</label>
+    <input type="text" id="site_name" name="site_name"><br />
+
+    <label for="site_lat">lat:</label>
+    <input type="text" id="site_lat" name="site_lat"><br />
+
+    <label for="site_lon">lon:</label>
+    <input type="text" id="site_lon" name="site_lon"><br />
+  </fieldset>
+  <button type="submit" name="submit" value="Add">Add!</button>
+
+
+</form>
+
+<script type="text/javascript">
+  var map = L.map('map', {zoomControl: false}).setView([52.2, 5.4], 7);
+  var marker;
+
+  L.control.zoom({
+      position: 'bottomright'
+  }).addTo(map);
+
+  var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  map.on('click', function(e) {
+    if (marker){
+      map.removeLayer(marker);
+    }
+    
+    marker = L.marker(e.latlng).addTo(map);
+    var lat = e.latlng.lat.toFixed(5);
+    var lon = e.latlng.lng.toFixed(5)
+    document.getElementById('site_lat').value = lat;
+    document.getElementById('site_lon').value = lon;
+  });
+  </script>
+  
+{% endblock %}

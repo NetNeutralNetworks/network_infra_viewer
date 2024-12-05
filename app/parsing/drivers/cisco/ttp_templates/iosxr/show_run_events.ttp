@@ -1,0 +1,32 @@
+<doc>
+##################################################################################################
+TTP Template to parse Cisco IOS "show running config" and extract all event information. This is
+Cisco specific configuration.
+##################################################################################################
+
+```
+event manager environment _scp_server 145.50.42.25
+event manager environment _scp_directory /var/adm/tftproot-configs/
+event manager directory user policy disk0:/ARCHIVE
+event manager policy EEM-Script-ASR9K-Configuration-Archive-v8.6.tcl username confscp persist-time 3600 type user
+```
+</doc>
+
+<group name='root._events.event.{{event-name}}**' expand=''>
+event manager {{config.type | re('environment') | copy('config.name') | copy('event-name')}} {{ignore}} {{ignore}}
+</group>
+<group name='root._events.event.{{event-name}}.env-vars.env-var.{{name}}' expand='' method="table">
+event manager {{event-name | re('environment')}} {{key | copy('name')}} {{value}}
+</group>
+<group name='root._events.event.{{event-name}}**' expand=''>
+event manager {{config.type | re('directory') | copy('config.name') | copy('event-name')}} {{ignore}} {{ignore}} {{ignore}}
+</group>
+<group name='root._events.event.{{event-name}}.directories.directory.{{name}}' expand='' method="table">
+event manager {{event-name | re('directory')}} {{type | re('user policy') | copy('name')}} {{path}}
+</group>
+<group name='root._events.event.{{event-name}}**' expand=''>
+event manager {{config.type | re('policy')}} {{config.name | copy('event-name')}} username {{ignore}} persist-time {{ignore}} type {{ignore}}
+</group>
+<group name='root._events.event.{{event-name}}.policies.policy.{{type-name}}' expand='' method="table">
+event manager policy {{event-name}} username {{username}} persist-time {{persist-time | to_int}} type {{type | copy('type-name')}}
+</group>

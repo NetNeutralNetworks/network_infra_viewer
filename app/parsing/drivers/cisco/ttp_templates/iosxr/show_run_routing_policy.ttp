@@ -1,0 +1,178 @@
+<doc>
+```
+route-policy DENY_DEFAULT
+ if (destination in PS_DEFAULT) then
+  drop
+ else
+  pass
+ endif
+end-policy
+                                                                                                                                                                <!-- route-policy FULL_PRIM (critical / minor)
+ set med 10
+end-policy
+! -->
+  <!-- route-policy FULL_SEC  (critical / minor)
+ set med 20
+ set local-preference 90
+! -->
+  <!-- route-policy CE_CON_SEC_OUT (critical / minor)
+  apply DENY_DEFAULT
+  set med 20
+end-policy
+! -->
+route-policy ES_ROUTE (critical / major)
+ if (destination in ES_ROUTES) then
+   pass
+ else
+   drop
+ endif
+end-policy
+route-policy DEFAULT_PRIM	(critical / minor)
+  if destination in (0.0.0.0/0) then
+   set med 10
+  else
+     drop
+  endif
+end-policy
+!
+route-policy DEFAULT_SEC	(critical / minor)
+  if destination in (0.0.0.0/0) then
+   set med 20
+   set local-preference 90
+  else
+     drop
+  endif
+end-policy
+!
+route-policy LABEL_STATIC	(critical / minor)
+ if ((tag eq 1100)) then
+  set community (65000:65004)
+  elseif ((tag eq 1110)) then
+   set community (65000:65003, 65000:65004)
+  elseif ((tag eq 1010)) then
+   set community (65000:65003)
+  elseif ((tag eq 1011)) then
+   set community (65000:65001, 65000:65003)
+  elseif ((tag eq 1111)) then
+   set community (65000:65001, 65000:65003, 65000:65004)
+  elseif ((tag eq 1101)) then
+   set community (65000:65001, 65000:65004)
+  elseif ((tag eq 1001)) then
+   set community (65000:65001)
+  else
+    pass
+  endif
+end-policy
+!
+```
+</doc>
+
+<macro>
+import re
+
+TAG = re.compile(r".*tag eq (\d+)")
+PREFIX_LIST = re.compile(r".*destination in \(?([^)\s]+)")
+COMMUNITY = re.compile(r".*community matches-any ([^)\s]+)")
+
+
+def get_condition(data):
+    routing_policies = data[0].get('root', {}).get('routing-policy', {}).get('policy-definitions', {}).get('policy-definition', {})
+
+    for _, policy in routing_policies.items():
+        statements = policy.get('statements', {}).get('statement', {})
+        for name, statement in statements.items():
+            if name in ['DEFAULT', 'ELSE']:
+                continue
+            if match := TAG.match(name):
+                 statement['conditions'] = {'match-tag-sets': {'config': {'tag-set': match[1], 'tag-set-options': 'ANY'}}}
+            elif match := PREFIX_LIST.match(name):
+                 statement['conditions'] = {'match-prefix-sets': {'config': {'prefix-set': match[1], 'prefix-set-options': 'ANY'}}}
+            elif match := COMMUNITY.match(name):
+                 statement['conditions'] = {'bgp-conditions': {'config': {'community-set': match[1]}}}
+
+            name = name.replace(' ', '_').upper()
+
+
+</macro>
+
+
+<group name='root.routing-policy.policy-definitions.policy-definition.{{name}}' expand=''>
+route-policy {{ config.name | copy('name') }}
+  <group name='statements.statement.{{statement_name}}' expand='' method="table">
+  {{config.name | copy('statement_name') | ORPHRASE}} then
+  else{{config.name | set('else') | copy('statement_name')}}
+    <group name="conditions.match-prefix-set.config" expand=''>
+  if (destination in {{prefix-set}}) then
+    </group>
+    <group name="conditions.config" expand=''>
+    apply {{call-policy}}
+    </group>
+    <group name="actions" method="table" expand=''>
+    drop{{config.policy-result | set('REJECT_ROUTE')}}
+    pass{{config.policy-result | set('ACCEPT_ROUTE')}}
+    set weight {{bgp-actions.config.set-weight | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+    set med {{bgp-actions.config.set-med | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+    set local-preference {{bgp-actions.config.set-local-pref | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+    set path-selection backup {{bgp-actions.config._set-path-selection-backup | to_int}} install
+    set community ({{bgp-actions.set-community.inline.config.communities | split(', ') | let('bgp-actions.set-community.config.method', 'INLINE') | ORPHRASE | let('bgp-actions.set-community.config.options', 'REPLACE')}})
+    set community ({{bgp-actions.set-community.inline.config.communities | split(', ') | let('bgp-actions.set-community.config.method', 'INLINE') | ORPHRASE | let('bgp-actions.set-community.config.options', 'ADD')}}) additive
+    </group>
+  endif{{_end_}}
+  </group>
+  <group name="statements.statement.DEFAULT.conditions.config" expand=''>
+  apply {{call-policy}}
+  </group>
+  <group name="statements.statement.DEFAULT.actions**" method="table" expand=''>
+  drop{{config.policy-result | set('REJECT_ROUTE')}}
+  pass{{config.policy-result | set('ACCEPT_ROUTE')}}
+
+  set weight {{bgp-actions.config.set-weight | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+  set med {{bgp-actions.config.set-med | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+  set local-preference {{bgp-actions.config.set-local-pref | to_int | let('config.policy-result', 'ACCEPT_ROUTE')}}
+  set path-selection backup {{bgp-actions.config._set-path-selection-backup | to_int}} install
+  set community ({{bgp-actions.set-community.inline.config.communities | split(', ') | let('bgp-actions.set-community.config.method', 'INLINE') |  | let('bgp-actions.set-community.config.options', 'REPLACE')}})
+  set community ({{bgp-actions.set-community.inline.config.communities | split(', ') | let('bgp-actions.set-community.config.method', 'INLINE') |  | let('bgp-actions.set-community.config.options', 'ADD')}}) additive
+  </group>
+end-policy{{_end_}}
+</group>
+
+<output macro="get_condition"/>
+
+<doc>
+```
+prefix-set PS_DEFAULT
+ 0.0.0.0/0
+ 0.0.0.0/0
+end-set
+!
+```
+</doc>
+
+<group name='root.routing-policy.defined-sets.prefix-sets.prefix-set.{{name}}' expand=''>
+prefix-set {{config.name | copy('name')}}
+  <group name='prefixes.prefix.{{ip-prefix}} {{masklength-range}}' expand='' method='table'>
+  {{config.ip-prefix | copy('ip-prefix')}}/{{config.masklength-range | re('\d+') | to_int | copy('masklength-range')}},
+  {{config.ip-prefix | copy('ip-prefix')}}/{{config.masklength-range | re('\d+') | to_int | copy('masklength-range')}}
+  </group>
+end-set{{_end_}}
+</group>
+
+<doc>
+```
+community-set ODC_COMMUNITIES
+ 65100:100,
+ 65100:200,
+ 65200:100,
+ 65200:200,
+ 65002:100
+```
+</doc>
+
+<group name='root.routing-policy.defined-sets.bgp-defined-sets.community-sets.community-set.{{community-set-name}}**' expand=''>
+community-set {{config.community-set-name | copy('community-set-name')}}
+  <group name='config**.community-member' expand='' method='table' itemize='community_member'>
+  {{community_member | joinmatches}},
+  {{community_member | joinmatches}}
+  </group>
+end-set{{_end_}}
+</group>

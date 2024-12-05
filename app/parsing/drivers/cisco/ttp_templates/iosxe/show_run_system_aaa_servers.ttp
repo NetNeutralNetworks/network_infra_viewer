@@ -1,0 +1,10 @@
+<group name='root.system.aaa.server-groups.server-group*' expand=''>
+aaa group server {{config.type | lookup('aaa.server.type')}} {{config.name}}
+  <group name='servers.server*' expand='' method="table">
+ server-private {{config.address | copy('config.name')}} auth-port {{radius.config.auth-port | to_int}} acct-port {{radius.config.acct-port | to_int}} key {{radius.config._encryption_level|to_int}} {{radius.config.secret-key-hashed}}
+ server-private {{config.address | copy('config.name')}} key {{radius.config._encryption_level|to_int}} {{radius.config.secret-key-hashed}}
+  </group>
+ ip vrf forwarding {{config._network-instance | default('DEFAULT_INSTANCE')}}
+ ip radius source-interface {{config._source-interface | default('DEFAULT_INSTANCE')}}
+!{{_end_}}
+</group>
