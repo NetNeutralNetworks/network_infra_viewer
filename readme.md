@@ -24,14 +24,7 @@ DEBUG_MODE=
 used for config of appbuilder (contains authentication/db connections); Gets mounted to /var/appbuilder/config.py  
 
 `ncubed_flask_base`  
-used to store local db; Gets mounted to /var/lib/appbuilder/data  
-
-`/opt/ncubed/data/configs/CSPC_exports/`  
-used to access cscp data; Gets mounted to /opt/ncubed/data/configs/CSPC_exports/ as readonly  
-Expects a date as foldername with a Network_1 folder inside ('/opt/ncubed/data/configs/CSPC_exports/20230301/Network_1')
-
-`/opt/ncubed/data/configs/CSPC_exports/oc`  
-used to access OpenConfig data; Gets mounted to /opt/ncubed/data/configs/CSPC_exports/oc as read+write  
+used to store local db; Gets mounted to /var/lib/appbuilder/data
 
 # Building in MicroK8s
 This container image is not yet published in a container registry, so in order to use the image in MicroK8s run the following commands:
