@@ -43,12 +43,12 @@ class MyIndexView(IndexView):
 
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView)
 
-appbuilder.add_view(MapOverview, "Overview", category='Network Components', category_icon='fa-chart-network', icon='fa-map')
+appbuilder.add_view(MapOverview, "Overview", category='Network Components', category_icon='fa-network-wired', icon='fa-map')
 appbuilder.add_view(DevicesOverview, "All devices", category='Network Components', icon='fa-display')
 appbuilder.add_view(ServiceView, "All services", category='Network Components', icon='fa-circle-nodes')
 appbuilder.add_view(LocationView, "All locations", category='Network Components', icon='fa-location-dot')
 appbuilder.add_view(HardwareView, "All hardware", category='Network Components', icon='fa-server')
-appbuilder.add_view(ObjectTypeView, "All object types", category='Network Components', icon='fa-grid')
+appbuilder.add_view(ObjectTypeView, "All object types", category='Network Components', icon='fa-list')
 
 appbuilder.add_view(ImportSiteView, "Add site", category='Import', icon='fa-location-dot', category_icon='fa-download')
 appbuilder.add_view(ImportDeviceView, "Add device", category='Import', icon='fa-server')
