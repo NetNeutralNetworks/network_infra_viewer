@@ -25,11 +25,3 @@ used for config of appbuilder (contains authentication/db connections); Gets mou
 
 `ncubed_flask_base`  
 used to store local db; Gets mounted to /var/lib/appbuilder/data
-
-# Building in MicroK8s
-This container image is not yet published in a container registry, so in order to use the image in MicroK8s run the following commands:
-```
-sudo docker build -t docker.io/library/network-infra-viewer:latest .
-sudo docker save network-infra-viewer > nivr.tar
-microk8s ctr image import nivr.tar
-```
