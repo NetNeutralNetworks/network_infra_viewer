@@ -134,6 +134,7 @@ OAUTH_PROVIDERS = [{
             'request_token_url': None,
             'client_id': f'{AUTHENTIK_CLIENT_ID}',
             'client_secret': f'{AUTHENTIK_CLIENT_SECRET}',
+            'jwks_uri': f'{AUTHENTIK_DOMAIN}/application/o/fab-data-visualiser/jwks/'
         }
    },
        {
