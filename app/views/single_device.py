@@ -3,6 +3,7 @@ import json, logging, re, itertools, os, glob, xmltodict
 from flask import request
 from flask_appbuilder import AppBuilder, BaseView, expose, has_access
 
+from bs4 import BeautifulSoup
 from pyvis.network import Network
 
 from app.parsing.drivers.cisco import ios
@@ -23,6 +24,29 @@ def parse_xml_data(data):
             result['inventoryname'] = data['NetworkDevice']['PrimaryDeviceName']
             return result
 
+def parse_py_vis(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    head = soup.head
+    jq = soup.new_tag("script", src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js")
+    legend_css = soup.new_tag("link", href="/static/css/overview-legend.css", rel="stylesheet")
+    head.append(jq)
+    head.append(legend_css)
+    head_html = head.prettify()
+    vis = soup.find('div')
+    vis_html = vis.prettify()
+    legend = soup.new_tag('div')
+    legend['class'] = "legend-panel-container overlay"
+    legend.append("Legend")
+    script = soup.body.script
+    script.append("""
+                vis = $('.vis-network'); $('.card').remove(); $('body').append(vis);
+                  network.on('doubleClick', function(params){
+                    window.location.replace("?hostname=" + nodes.get(params.nodes[0]).label);
+                    // alert(nodes.get(params.nodes[0]).label)
+                })
+                """)
+    script_html = script.prettify()
+    return head_html+str(legend)+vis_html+script_html
 class DeviceView(BaseView):
     load_dotenv(override=True)
     config_date = os.environ.get('CSPC_FOLDER')
@@ -148,41 +172,7 @@ class DeviceView(BaseView):
         # Filter unique paths
         connections.sort()
         connections = list(k for k,_ in itertools.groupby(connections))
-
-
-        # L2 overview
-
-        q = f"""
-            MATCH path=(d:Device)-[]-(i:Interface)-[]-(i2:Interface)-[]-(d2:Device)
-            where d.hostname =~ "{hostname}"
-            RETURN distinct path
-
-
-        """
-        device_network = Network(notebook=False, cdn_resources='in_line', height='800px')
-        # device_network.show_buttons()
-        for path in execute_query(q):
-            # logging.getLogger().info('Response: %s', path[0])
-            nodes = path[0].nodes
-            for node in nodes:
-                if "Device" in node.labels:
-                    if "-CE" in node.properties["hostname"]:
-                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="red")
-                    elif "-PE" in node.properties["hostname"]:
-                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="purple")
-                    elif "-P4" in node.properties["hostname"] or "-P5" in node.properties["hostname"]:
-                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="blue")
-                    else:
-                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="yellow")
-                elif "Interface" in node.labels:
-                    device_network.add_node(node.id, label=node.properties.get("name"), color="orange", shape="box", mass=1)
-            edges = path[0].relationships
-            for edge in edges:
-                device_network.add_edge(edge.start_id, edge.end_id)
-        l2_html = device_network.generate_html()
-        l2_html = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html, 2, re.DOTALL)
-        l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
-        l2_html = re.sub(r'row no-gutter', '', l2_html, 0, re.DOTALL)
+        
         # logging.getLogger().info(l2_html)
 
 
@@ -288,9 +278,48 @@ class DeviceView(BaseView):
             pass
                         
 
-        return self.render_template('single_device.html', device=device, connections=connections, markers = unique_locations, spans=spans, lines=lijnen, html=l2_html, device_config=device_config, l3=vrfs, oc=oc_text, interfaces=interfaces, config_date=self.config_date)
+        return self.render_template('single_device.html', device=device, connections=connections, markers = unique_locations, spans=spans, lines=lijnen, device_config=device_config, l3=vrfs, oc=oc_text, interfaces=interfaces, config_date=self.config_date)
     
 
+    @expose('/l2_graph/', methods=['GET'])
+    @has_access
+    def l2_graph(self):
+        request_data = request.args
+        if not request_data.get('hostname'):
+            return 'Error looking up hostname'
+        hostname = request_data['hostname'].upper()
+        q = f"""
+        MATCH path=(d:Device)-[]-(i:Interface)-[]-(i2:Interface)-[]-(d2:Device)
+        where d.hostname =~ "{hostname}"
+        RETURN distinct path
+        """
+        device_network = Network(notebook=False, cdn_resources='in_line', height='800px')
+        # device_network.show_buttons()
+        for path in execute_query(q):
+            # logging.getLogger().info('Response: %s', path[0])
+            nodes = path[0].nodes
+            for node in nodes:
+                if "Device" in node.labels:
+                    if "-CE" in node.properties["hostname"]:
+                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="red")
+                    elif "-PE" in node.properties["hostname"]:
+                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="purple")
+                    elif "-P4" in node.properties["hostname"] or "-P5" in node.properties["hostname"]:
+                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="blue")
+                    else:
+                        device_network.add_node(node.id, label=node.properties.get("hostname"), color="yellow")
+                elif "Interface" in node.labels:
+                    device_network.add_node(node.id, label=node.properties.get("name"), color="orange", shape="box", mass=1)
+            edges = path[0].relationships
+            for edge in edges:
+                device_network.add_edge(edge.start_id, edge.end_id)
+        l2_html = device_network.generate_html()
+        l2_html = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html, 2, re.DOTALL)
+        l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
+        l2_html = re.sub(r'row no-gutter', '', l2_html, 0, re.DOTALL)
+        
+        return parse_py_vis(l2_html)
+    
     @expose('/l2_extended/', methods=['GET'])
     @has_access
     def l2_extended(self):
@@ -357,7 +386,7 @@ class DeviceView(BaseView):
         l2_html = device_network.generate_html()
         l2_html = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html, 2, re.DOTALL)
         l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
-        return self.render_template('l2_extended.html', device=device, html=l2_html)
+        return parse_py_vis(l2_html)
         
         
         
@@ -445,4 +474,4 @@ class DeviceView(BaseView):
         l2_html_short = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html_short, 2, re.DOTALL)
         l2_html_short = re.sub(r'<link\s*href.*?\/>', '', l2_html_short, 0, re.DOTALL)
         l2_html_short = re.sub(r'row no-gutter', '', l2_html_short, 0, re.DOTALL)
-        return self.render_template('l2_extended.html', device=node1, html=l2_html_short)
+        return parse_py_vis(l2_html_short)

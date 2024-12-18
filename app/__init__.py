@@ -11,7 +11,7 @@ from .views.hardware import HardwareView
 from .views.object_types import ObjectTypeView
 from .views.recommendations import RecommendationView
 from .views.generate_fake_score import GenerateFakeScores
-from .views.empty import EmptyView
+from .views.empty import EmptyView, UITestView
 from .views.dataquality import LijnbenamingMissingPort, DeviceMissingLocation, DeviceMissingPort, NonConsecutiveLine
 from .views.abnomalies import DualHoming, Redundancy, LineRedundancy, LineRedundancyMap
 from .views.specific_requests import CVRFibers, WKSImport, InterfacesDevices, DevicesSerial, WirelessUplinks, RegexTest
@@ -82,6 +82,7 @@ appbuilder.add_view(DevicesSerial, "Serial numbers", category='Specific requests
 appbuilder.add_view(RegexTest, "Regex test", category='Specific requests')
 
 appbuilder.add_view(Abbreviations, "Afkortingen", category='Info', category_icon='fa-circle-info')
+appbuilder.add_view(UITestView, "UI test", category='Info', category_icon='fa-circle-info')
 
 appbuilder.add_view_no_menu(DeviceView)
 appbuilder.add_view_no_menu(GenerateFakeScores)

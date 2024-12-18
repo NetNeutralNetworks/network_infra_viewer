@@ -1,5 +1,8 @@
 {% extends 'appbuilder/init.html' %}
 {% import 'appbuilder/baselib.html' as baselib %}
+{% import 'components.html' as components %}
+
+
 
 {% block head_css%}
 {{ super() }}
@@ -7,6 +10,7 @@
 <link href="{{ url_for('static', filename='fontawesome/css/brands.css') }}" rel="stylesheet" />
 <link href="{{ url_for('static', filename='fontawesome/css/solid.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rws.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/device-page.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -49,10 +53,8 @@
         {% block messages %}
         {% include 'appbuilder/flash.html' %}
         {% endblock %}
-        <div class="content">
         {% block content %}
         {% endblock %}
-        </div>
 
     </div>
 

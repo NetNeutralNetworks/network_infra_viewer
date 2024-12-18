@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/device-page.css') }}">
+
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+
+{% block page_title %}
+UI Test
+{% endblock %}
+
+{% block content %}
+<div class="content">
+
+    <div class="fds-row">
+        {{components.card(title='Legend')}}
+        <div class="card">
+            This is a card in row 1 {{components.icon('fa-arrow-left')}}{{components.icon('fa-arrow-right', '#FF0000;')}}
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+    </div>
+    <div class="fds-row">
+        <div class="card">
+            This is a card in row 1
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+        <div class="card">
+            This is another card in row 1
+        </div>
+    </div>
+    <div class="card">
+        This is a card
+    </div>
+    <div class="card">
+        This is another card
+    </div>
+    <div class="card">
+        Third card
+    </div>
+
+</div>
+
+{% endblock %}
+

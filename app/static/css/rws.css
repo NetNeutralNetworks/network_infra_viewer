@@ -551,6 +551,14 @@ body {
     overflow-y: scroll;
     /* align-self: stretch; */
     /* font-family: sans-serif; */
+    display: flex;
+    padding: var(--fds-density-space-1_0x, 16px) var(--fds-density-space-1_5x, 24px) var(--fds-density-space-1_5x, 24px) var(--fds-density-space-1_5x, 24px);
+    background: var(--fds-color-surface-base, #E6E6E6);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fds-density-space-1_0x, 16px);
+    flex: 1 0 0;
+    align-self: stretch;
 }
 
 .dropdown-menu {
@@ -565,6 +573,18 @@ body {
 
 .current-menu-selected .nav-link{
     margin: 0px 0px 0px 36px;
+
+}
+
+#page-nav{
+    display: flex;
+    height: 48px;
+    padding: var(--fds-density-space-0_5x, 8px);
+    align-items: center;
+    align-self: stretch;
+    background: var(--fds-color-surface-primary, #FFF);
+    /* Elevation/1 */
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.04);
 
 }
 
@@ -627,4 +647,10 @@ font-family: RijksoverheidSansWebText;
   }
 .leaflet-bottom .leaflet-control {
     margin-bottom: 24px;
+}
+
+.vert-divider{
+    width: 1px;
+    height: 16px;
+    background: var(--fds-color-line-secondary, #E6E6E6);
 }
