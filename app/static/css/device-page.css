@@ -417,6 +417,36 @@
     line-height: 24px; /* 160% */
 }
 
+.empty-state{
+    display: flex;
+    padding: var(--fds-density-space-2_0x, 32px);
+    justify-content: center;
+    align-items: center;
+    gap: var(--fds-density-space-0_5x, 8px);
+    flex: 1 0 0;
+    align-self: stretch;
+    background: var(--fds-color-surface-info, #D9EBF7);
+}
+
+.empty-state-content-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.empty-state-content{
+    color: var(--fds-color-text-page_title, #154273);
+text-align: center;
+
+/* Forms/Placeholder */
+font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+font-size: var(--fds-font-forms-placeholder, 15px);
+font-style: italic;
+font-weight: 400;
+line-height: 24px; /* 160% */
+}
+
 .jsontree_tree{
     padding: 0px !important;
     margin: 0px !important;

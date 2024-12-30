@@ -45,8 +45,8 @@
 </div>
 {%- endmacro %}
 
-{% macro medium_tile(label, active=False) -%}
-<div class="tile tile-medium">
+{% macro medium_tile(label, active=False, onclick=False, extra_classes=False) -%}
+<div class="tile tile-medium{% if extra_classes %} {{extra_classes}} {% endif %}" {% if onclick %}onclick="{{onclick}}" {% endif %}>
     <div class="tile-trailing-icon">
       <i class="fa-solid fa-chevron-right" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 12px; "></i>
     </div>
@@ -58,4 +58,16 @@
         
     </div>
   </div>
+{%- endmacro %}
+
+{% macro empty_state(content, extra_classes=False) -%}
+<div class="empty-state{% if extra_classes %} {{extra_classes}} {% endif %}">
+    <div class="empty-state-content-wrapper">
+        <i class="fa-light fa-circle-exclamation" style="display: flex; width: 24px; height: 24px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 20px; font-style: normal; font-weight: 300; line-height: 24px; "></i>
+        <div class="empty-state-content">
+            {{content}}
+        </div>
+    </div>
+    
+</div>
 {%- endmacro %}

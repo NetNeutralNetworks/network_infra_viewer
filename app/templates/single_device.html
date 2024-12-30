@@ -431,6 +431,23 @@ function openTile(evt, url) {
   </div>
   
   <div id="Layer3" class="tabcontent">
+    <script>
+      function switch_network_instance(instance){
+        // Declare all variables
+        var i, net_inst, tablinks;
+
+        // Get all elements with class="network_instance" and hide them
+        net_inst = document.getElementsByClassName("network-instance");
+        for (i = 0; i < net_inst.length; i++) {
+          net_inst[i].style.display = "none";
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(instance).style.display = "flex";
+
+      }
+    </script>
+
     <div class="card">
       <div class="card-title">
         Networks {{components.info_icon('l3','About this page','This page shows the network segments configured on the selected device according to the configuration collected by the CSPC collector.')}}
@@ -465,7 +482,7 @@ function openTile(evt, url) {
             <div class="accordion">interface: {{ interface}}</div>  
           {% endfor %}
         </div> -->
-          {{ components.medium_tile(vrf.name) }}
+          {{ components.medium_tile(vrf.name, onclick="switch_network_instance('table-netinst-" + vrf.name + "')") }}
         {% endfor %}
       </div>
     </div> 
@@ -475,7 +492,18 @@ function openTile(evt, url) {
           NETWORK INSTANCE
         </div>
         <div class="card-content">
-          TABLE HERE
+          {{components.empty_state('No results found', extra_classes='network-instance')}}
+          {% for vrf in l3 %}
+          <table id="table-netinst-{{vrf.name}}" class="table table-striped fds-column network-instance" style="display: none;">
+          <thead><tr><th>Segments</th></tr></thead>
+          <tbody>
+            {% for interface in vrf.interfaces %}
+            <tr><td>{{ interface}}</td></tr>
+            {% endfor %}
+          </tbody>
+          </table>  
+          
+        {% endfor %}
         </div>
     </div>
   </div>
