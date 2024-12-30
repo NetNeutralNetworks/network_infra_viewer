@@ -294,8 +294,8 @@ crossorigin=""></script>
         {{ components.label_card('latitude', device.latitude) }}
         {{ components.label_card('longtitude', device.longtitude) }}
       </div>
-    <div class="fds-row">
-      <div class="card">
+    <div class="fds-row" style="display: grid; grid-template-columns: repeat(6, 1fr);">
+      <div class="card" style="grid-column: 1 / 5;">
         <div class="card-title">
           Connected devices {{components.info_icon('l1' ,'About this page', 'Content')}}
         </div>
@@ -313,7 +313,7 @@ crossorigin=""></script>
           </div>
         </div>
       </div>
-      <div id="map" style="background-color:green; width:32.6%;"></div>
+      <div id="map" style="background-color:green; grid-column:5 / 7; width:100%;"></div>
     </div>
   </div>
     <!-- <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
