@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 {{ super() }}
@@ -42,35 +42,21 @@ crossorigin=""></script>
     
 {% endblock %}
 
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block messages %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block content %}
-    <div style="margin:20px;">
-    <h1>Devices</h1>
-    <table id="object-table">
-        <thead><tr><td>Device</td><td>Location</td><td>RWS Object location</td></tr></thead>
-        <tbody>
-            {% for entry in devices %}
-            <tr><td><a href='/deviceview/show/?hostname={{entry.device}}'>{{entry.device}}</a></td><td>{{entry.location}}</td><td>{{entry.rws_location}}</td></tr>
-            {% endfor %}
-
-        </tbody>
-    </table>
-    </div>
-    {% endblock %}
-
-    {% block footer %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block tail_js %}
-    {% endblock %}
+{% block content %}
+<div class="content">
+    <div class="card" style="width: 100%;">
+        <h1>Devices</h1>
+        <table id="object-table">
+            <thead><tr><td>Device</td><td>Location</td><td>RWS Object location</td></tr></thead>
+            <tbody>
+                {% for entry in devices %}
+                <tr><td><a href='/deviceview/show/?hostname={{entry.device}}'>{{entry.device}}</a></td><td>{{entry.location}}</td><td>{{entry.rws_location}}</td></tr>
+                {% endfor %}
+    
+            </tbody>
+        </table>
+        </div>
+</div>
+    
 
 {% endblock %}

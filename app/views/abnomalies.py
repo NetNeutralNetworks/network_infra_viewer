@@ -38,7 +38,7 @@ class DualHoming(BaseView):
             <p>This page shows all devices that should be redundant in uplinks to PE devices (Dualhomed), but are missing one or both direct connections to a PE device. The devices are flagged as Dualhomed if the typical is followed by a "D". For example: CE49D.</p>
             <p>This data is provided by the CSPC collector.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Dualhomed devices not actualy conected to 2 PE devices", entries=lines,page_info=help)
+        return self.render_template('single_column_table.html', table_header="Dualhomed devices not actualy conected to 2 PE devices", entries=lines,page_info=help, page_category='Anomalies')
     
 class Redundancy(BaseView):
     default_view = 'main_page'
@@ -72,7 +72,7 @@ class Redundancy(BaseView):
             <p>This page shows all devices that should be redundant in both hardware and uplinks (Redundant), but are missing either. This can be caused by HA devices not being interconnected or one of the nodes not having a direct uplink to a PE router. The devices are flagged as Redundant if the typical is followed by a "R". For example: CE49R.</p>
             <p>This data is provided by the CSPC collector.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Redundant devices not actualy conected to 2 PE devices", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Redundant devices not actualy conected to 2 PE devices", entries=lines, page_info=help, page_category='Anomalies')
     
 class LineRedundancy(BaseView):
     default_view = 'main_page'
@@ -186,7 +186,7 @@ class LineRedundancy(BaseView):
         <p>The length of the segments are calculated as the sum of all the segments that share a fibrebundle and is displayed in meters. This data is provided by Cocon</p>
         """
         
-        return self.render_template('single_column_table.html', table_header="Hostname</td><td>Total non-redundanct fiber (m)", entries=entries, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Hostname</td><td>Total non-redundanct fiber (m)", entries=entries, page_info=help, page_category='Anomalies')
     
 # class LineRedundancyR(BaseView):
 #     default_view = 'main_page'
@@ -365,5 +365,5 @@ class LineRedundancyMap(BaseView):
         help = """
         <p>This page shows a map of all the fibers that should be redundant but arn't. They are plotted on a map.</p>
         """
-        return self.render_template('generic_map.html', lines=span_nodes, markers=[], page_info=help, color_strategy='single')
+        return self.render_template('generic_map.html', lines=span_nodes, markers=[], page_info=help, color_strategy='single', page_category='Anomalies')
     

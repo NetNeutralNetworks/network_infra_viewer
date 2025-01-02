@@ -1,0 +1,69 @@
+{% macro menu_item(item) %}
+    <a class="nav-link" tabindex="-1" href="{{item.get_url()}}">
+    {%if item.icon %}
+        <i class="fa fa-fw {{item.icon}}"></i>
+    {% endif %}
+{{-_(item.label)}}</a>
+{% endmacro %}
+
+
+
+
+{% for item1 in menu.get_list() %}
+    {% if item1 | is_menu_visible %}
+        {% if item1.childs %}
+            <div class="nav-category {% if item1.label == page_category %}{% else %}NIVR-dropdown{% endif %}">
+            <div class="nav-link {% if item1.label == page_category %}active-category{% endif %}" data-toggle="dropdown" href="#">
+                {% if item1.icon %}
+                <i class="fa {{item1.icon}} "></i>
+                {% endif %}
+                <span style="flex-grow: 10;">
+{{-_(item1.label)}}
+                </span>
+                <div>
+                {% if item1.label == page_category %}<i class="fa-solid fa-chevron-down fa-2xs"></i>{% else %}<i class="fa-solid fa-chevron-right fa-2xs"></i>{% endif %}
+                </div>
+            </div>
+            <div class="nav-category-children {% if item1.label == page_category %}current-menu-selected{% else %}hidden menu-not-selected{% endif %}">
+            {% for item2 in item1.childs %}
+                {% if item2 %}
+                    {% if item2.name == '-' %}
+                        <!-- {% if not loop.last %}
+                          <li class="divider"></li>
+                        {% endif %} -->
+                    {% elif item2 | is_menu_visible %}
+                        <div class="nav-item">{{ menu_item(item2) }}</div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            </div></div>
+        {% else %}
+            <div class="nav-category">
+                {{ menu_item(item1) }}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<script>
+    var dropdowns = document.getElementsByClassName("NIVR-dropdown");
+
+    var expandMenu = function (t) {
+            var dropdownElement = t.target;
+            dropdownElement.childNodes[3].classList.toggle('hidden')
+            // var parentofSelected = dropdownElement.parentNode; // gives the parent DIV
+
+            // var children = parentofSelected.childNodes;
+            // for (var i=0; i < children.length; i++) {
+            //     if (children[i].tagName = "div") {
+            //         children[i].classList.toggle('hidden')
+                
+            //     }
+            // }
+        }
+    
+    for (var i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].addEventListener('mouseenter', expandMenu, false);
+        dropdowns[i].addEventListener('mouseleave', expandMenu, false);
+    }
+</script>
