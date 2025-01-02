@@ -4,7 +4,7 @@
 
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/device-page.css') }}" />
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
 integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
 crossorigin=""/>
@@ -13,7 +13,7 @@ crossorigin=""/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
 crossorigin=""/>
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css"
 crossorigin=""/>
 <link href="{{ url_for('static', filename='appbuilder/css/bootstrap.min.css')}}" rel="stylesheet">
 <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -112,44 +112,14 @@ crossorigin=""></script>
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 <script src="https://code.jquery.com/jquery-3.5.1.js"
 crossorigin=""></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"
 crossorigin=""></script>
 <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"
 crossorigin=""></script>
 <script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
 <script src="{{url_for('static',filename='jsonTree/jsonTree.js')}}"></script>
 
-<script type="text/javascript">
-  var datatable;
-  $(document).ready(function () {
-      datatable = $('#connection-table').DataTable({
-        scrollY: '600px',
-        scrollCollapse: true,
-        paging: false,
-        destroy: true,
-        select: true,
-      });
-      $('#connection-table tbody').on( 'click', 'tr', function () {
-        var rowData = datatable.row( this ).data();
-        changeSelectionInMap(rowData[2])
-      } );
-      if (map){
-        map.invalidateSize()
-      }
-      // openView('evt','Layer1');
-  });
 
-  var datatable2;
-  $(document).ready(function () {
-      datatable2 = $('#interface-table').DataTable({
-        paging: false,
-        destroy: true,
-      });
-      $('#interface-table_wrapper').css("width", "100%");
-  });
-
-  
-</script>
 {% endblock %}
 
 {% block page_title %}
@@ -296,9 +266,17 @@ crossorigin=""></script>
       </div>
     <div class="fds-row" style="display: grid; grid-template-columns: repeat(6, 1fr);">
       <div class="card" style="grid-column: 1 / 5;">
-        <div class="card-title">
-          Connected devices {{components.info_icon('l1' ,'About this page', 'Content')}}
+        <div class="card-header">
+          <div class="card-title-left">
+            Connected devices {{components.info_icon('l1' ,'About this page', 'Content')}}
+            
+            
+          </div>
+          <div class="card-title-right">
+            {{components.searchbar('Search devices...', id='connection-table_filter')}}
+          </div>
         </div>
+        
         <div class="card-content">
           <div id="connection-details" style="width: 100%">
             <table id="connection-table">
@@ -334,7 +312,7 @@ crossorigin=""></script>
   
   <div id="Layer2" class="tabcontent">
     <div class="card">
-      <div class="card-title">
+      <div class="card-title-left">
         Data views {{components.info_icon('l2','About this page','Content')}}
       </div>
       <div class="card-content" style="display: flex;flex-direction: column; padding-bottom: 5px;">
@@ -400,7 +378,7 @@ crossorigin=""></script>
           </div>
       </div>
   </div>
-  <iframe name="l2_frame" src="/deviceview/l2_graph/?hostname={{device.hostname}}" style="height: calc(100vh - 180px); border:none; flex-grow: 2; background-color: #fff;" title="Overview"></iframe> 
+  <iframe id="l2_iframe" name="l2_frame" src="/deviceview/l2_graph/?hostname={{device.hostname}}" style="height: calc(100vh - 180px); border:none; flex-grow: 2; background-color: #fff;" title="Overview"></iframe> 
   
       <!-- {{html|safe}} -->
       <script>
@@ -443,14 +421,40 @@ function openTile(evt, url) {
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
-        document.getElementById(instance).style.display = "flex";
+        document.getElementById(instance).style.display = "table";
+        document.getElementById('ni_label').innerText = instance.substr(14);
 
       }
     </script>
 
     <div class="card">
-      <div class="card-title">
-        Networks {{components.info_icon('l3','About this page','This page shows the network segments configured on the selected device according to the configuration collected by the CSPC collector.')}}
+      <div class="card-header">
+        <div class="card-title-left">
+          Networks {{components.info_icon('l3','About this page','This page shows the network segments configured on the selected device according to the configuration collected by the CSPC collector.')}}
+        </div>
+        <div class="card-title-right">
+          {{components.searchbar('Search networks...', id='l3_network_filter')}}
+          <script>
+            
+            $('#l3_network_filter').keyup(function(){
+              var l3_network_tiles = $('#l3_networklist')[0].children;
+              for(var x = 0; x < l3_network_tiles.length; x++) {
+                console.log(l3_network_tiles[x])
+                l3_network_tiles[x].style.display = 'none';
+                try{
+                  var content = l3_network_tiles[x].querySelector('.tile-label')
+                  if($('#l3_network_filter')[0].value == '' || content.outerText.toLowerCase().includes($('#l3_network_filter')[0].value.toLowerCase())){
+                    l3_network_tiles[x].style.display = 'flex';
+                  }
+                } catch{
+
+                }
+                
+              }
+            })
+            
+          </script>
+        </div>
       </div>
       <div class="card-content">
       <!-- {% for vrf in l3 %}
@@ -473,7 +477,7 @@ function openTile(evt, url) {
     {% endfor %}
     </div>  -->
     
-      <div class="fds-column" style="gap: var(--fds-density-space-0_5x, 8px);">
+      <div id="l3_networklist" class="fds-column" style="gap: var(--fds-density-space-0_5x, 8px);">
 
         {% for vrf in l3 %}
           <!-- <button class="accordion">{{ vrf.name }}</button>
@@ -487,14 +491,14 @@ function openTile(evt, url) {
       </div>
     </div> 
       </div>
-      <div class="card">
-        <div class="card-title">
+      <div class="card" style="flex-grow: 2;">
+        <div id="ni_label" class="card-title-left">
           NETWORK INSTANCE
         </div>
         <div class="card-content">
           {{components.empty_state('No results found', extra_classes='network-instance')}}
           {% for vrf in l3 %}
-          <table id="table-netinst-{{vrf.name}}" class="table table-striped fds-column network-instance" style="display: none;">
+          <table id="table-netinst-{{vrf.name}}" class="table table-striped network-instance" style="display: none;">
           <thead><tr><th>Segments</th></tr></thead>
           <tbody>
             {% for interface in vrf.interfaces %}
@@ -511,7 +515,7 @@ function openTile(evt, url) {
   
   <div id="device_config" class="tabcontent" >
     <div class="card">
-      <div class="card-title">
+      <div class="card-title-left">
         Configuration {{components.info_icon('device_config','About this page','This page shows the raw config as provided by the CSPC collector')}}
       </div>
       <div class="card-content" style="white-space: pre-wrap;">
@@ -519,7 +523,7 @@ function openTile(evt, url) {
       </div>
   </div>
   <div class="card">
-    <div class="card-title">
+    <div class="card-title-left">
       JSON
     </div>
     <div id="oc_content" class="card-content">
@@ -539,8 +543,32 @@ function openTile(evt, url) {
   
   <div id="interfaces" class="tabcontent" >
     <div class="card">
-      <div class="card-title">
-        Interfaces {{components.info_icon('inf','About this page','This page shows the interpretted interface data from config')}}
+      <div class="card-header">
+        <div class="card-title-left">
+          Interfaces {{components.info_icon('inf','About this page','This page shows the interpretted interface data from config')}}
+        </div>
+        <div class="card-title-right">
+          {{components.searchbar('Search interfaces...', id='interfaces_filter')}}
+          <script>
+            var datatable2;
+            $(document).ready(function () {
+                datatable2 = $('#interface-table').DataTable({
+                  paging: false,
+                  destroy: true,
+                  layout: {
+                    topStart: null,
+                    topEnd: null,
+                    bottomStart: null,
+                    bottomEnd: null
+                  },
+                });
+                $('#interface-table_wrapper').css("width", "100%");
+            });
+            $('#interfaces_filter').keyup(function(){
+              datatable2.search($(this).val()).draw() ;
+            })
+          </script>
+        </div>
       </div>
       <div class="card-content">
     <table id="interface-table" class="table table-striped" style="width: 100%">
@@ -604,6 +632,11 @@ function openView(evt, viewName) {
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(viewName).style.display = "flex";
   evt.currentTarget.className += " active";
+
+  if (viewName == 'Layer2'){
+    var l2frame = document.getElementById('l2_iframe');
+    l2frame.contentWindow.network.fit();
+  }
 } 
 
   function changeSelectionInTable(selected_item){
@@ -796,4 +829,103 @@ function get_connection_type_color(x){
   
   
   </script>
+
+<!-- <script type="text/javascript">
+  var datatable;
+  $(document).ready(function () {
+      datatable = $('#connection-table').DataTable({
+        scrollY: '600px',
+        scrollCollapse: true,
+        pageLength: 15,
+        paging: true,
+        destroy: true,
+        select: true,
+        searching: false,
+        layout: {
+          topStart: null,
+          topEnd: null,
+          bottomStart: 'paging',
+          bottomEnd: 'pageLength'
+        }
+      });
+      $('#connection-table tbody').on( 'click', 'tr', function () {
+        var rowData = datatable.row( this ).data();
+        changeSelectionInMap(rowData[2])
+      } );
+      if (map){
+        map.invalidateSize()
+      }
+      // openView('evt','Layer1');
+  });
+
+  var datatable2;
+  $(document).ready(function () {
+      datatable2 = $('#interface-table').DataTable({
+        paging: false,
+        destroy: true,
+      });
+      $('#interface-table_wrapper').css("width", "100%");
+  });
+
+  
+</script> -->
+<script type="text/javascript">
+  var datatable;
+
+  datatable = new DataTable('#connection-table', {
+    layout: {
+          topStart: null,
+          topEnd: null,
+          bottomStart: {
+            paging: {
+                firstLast: false
+            }
+          },
+          bottomEnd: 'pageLength'
+        },
+    scrollY: '600px',
+    scrollCollapse: true,
+    pageLength: 15,
+    paging: true,
+    destroy: true,
+    select: {
+      style: 'single'
+    },
+    searching: true,
+    lengthMenu: [15, 25, {label: 'All', value: -1}],
+    language: {
+      lengthMenu: 'rows per page _MENU_'
+    }
+    
+  });
+
+  $('#connection-table_filter').keyup(function(){
+    datatable.search($(this).val()).draw() ;
+    console.log('Typed!')
+  })
+  $(document).ready(function () {
+      $('#connection-table tbody').on( 'click', 'tr', function (e) {
+        var rowData = datatable.row( this ).data();
+        let classList = e.currentTarget.classList;
+ 
+    if (classList.contains('selected')) {
+        classList.remove('selected');
+    }
+    else {
+        datatable.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+        classList.add('selected');
+    }
+        changeSelectionInMap(rowData[2])
+      } );
+      if (map){
+        map.invalidateSize()
+      }
+      // openView('evt','Layer1');
+      
+  });
+
+  
+
+  
+</script>
 {% endblock %}

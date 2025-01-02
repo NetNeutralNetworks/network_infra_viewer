@@ -71,3 +71,44 @@
     
 </div>
 {%- endmacro %}
+
+{% macro searchbar(placeholder, id=False, filter=False, results=False, clear_filter=False) %}
+<div class='search-panel-container'>
+    
+    <div class='filter-wrapper'>
+            <div class='search-input'>
+                    <i class='fa fa-search search-bar-icon'></i>
+                    <input {% if id %}id='{{id}}'{% endif %} class="search-box-input" type='text' placeholder='{{placeholder}}' autofocus='true'></input>
+                    {% if clear_filter %}<span onclick='clear_filter()'><i class='fa fa-close search-bar-icon search-bar-trailing-icon'></i></span>{% endif %}
+            </div>
+            {% if filter %}
+            <div class='filter-button' onclick='toggleFilters()'>
+                    <i class='fa-solid fa-bars-filter search-bar-filter-icon'></i>
+            </div>
+            <div class='filter-options-wrapper hidden'>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Not yet in use</div></div>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>In use</div></div>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Ready for removal</div></div>
+            </div>
+            {% endif %}
+    </div>
+    {% if results %}
+    <div class='filter-results-wrapper hidden'>
+            <table class='table table-striped' id='search-results-table'>
+                    <thead>
+                            <tr>
+                            <th scope='col'>Objects</th>
+                            <th scope='col'>Type</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                            <td>No data found</td>
+                            <td>No data found</td>
+                            </tr>
+                    </tbody>
+            </table>
+    </div>
+    {% endif %}
+</div>
+{%- endmacro %}

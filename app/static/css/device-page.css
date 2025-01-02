@@ -153,12 +153,22 @@
     gap:0px;
 
 }
-.card-title{
+
+.card-header{
+    display: flex;
+    align-items: center;
+    gap: var(--fds-density-space-1_0x, 16px);
+    align-self: stretch;
+    flex-direction: row;
+}
+.card-title-left{
     display: flex;
     /* width: 752px; */
     align-items: center;
     gap: var(--fds-density-space-0_5x, 8px);
     color: var(--fds-color-text-title-primary, #000);
+    align-items: center;
+    flex: 1 0 0;
 
     /* Heading/3 */
     font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
@@ -166,6 +176,13 @@
     font-style: normal;
     font-weight: 700;
     line-height: 24px; /* 126.316% */
+}
+
+.card-title-right{
+    display: flex;
+    width: 61px;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .card-label{
@@ -236,6 +253,7 @@
     padding: var(--fds-density-space-0_75x, 12px) var(--fds-density-space-1_0x, 16px);
     flex-direction: column;
     align-items: flex-start;
+    max-height: 50px;
 }
 
 .tile:hover{
@@ -445,6 +463,18 @@ font-size: var(--fds-font-forms-placeholder, 15px);
 font-style: italic;
 font-weight: 400;
 line-height: 24px; /* 160% */
+}
+
+table.dataTable>tbody>tr.selected, table.dataTable>tbody>tr.selected>*, table.dataTable>tbody>tr.selected:hover, table.dataTable>tbody>tr.selected a{
+    background: var(--fds-color-surface-highlight, #D9EBF7) !important;
+    color: var(--fds-color-text-highlight, #007BC7) !important;
+    font-family: var(--typography-font-family, RijksoverheidSansWebText);
+    box-shadow: none !important;
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
 }
 
 .jsontree_tree{
