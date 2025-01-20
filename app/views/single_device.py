@@ -297,7 +297,7 @@ class DeviceView(BaseView):
             pass
                         
 
-        return self.render_template('single_device.html', device=device, connections=connections, markers = unique_locations, spans=spans, lines=lijnen, device_config=device_config, l3=vrfs, oc=oc_text, interfaces=interfaces, config_date=self.config_date, page_category='Network Components')
+        return self.render_template('single_device.html', device=device, connections=connections, markers = unique_locations, spans=spans, lines=lijnen, device_config=device_config, l3=vrfs, oc=oc_text, interfaces=interfaces, config_date=self.config_date, page_category='Network Components', page='Devices')
     
 
     @expose('/l2_graph/', methods=['GET'])

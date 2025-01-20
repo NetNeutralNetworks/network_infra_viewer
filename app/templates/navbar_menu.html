@@ -32,7 +32,7 @@
                           <li class="divider"></li>
                         {% endif %} -->
                     {% elif item2 | is_menu_visible %}
-                        <div class="nav-item">{{ menu_item(item2) }}</div>
+                        <div class="nav-item{% if item2.label == page %} nav-item-active{% endif %}">{{ menu_item(item2) }}</div>
                     {% endif %}
                 {% endif %}
             {% endfor %}
