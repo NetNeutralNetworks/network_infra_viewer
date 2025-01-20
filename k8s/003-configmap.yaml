@@ -14,4 +14,4 @@ data:
   DEBUG_MODE: 'True'
   AUTHENTIK_DOMAIN: '' 
   KEYCLOAK_DOMAIN: https://secure-ui.k8s.datalake-poc.cnap-am4.intranet.rws.nl
-  CSPC_FOLDER: '20230725_cspc_collector'
+  CSPC_FOLDER: '20240704'

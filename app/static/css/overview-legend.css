@@ -1,12 +1,12 @@
 .legend-panel-container{
     display: flex;
     width: 176px;
-    padding: var(--sizes-spacings-small, 16px);
+    padding: var(--fds-density-space-1_0x, 16px);
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--sizes-spacings-xsmall, 8px);
+    gap: var(--fds-density-space-0_5x, 8px);
 
-    background: var(--color-surface-card, #FFF);
+    background: var(--fds-color-surface-primary, #FFF);
     /* Elevation 3 */
     box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.06);
 }
@@ -19,10 +19,10 @@
 }
 
 .legend-header{
-    color: var(--color-text-label-onDefault, #535353);
+    color: var(--fds-color-text-label-primary, #535353);
     /* Forms/Label */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-forms-label, 11px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-label, 11px);
     font-style: normal;
     font-weight: 700;
     line-height: 16px; /* 145.455% */
@@ -39,9 +39,9 @@
 
 .legend-item{
     display: flex;
-    height: var(--typography-heading-H4, 16px);
+    height: var(--fds-font-heading-level-4, 16px);
     align-items: center;
-    gap: var(--sizes-spacings-xsmall, 8px);
+    gap: var(--fds-density-space-0_5x, 8px);
     align-self: stretch;
 }
 
@@ -57,12 +57,12 @@
     -webkit-line-clamp: 1;
     flex: 1 0 0;
     overflow: hidden;
-    color: var(--color-text-label-onDefault, #535353);
+    color: var(--fds-color-text-label-primary, #535353);
     text-overflow: ellipsis;
 
     /* Body/Small */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-small, 11px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-s, 11px);
     font-style: normal;
     font-weight: 400;
     line-height: 16px; /* 145.455% */

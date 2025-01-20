@@ -62,7 +62,8 @@ class MapOverview(BaseView):
         return self.render_template('overview_new.html', 
                                     # markers=markers, 
                                     # spans=spans, 
-                                    page_category='Network Components')
+                                    page_category='Network Components',
+                                    page='Overview')
     
     @expose('/overview/old', methods=['GET','POST'])
     @has_access
@@ -118,7 +119,8 @@ class MapOverview(BaseView):
         return self.render_template('overview.html', 
                                     markers=markers, 
                                     spans=spans, 
-                                    page_category='Network Components')
+                                    page_category='Network Components',
+                                    page='Overview')
     
     @expose('/span/', methods=['GET'])
     @has_access

@@ -1,339 +1,258 @@
-:root {
-    /* THEMES */
-    --sizes-sidebar-width-default: 256px;
-    --sizes-sidebar-width-rem-default: 16rem;
-    --sizes-sidebar-width-power-bi: 256px;
-    --sizes-sidebar-width-rem-power-bi: 16rem;
-    --typography-font-family-default: "RijksoverheidSansWebText";
-    --typography-font-family-power-bi: "Calibri";
-    --typography-heading-h1-default: 27px;
-    --typography-heading-h1-rem-default: 1.6875rem;
-    --typography-heading-h1-power-bi: 27px;
-    --typography-heading-h1-rem-power-bi: 1.6875rem;
-    --typography-heading-h2-default: 23px;
-    --typography-heading-h2-rem-default: 1.4375rem;
-    --typography-heading-h2-power-bi: 23px;
-    --typography-heading-h2-rem-power-bi: 1.4375rem;
-    --typography-heading-h3-default: 19px;
-    --typography-heading-h3-rem-default: 1.1875rem;
-    --typography-heading-h3-power-bi: 19px;
-    --typography-heading-h3-rem-power-bi: 1.1875rem;
-    --typography-heading-h4-default: 16px;
-    --typography-heading-h4-rem-default: 1rem;
-    --typography-heading-h4-power-bi: 16px;
-    --typography-heading-h4-rem-power-bi: 1rem;
-    --typography-heading-h5-default: 14px;
-    --typography-heading-h5-rem-default: 0.875rem;
-    --typography-heading-h5-power-bi: 14px;
-    --typography-heading-h5-rem-power-bi: 0.875rem;
-    --typography-body-small-default: 11px;
-    --typography-body-small-rem-default: 0.6875rem;
-    --typography-body-small-power-bi: 11px;
-    --typography-body-small-rem-power-bi: 0.6875rem;
-    --typography-body-regular-default: 13px;
-    --typography-body-regular-rem-default: 0.8125rem;
-    --typography-body-regular-power-bi: 13px;
-    --typography-body-regular-rem-power-bi: 0.8125rem;
-    --typography-body-large-default: 15px;
-    --typography-body-large-rem-default: 0.9375rem;
-    --typography-body-large-power-bi: 15px;
-    --typography-body-large-rem-power-bi: 0.9375rem;
-    --typography-forms-label-default: 11px;
-    --typography-forms-label-rem-default: 0.6875rem;
-    --typography-forms-label-power-bi: 11px;
-    --typography-forms-label-rem-power-bi: 0.6875rem;
-    --typography-forms-value-default: 15px;
-    --typography-forms-value-rem-default: 0.9375rem;
-    --typography-forms-value-power-bi: 15px;
-    --typography-forms-value-rem-power-bi: 0.9375rem;
-    --typography-button-regular-default: 14px;
-    --typography-button-regular-rem-default: 0.875rem;
-    --typography-button-regular-power-bi: 15px;
-    --typography-button-regular-rem-power-bi: 0.9375rem;
-    --typography-button-large-default: 15px;
-    --typography-button-large-rem-default: 0.9375rem;
-    --typography-button-large-power-bi: 16px;
-    --typography-button-large-rem-power-bi: 1rem;
-    --typography-forms-link-default: 13px;
-    --typography-forms-link-rem-default: 0.8125rem;
-    --typography-forms-link-power-bi: 13px;
-    --typography-forms-link-rem-power-bi: 0.8125rem;
-    --typography-forms-placeholder-default: 15px;
-    --typography-forms-placeholder-rem-default: 0.9375rem;
-    --typography-forms-placeholder-power-bi: 15px;
-    --typography-forms-placeholder-rem-power-bi: 0.9375rem;
-    --color-text-pagetitle-default: var(--lintblauw-100);
-    --color-text-pagetitle-power-bi: var(--lintblauw-100);
-    --color-text-title-ondefault-default: var(--neutraal-zwart);
-    --color-text-title-ondefault-power-bi: var(--neutraal-zwart);
-    --color-text-subtitle-default: var(--neutraal-grijs-6);
-    --color-text-subtitle-power-bi: var(--neutraal-grijs-6);
-    --color-text-body-ondefault-default: var(--neutraal-zwart);
-    --color-text-body-ondefault-power-bi: var(--neutraal-zwart);
-    --color-text-placeholder-ondefault-default: var(--neutraal-grijs-5);
-    --color-text-placeholder-ondefault-power-bi: var(--neutraal-grijs-5);
-    --color-text-label-ondefault-default: var(--neutraal-grijs-7);
-    --color-text-label-ondefault-power-bi: var(--neutraal-grijs-7);
-    --color-text-link-default: var(--overige-donkerblauw-100);
-    --color-text-link-power-bi: var(--overige-donkerblauw-100);
-    --color-text-action-ondefault-default: var(--neutraal-zwart);
-    --color-text-action-ondefault-power-bi: var(--neutraal-zwart);
-    --color-text-action-onprimary-default: var(--neutraal-wit);
-    --color-text-action-onprimary-power-bi: var(--neutraal-wit);
-    --color-text-link-hover-default: var(--lintblauw-100);
-    --color-text-link-hover-power-bi: var(--lintblauw-100);
-    --color-text-disabled-default: var(--neutraal-grijs-4);
-    --color-text-disabled-power-bi: var(--neutraal-grijs-4);
-    --color-surface-base-default: var(--neutraal-grijs-2);
-    --color-surface-base-power-bi: var(--neutraal-grijs-2);
-    --color-surface-card-default: var(--neutraal-wit);
-    --color-surface-card-power-bi: var(--neutraal-wit);
-    --color-surface-primary-default: var(--lintblauw-100);
-    --color-surface-primary-power-bi: var(--lintblauw-100);
-    --color-surface-action-blue-default: var(--overige-donkerblauw-100);
-    --color-surface-action-blue-power-bi: var(--overige-donkerblauw-100);
-    --color-surface-action-yellow-default: var(--overige-geel-100);
-    --color-surface-action-yellow-power-bi: var(--overige-geel-100);
-    --color-surface-action-purple-default: var(--overige-paars-100);
-    --color-surface-action-purple-power-bi: var(--overige-paars-100);
-    --color-surface-disabled-default: var(--neutraal-grijs-2);
-    --color-surface-disabled-power-bi: var(--neutraal-grijs-2);
-    --color-surface-light-default: var(--neutraal-grijs-1);
-    --color-surface-light-power-bi: var(--neutraal-grijs-1);
-    --color-border-default-default: var(--lintblauw-30);
-    --color-border-default-power-bi: var(--lintblauw-30);
-    --color-border-light-default: var(--neutraal-grijs-2);
-    --color-border-light-power-bi: var(--neutraal-grijs-2);
-    --color-border-primary-default: var(--lintblauw-60);
-    --color-border-primary-power-bi: var(--lintblauw-60);
-    --color-border-dark-default: var(--neutraal-zwart);
-    --color-border-dark-power-bi: var(--neutraal-zwart);
-    --color-border-focused-ondefault-default: var(--neutraal-zwart);
-    --color-border-focused-ondefault-power-bi: var(--neutraal-zwart);
-    --color-text-success-default: var(--overige-groen-100);
-    --color-text-success-power-bi: var(--overige-groen-100);
-    --color-text-error-default: var(--overige-rood-100);
-    --color-text-error-power-bi: var(--overige-rood-100);
-    --color-surface-chart-blue-default: var(--overige-hemelblauw-100);
-    --color-surface-chart-blue-power-bi: var(--overige-hemelblauw-100);
-    --color-surface-chart-darkblue-default: var(--lintblauw-100);
-    --color-surface-chart-darkblue-power-bi: var(--lintblauw-100);
-    --color-surface-chart-purple-default: var(--overige-paars-100);
-    --color-surface-chart-purple-power-bi: var(--overige-paars-100);
-    --color-surface-chart-violet-default: var(--overige-violet-100);
-    --color-surface-chart-violet-power-bi: var(--overige-violet-100);
-    --color-surface-chart-ruby-default: var(--overige-robijnrood-100);
-    --color-surface-chart-ruby-power-bi: var(--overige-robijnrood-100);
-    --color-surface-chart-orange-default: var(--overige-oranje-100);
-    --color-surface-chart-orange-power-bi: var(--overige-oranje-100);
-    --color-surface-chart-darkyellow-default: var(--overige-donkergeel-100);
-    --color-surface-chart-darkyellow-power-bi: var(--overige-donkergeel-100);
-    --color-surface-chart-yellow-default: var(--overige-geel-100);
-    --color-surface-chart-yellow-power-bi: var(--overige-geel-100);
-    --color-surface-chart-green-default: var(--overige-groen-100);
-    --color-surface-chart-green-power-bi: var(--overige-groen-100);
-    --color-surface-chart-darkgreen-default: var(--overige-donkergroen-100);
-    --color-surface-chart-darkgreen-power-bi: var(--overige-donkergroen-100);
-    --color-surface-card-hovered-default: var(--neutraal-grijs-1);
-    --color-surface-card-hovered-power-bi: var(--neutraal-grijs-1);
-    --color-surface-success-default: var(--overige-groen-15);
-    --color-surface-success-power-bi: var(--overige-groen-15);
-    --color-surface-warning-default: var(--overige-donkergeel-15);
-    --color-surface-warning-power-bi: var(--overige-donkergeel-15);
-    --color-surface-error-default: var(--overige-rood-15);
-    --color-surface-error-power-bi: var(--overige-rood-15);
-    --color-surface-info-default: var(--overige-hemelblauw-15);
-    --color-surface-info-power-bi: var(--overige-hemelblauw-15);
-    --color-icon-info-default: var(--overige-hemelblauw-100);
-    --color-icon-info-power-bi: var(--overige-hemelblauw-100);
-    --color-icon-success-default: var(--overige-groen-100);
-    --color-icon-success-power-bi: var(--overige-groen-100);
-    --color-icon-warning-default: var(--overige-donkergeel-100);
-    --color-icon-warning-power-bi: var(--overige-donkergeel-100);
-    --color-icon-error-default: var(--overige-rood-100);
-    --color-icon-error-power-bi: var(--overige-rood-100);
-    --color-surface-primary-card-default: var(--lintblauw-90);
-    --color-surface-primary-card-power-bi: var(--lintblauw-90);
-    --color-surface-primary-card-hovered-default: var(--lintblauw-75);
-    --color-surface-primary-card-hovered-power-bi: var(--lintblauw-75);
-    --color-border-default-hovered-default: var(--lintblauw-60);
-    --color-border-default-hovered-power-bi: var(--lintblauw-60);
-    --color-border-error-default: var(--overige-rood-100);
-    --color-border-error-power-bi: var(--overige-rood-100);
-    --color-border-focused-onprimary-default: var(--neutraal-wit);
-    --color-border-focused-onprimary-power-bi: var(--neutraal-wit);
-    --color-border-selected-ondefault-default: var(--overige-hemelblauw-100);
-    --color-border-selected-ondefault-power-bi: var(--overige-hemelblauw-100);
-    --color-border-selected-onprimary-default: var(--overige-lichtblauw-100);
-    --color-border-selected-onprimary-power-bi: var(--overige-lichtblauw-100);
-    --color-text-body-onprimary-default: var(--neutraal-wit);
-    --color-text-body-onprimary-power-bi: var(--neutraal-wit);
-    --color-text-label-onprimary-default: var(--neutraal-grijs-2);
-    --color-text-label-onprimary-power-bi: var(--neutraal-grijs-2);
-    --color-text-placeholder-onprimary-default: var(--neutraal-grijs-3);
-    --color-text-placeholder-onprimary-power-bi: var(--neutraal-grijs-3);
-    --color-icon-light-default: var(--neutraal-wit);
-    --color-icon-light-power-bi: var(--neutraal-wit);
-    --color-icon-dark-default: var(--neutraal-zwart);
-    --color-icon-dark-power-bi: var(--neutraal-zwart);
-    --color-icon-active-default: var(--overige-geel-100);
-    --color-icon-active-power-bi: var(--overige-geel-100);
-    --color-icon-inactive-default: var(--lintblauw-30);
-    --color-icon-inactive-power-bi: var(--lintblauw-30);
-    --color-icon-primary-default: var(--lintblauw-100);
-    --color-icon-primary-power-bi: var(--lintblauw-100);
-    --color-text-title-onprimary-default: var(--neutraal-wit);
-    --color-text-title-onprimary-power-bi: var(--neutraal-wit);
-    --color-border-primary-hovered-default: var(--lintblauw-45);
-    --color-border-primary-hovered-power-bi: var(--lintblauw-45);
-    --color-surface-light-hovered-default: var(--neutraal-grijs-2);
-    --color-surface-light-hovered-power-bi: var(--neutraal-grijs-2);
-    --color-text-inactive-default: var(--lintblauw-30);
-    --color-text-inactive-power-bi: var(--lintblauw-30);
-    --sizes-spacings-medium-default: 24px;
-    --sizes-spacings-medium-rem-default: 1.5rem;
-    --sizes-spacings-medium-power-bi: 24px;
-    --sizes-spacings-medium-rem-power-bi: 1.5rem;
-    --sizes-spacings-small-default: 16px;
-    --sizes-spacings-small-rem-default: 1rem;
-    --sizes-spacings-small-power-bi: 16px;
-    --sizes-spacings-small-rem-power-bi: 1rem;
-    --sizes-spacings-xsmall-default: 8px;
-    --sizes-spacings-xsmall-rem-default: 0.5rem;
-    --sizes-spacings-xsmall-power-bi: 8px;
-    --sizes-spacings-xsmall-rem-power-bi: 0.5rem;
-    --sizes-spacings-large-default: 32px;
-    --sizes-spacings-large-rem-default: 2rem;
-    --sizes-spacings-large-power-bi: 32px;
-    --sizes-spacings-large-rem-power-bi: 2rem;
-    --color-surface-dark-default: var(--neutraal-grijs-7);
-    --color-surface-dark-power-bi: var(--neutraal-grijs-7);
-    --sizes-sidebar-collapsed-default: 64px;
-    --sizes-sidebar-collapsed-rem-default: 4rem;
-    --sizes-sidebar-collapsed-power-bi: 64px;
-    --sizes-sidebar-collapsed-rem-power-bi: 4rem;
-  
-    /* PRIMITIVES */
-    --lintblauw-100: #154273;
-    --lintblauw-90: #2c5581;
-    --lintblauw-75: #507196;
-    --lintblauw-60: #738eab;
-    --lintblauw-45: #96aac0;
-    --lintblauw-30: #b9c6d5;
-    --lintblauw-15: #dce3ea;
-    --neutraal-zwart: #000000;
-    --neutraal-grijs-7: #535353;
-    --neutraal-grijs-6: #696969;
-    --neutraal-grijs-5: #999999;
-    --neutraal-grijs-4: #b4b4b4;
-    --neutraal-grijs-3: #cccccc;
-    --neutraal-grijs-2: #e6e6e6;
-    --neutraal-grijs-1: #f3f3f3;
-    --neutraal-wit: #ffffff;
-    --overige-paars-100: #42145f;
-    --overige-paars-75: #714f87;
-    --overige-paars-60: #8d729f;
-    --overige-paars-45: #a995b7;
-    --overige-paars-30: #c6b8ce;
-    --overige-paars-15: #e3dce7;
-    --overige-violet-100: #a90061;
-    --overige-violet-75: #be4088;
-    --overige-violet-60: #cb66a0;
-    --overige-violet-45: #d88cb7;
-    --overige-violet-30: #e5b2cf;
-    --overige-violet-15: #f2d9e7;
-    --overige-robijnrood-100: #ca005d;
-    --overige-robijnrood-75: #d74085;
-    --overige-robijnrood-60: #df669d;
-    --overige-robijnrood-45: #e78cb6;
-    --overige-robijnrood-30: #efb2ce;
-    --overige-robijnrood-15: #f7d9e7;
-    --overige-roze-100: #f092cd;
-    --overige-roze-75: #f4add9;
-    --overige-roze-60: #f6bde1;
-    --overige-roze-45: #f8cee8;
-    --overige-roze-30: #fbdef0;
-    --overige-roze-15: #fdeff8;
-    --overige-rood-100: #d52b1e;
-    --overige-rood-75: #df6056;
-    --overige-rood-60: #e67f78;
-    --overige-rood-45: #ec9f99;
-    --overige-rood-30: #f2bfbb;
-    --overige-rood-15: #f9dfdd;
-    --overige-oranje-100: #e17000;
-    --overige-oranje-75: #e89440;
-    --overige-oranje-60: #eda966;
-    --overige-oranje-45: #f1be8c;
-    --overige-oranje-30: #f6d4b2;
-    --overige-oranje-15: #fbead9;
-    --overige-donkergeel-100: #ffb612;
-    --overige-donkergeel-75: #fdc84d;
-    --overige-donkergeel-60: #fdd370;
-    --overige-donkergeel-45: #fdde94;
-    --overige-donkergeel-30: #fee9b7;
-    --overige-donkergeel-15: #fef4db;
-    --overige-geel-100: #f9e11e;
-    --overige-geel-75: #fae856;
-    --overige-geel-60: #fbed78;
-    --overige-geel-45: #fcf199;
-    --overige-geel-30: #fdf6bb;
-    --overige-geel-15: #fefbdd;
-    --overige-donkerbruin-100: #673327;
-    --overige-donkerbruin-75: #8d665d;
-    --overige-donkerbruin-60: #a3847d;
-    --overige-donkerbruin-45: #baa39d;
-    --overige-donkerbruin-30: #d1c1bd;
-    --overige-donkerbruin-15: #e8e0df;
-    --overige-bruin-100: #94710a;
-    --overige-bruin-75: #af9447;
-    --overige-bruin-60: #bfa96c;
-    --overige-bruin-45: #cfbf90;
-    --overige-bruin-30: #dfd4b5;
-    --overige-bruin-15: #efeada;
-    --overige-donkergroen-100: #275937;
-    --overige-donkergroen-75: #5d8269;
-    --overige-donkergroen-60: #7d9b87;
-    --overige-donkergroen-45: #9db4a4;
-    --overige-donkergroen-30: #bdcdc2;
-    --overige-donkergroen-15: #dee6e1;
-    --overige-groen-100: #39870c;
-    --overige-groen-75: #6aa549;
-    --overige-groen-60: #88b76d;
-    --overige-groen-45: #a5c991;
-    --overige-groen-30: #c3dbb5;
-    --overige-groen-15: #e1edda;
-    --overige-mosgroen-100: #777b00;
-    --overige-mosgroen-75: #999c40;
-    --overige-mosgroen-60: #adaf66;
-    --overige-mosgroen-45: #c1c38c;
-    --overige-mosgroen-30: #d6d7b2;
-    --overige-mosgroen-15: #ebebd9;
-    --overige-mintgroen-100: #76d2b6;
-    --overige-mintgroen-75: #98ddc8;
-    --overige-mintgroen-60: #ace4d3;
-    --overige-mintgroen-45: #c1ebde;
-    --overige-mintgroen-30: #d5f1e9;
-    --overige-mintgroen-15: #eaf8f4;
-    --overige-donkerblauw-100: #01689b;
-    --overige-donkerblauw-75: #408eb4;
-    --overige-donkerblauw-60: #66a4c3;
-    --overige-donkerblauw-45: #8cbbd2;
-    --overige-donkerblauw-30: #b2d1e1;
-    --overige-donkerblauw-15: #d9e8f0;
-    --overige-hemelblauw-100: #007bc7;
-    --overige-hemelblauw-75: #409cd5;
-    --overige-hemelblauw-60: #66afdd;
-    --overige-hemelblauw-45: #8cc3e6;
-    --overige-hemelblauw-30: #b2d7ee;
-    --overige-hemelblauw-15: #d9ebf7;
-    --overige-lichtblauw-100: #8fcae7;
-    --overige-lichtblauw-75: #abd7ed;
-    --overige-lichtblauw-60: #bcdff0;
-    --overige-lichtblauw-45: #cce7f4;
-    --overige-lichtblauw-30: #ddeff8;
-    --overige-lichtblauw-15: #eef7fc;
-    --design-library-component-regular: #9747ff;
+  /* < Primitives > */
+  :root {
+    /* Mode 1 */
+    /* color */
     --design-library-component-light: #f8f2ff;
+    --design-library-component-regular: #9747ff;
+    --fds-bruin-100: #94710a;
+    --fds-bruin-15: #efeada;
+    --fds-bruin-30: #dfd4b5;
+    --fds-bruin-45: #cfbf90;
+    --fds-bruin-60: #bfa96c;
+    --fds-bruin-75: #af9447;
+    --fds-donkerblauw-100: #01689b;
+    --fds-donkerblauw-15: #d9e8f0;
+    --fds-donkerblauw-30: #b2d1e1;
+    --fds-donkerblauw-45: #8cbbd2;
+    --fds-donkerblauw-60: #66a4c3;
+    --fds-donkerblauw-75: #408eb4;
+    --fds-donkerbruin-100: #673327;
+    --fds-donkerbruin-15: #e8e0df;
+    --fds-donkerbruin-30: #d1c1bd;
+    --fds-donkerbruin-45: #baa39d;
+    --fds-donkerbruin-60: #a3847d;
+    --fds-donkerbruin-75: #8d665d;
+    --fds-donkergeel-100: #ffb612;
+    --fds-donkergeel-15: #fef4db;
+    --fds-donkergeel-30: #fee9b7;
+    --fds-donkergeel-45: #fdde94;
+    --fds-donkergeel-60: #fdd370;
+    --fds-donkergeel-75: #fdc84d;
+    --fds-donkergroen-100: #275937;
+    --fds-donkergroen-15: #dee6e1;
+    --fds-donkergroen-30: #bdcdc2;
+    --fds-donkergroen-45: #9db4a4;
+    --fds-donkergroen-60: #7d9b87;
+    --fds-donkergroen-75: #5d8269;
+    --fds-geel-100: #f9e11e;
+    --fds-geel-15: #fefbdd;
+    --fds-geel-30: #fdf6bb;
+    --fds-geel-45: #fcf199;
+    --fds-geel-60: #fbed78;
+    --fds-geel-75: #fae856;
+    --fds-groen-100: #39870c;
+    --fds-groen-15: #e1edda;
+    --fds-groen-30: #c3dbb5;
+    --fds-groen-45: #a5c991;
+    --fds-groen-60: #88b76d;
+    --fds-groen-75: #6aa549;
+    --fds-hemelblauw-100: #007bc7;
+    --fds-hemelblauw-15: #d9ebf7;
+    --fds-hemelblauw-30: #b2d7ee;
+    --fds-hemelblauw-45: #8cc3e6;
+    --fds-hemelblauw-60: #66afdd;
+    --fds-hemelblauw-75: #409cd5;
+    --fds-lichtblauw-100: #8fcae7;
+    --fds-lichtblauw-15: #eef7fc;
+    --fds-lichtblauw-30: #ddeff8;
+    --fds-lichtblauw-45: #cce7f4;
+    --fds-lichtblauw-60: #bcdff0;
+    --fds-lichtblauw-75: #abd7ed;
+    --fds-lintblauw-100: #154273;
+    --fds-lintblauw-15: #dce3ea;
+    --fds-lintblauw-30: #b9c6d5;
+    --fds-lintblauw-45: #96aac0;
+    --fds-lintblauw-60: #738eab;
+    --fds-lintblauw-75: #507196;
+    --fds-lintblauw-90: #2c5581;
+    --fds-mintgroen-100: #76d2b6;
+    --fds-mintgroen-15: #eaf8f4;
+    --fds-mintgroen-30: #d5f1e9;
+    --fds-mintgroen-45: #c1ebde;
+    --fds-mintgroen-60: #ace4d3;
+    --fds-mintgroen-75: #98ddc8;
+    --fds-mosgroen-100: #777b00;
+    --fds-mosgroen-15: #ebebd9;
+    --fds-mosgroen-30: #d6d7b2;
+    --fds-mosgroen-45: #c1c38c;
+    --fds-mosgroen-60: #adaf66;
+    --fds-mosgroen-75: #999c40;
+    --fds-neutraal-grijs-1: #f3f3f3;
+    --fds-neutraal-grijs-2: #e6e6e6;
+    --fds-neutraal-grijs-3: #cccccc;
+    --fds-neutraal-grijs-4: #b4b4b4;
+    --fds-neutraal-grijs-5: #999999;
+    --fds-neutraal-grijs-6: #696969;
+    --fds-neutraal-grijs-7: #535353;
+    --fds-neutraal-wit: #ffffff;
+    --fds-neutraal-zwart: #000000;
+    --fds-oranje-100: #e17000;
+    --fds-oranje-15: #fbead9;
+    --fds-oranje-30: #f6d4b2;
+    --fds-oranje-45: #f1be8c;
+    --fds-oranje-60: #eda966;
+    --fds-oranje-75: #e89440;
+    --fds-overig-overlay: #2d425a3d;
+    --fds-paars-100: #42145f;
+    --fds-paars-15: #e3dce7;
+    --fds-paars-30: #c6b8ce;
+    --fds-paars-45: #a995b7;
+    --fds-paars-60: #8d729f;
+    --fds-paars-75: #714f87;
+    --fds-robijnrood-100: #ca005d;
+    --fds-robijnrood-15: #f7d9e7;
+    --fds-robijnrood-30: #efb2ce;
+    --fds-robijnrood-40: #ea99be;
+    --fds-robijnrood-45: #e78cb6;
+    --fds-robijnrood-50: #df669e;
+    --fds-robijnrood-60: #df669d;
+    --fds-robijnrood-70: #da4d8e;
+    --fds-robijnrood-75: #d74085;
+    --fds-robijnrood-80: #d5337d;
+    --fds-robijnrood-90: #cf1a6d;
+    --fds-rood-100: #d52b1e;
+    --fds-rood-15: #f9dfdd;
+    --fds-rood-30: #f2bfbb;
+    --fds-rood-45: #ec9f99;
+    --fds-rood-60: #e67f78;
+    --fds-rood-75: #df6056;
+    --fds-roze-100: #f092cd;
+    --fds-roze-15: #fdeff8;
+    --fds-roze-30: #fbdef0;
+    --fds-roze-45: #f8cee8;
+    --fds-roze-60: #f6bde1;
+    --fds-roze-75: #f4add9;
+    --fds-violet-100: #a90061;
+    --fds-violet-15: #f2d9e7;
+    --fds-violet-30: #e5b2cf;
+    --fds-violet-45: #d88cb7;
+    --fds-violet-60: #cb66a0;
+    --fds-violet-75: #be4088;
+  }
+
+/* Theme */
+:root {
+    /* Light */
+    /* color */
+    --fds-color-icon-accent: var(--fds-lintblauw-100);
+    --fds-color-icon-active: var(--fds-geel-100);
+    --fds-color-icon-disabled: var(--fds-neutraal-grijs-3);
+    --fds-color-icon-error: var(--fds-rood-100);
+    --fds-color-icon-inactive: var(--fds-lintblauw-30);
+    --fds-color-icon-info: var(--fds-hemelblauw-100);
+    --fds-color-icon-inverted: var(--fds-neutraal-wit);
+    --fds-color-icon-link: var(--fds-donkerblauw-100);
+    --fds-color-icon-primary: var(--fds-neutraal-zwart);
+    --fds-color-icon-secondary: var(--fds-neutraal-grijs-3);
+    --fds-color-icon-success: var(--fds-groen-100);
+    --fds-color-icon-warning: var(--fds-oranje-75);
+    --fds-color-line-accent: var(--fds-lintblauw-60);
+    --fds-color-line-accent-active: var(--fds-lichtblauw-100);
+    --fds-color-line-accent-focus: var(--fds-neutraal-wit);
+    --fds-color-line-accent-hover: var(--fds-lintblauw-45);
+    --fds-color-line-disabled: var(--fds-neutraal-grijs-2);
+    --fds-color-line-error: var(--fds-rood-100);
+    --fds-color-line-inverted: var(--fds-neutraal-zwart);
+    --fds-color-line-primary: var(--fds-lintblauw-30);
+    --fds-color-line-primary-active: var(--fds-hemelblauw-100);
+    --fds-color-line-primary-focus: var(--fds-neutraal-zwart);
+    --fds-color-line-primary-hover: var(--fds-lintblauw-60);
+    --fds-color-line-secondary: var(--fds-neutraal-grijs-2);
+    --fds-color-line-map-100: var(--fds-robijnrood-100);
+    --fds-color-line-map-40: var(--fds-robijnrood-40);
+    --fds-color-line-map-50: var(--fds-robijnrood-50);
+    --fds-color-line-map-60: var(--fds-robijnrood-60);
+    --fds-color-line-map-70: var(--fds-robijnrood-70);
+    --fds-color-line-map-80: var(--fds-robijnrood-80);
+    --fds-color-line-map-90: var(--fds-robijnrood-90);
+    --fds-color-surface-accent: var(--fds-lintblauw-100);
+    --fds-color-surface-accent-card: var(--fds-lintblauw-90);
+    --fds-color-surface-accent-card-hover: var(--fds-lintblauw-75);
+    --fds-color-surface-action-1: var(--fds-donkerblauw-100);
+    --fds-color-surface-action-2: var(--fds-geel-100);
+    --fds-color-surface-action-3: var(--fds-paars-100);
+    --fds-color-surface-base: var(--fds-neutraal-grijs-2);
+    --fds-color-surface-disabled: var(--fds-neutraal-grijs-2);
+    --fds-color-surface-error: var(--fds-rood-15);
+    --fds-color-surface-highlight: var(--fds-hemelblauw-15);
+    --fds-color-surface-info: var(--fds-hemelblauw-15);
+    --fds-color-surface-inverted: var(--fds-neutraal-grijs-7);
+    --fds-color-surface-overlay: var(--fds-overig-overlay);
+    --fds-color-surface-primary: var(--fds-neutraal-wit);
+    --fds-color-surface-primary-hover: var(--fds-neutraal-grijs-1);
+    --fds-color-surface-secondary: var(--fds-neutraal-grijs-1);
+    --fds-color-surface-secondary-hover: var(--fds-neutraal-grijs-2);
+    --fds-color-surface-success: var(--fds-groen-15);
+    --fds-color-surface-warning: var(--fds-donkergeel-15);
+    --fds-color-surface-chart-blue: var(--fds-hemelblauw-100);
+    --fds-color-surface-chart-darkblue: var(--fds-lintblauw-100);
+    --fds-color-surface-chart-darkgreen: var(--fds-donkergroen-100);
+    --fds-color-surface-chart-darkyellow: var(--fds-donkergeel-100);
+    --fds-color-surface-chart-green: var(--fds-groen-100);
+    --fds-color-surface-chart-orange: var(--fds-oranje-100);
+    --fds-color-surface-chart-purple: var(--fds-paars-100);
+    --fds-color-surface-chart-red: var(--fds-rood-100);
+    --fds-color-surface-chart-ruby: var(--fds-robijnrood-100);
+    --fds-color-surface-chart-violet: var(--fds-violet-100);
+    --fds-color-surface-chart-yellow: var(--fds-geel-100);
+    --fds-color-text-action-inverted: var(--fds-neutraal-wit);
+    --fds-color-text-action-primary: var(--fds-neutraal-zwart);
+    --fds-color-text-active: var(--fds-lintblauw-100);
+    --fds-color-text-body-accent: var(--fds-neutraal-wit);
+    --fds-color-text-body-primary: var(--fds-neutraal-zwart);
+    --fds-color-text-disabled: var(--fds-neutraal-grijs-4);
+    --fds-color-text-error: var(--fds-rood-100);
+    --fds-color-text-highlight: var(--fds-hemelblauw-100);
+    --fds-color-text-inactive: var(--fds-lintblauw-30);
+    --fds-color-text-info: var(--fds-hemelblauw-100);
+    --fds-color-text-label-accent: var(--fds-neutraal-grijs-2);
+    --fds-color-text-label-primary: var(--fds-neutraal-grijs-7);
+    --fds-color-text-link: var(--fds-donkerblauw-100);
+    --fds-color-text-link-hover: var(--fds-lintblauw-100);
+    --fds-color-text-page-title: var(--fds-lintblauw-100);
+    --fds-color-text-placeholder-accent: var(--fds-neutraal-grijs-3);
+    --fds-color-text-placeholder-primary: var(--fds-neutraal-grijs-5);
+    --fds-color-text-subtitle: var(--fds-neutraal-grijs-6);
+    --fds-color-text-success: var(--fds-groen-100);
+    --fds-color-text-title-accent: var(--fds-neutraal-wit);
+    --fds-color-text-title-primary: var(--fds-neutraal-zwart);
+    --fds-color-text-warning: var(--fds-oranje-100);
+  }
+
+  /* Tools */
+  :root {
+    /* Default */
+    /* number */
+    --fds-font-body-s: 11px;
+    --fds-font-body-m: 13px;
+    --fds-font-body-l: 15px;
+    --fds-font-button-m: 14px;
+    --fds-font-button-l: 15px;
+    --fds-font-forms-label: 11px;
+    --fds-font-forms-link: 13px;
+    --fds-font-forms-placeholder: 15px;
+    --fds-font-forms-value: 15px;
+    --fds-font-heading-level-5: 14px;
+    --fds-font-heading-level-4: 16px;
+    --fds-font-heading-level-3: 19px;
+    --fds-font-heading-level-2: 23px;
+    --fds-font-heading-level-1: 27px;
+    /* string */
+    --fds-font-family-sans-serif: RijksoverheidSansWebText;
+  }
+  /* Density */
+  :root {
+    /* Standard */
+    /* number */
+    --fds-density-height-page-header: 80px;
+    --fds-density-space-0-25x: 4px;
+    --fds-density-space-0-5x: 8px;
+    --fds-density-space-0-75x: 12px;
+    --fds-density-space-1-0x: 16px;
+    --fds-density-space-1-5x: 24px;
+    --fds-density-space-2-0x: 32px;
+    --fds-density-width-sidenav-collapsed: 64px;
+    --fds-density-width-sidenav: 256px;
   }
 
 @font-face {
@@ -361,7 +280,7 @@ body {
     z-index:2;
     width: 100%;
     align-items: flex-start;
-    background: var(--color-surface-card, #FFF);
+    background: var(--fds-color-surface-primary, #FFF);
     /* Elevation 2 */
     box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
 }
@@ -370,7 +289,7 @@ body {
     display: flex;
     justify-content: center;
     height: 80px;
-    padding: 0px var(--sizes-spacings-medium, 24px);
+    padding: 0px var(--fds-density-space-1_5x, 24px);
     gap: 0px 0px;
     align-items: center;
     flex: 1 0 0;
@@ -407,12 +326,12 @@ body {
 
 .logo-wrapper {
     display: flex;
-    width: var(--sizes-sidebar-width, 256px);
+    width: var(--fds-density-width-sidenav, 256px);
     height: 80px;
     padding-left: 12px;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--sizes-spacings-xsmall, 8px);
+    gap: var(--fds-density-space-0_5x, 8px);
     flex-shrink: 0;
 
 }
@@ -424,9 +343,9 @@ body {
 .page-title {
     display: flex;
     height: 80px;
-    padding: 0px var(--sizes-spacings-medium, 24px);
+    padding: 0px var(--fds-density-space-1_5x, 24px);
     align-items: center;
-    gap: var(--sizes-spacings-small, 16px);
+    gap: var(--fds-density-space-1_0x, 16px);
     flex: 1 0 0;
 }
 
@@ -435,14 +354,14 @@ body {
     z-index:10;
     top: 80px;
     display: flex;
-    width: var(--sizes-sidebar-width, 256px);
+    min-width: var(--fds-density-width-sidenav, 256px);
     flex-direction: column;
     align-items: flex-start;
     box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
 }
 
 .NIVR-dropdown:hover {
-    background: var(--color-surface-primary-card, #2C5581);
+    background: var(--fds-color-surface-accent-card, #2C5581);
 }
 
 .navbar-container {
@@ -451,9 +370,9 @@ body {
     align-items: flex-start;
     flex: 1 0 0;
     align-self: stretch;
-    padding: 16px var(--sizes-spacings-xsmall, 8px);
+    padding: 16px var(--fds-density-space-0_5x, 8px);
 
-    background: var(--color-surface-primary, #154273);
+    background: var(--fds-color-surface-accent, #154273);
     /* Elevation 2 */
     box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.05);
 }
@@ -473,27 +392,27 @@ body {
 }
 
 .active-category {
-    color: var(--color-text-body-onPrimary, #FFF) !important;
+    color: var(--fds-color-text-body-accent, #FFF) !important;
     /* Body/Large - Bold */
-    font-size: var(--typography-body-large, 15px) !important;
+    font-size: var(--fds-font-body-l, 15px) !important;
     font-style: normal!important;
     font-weight: 700 !important;
     line-height: 24px !important /* 160% */
 }
 
-.active-category > i:nth-child(1){
-    color: var(--color-icon-active, #F9E11E);
-}
+/* .active-category > i:nth-child(1){
+    color: var(--fds-color-icon-active, #F9E11E);
+} */
 
 .nav-item {
     display: flex;
     
     align-items: center;
-    gap: var(--sizes-spacings-xsmall, 8px);
-    color: var(--color-text-inactive, #B9C6D5);
+    gap: var(--fds-density-space-0_5x, 8px);
+    color: var(--fds-color-text-inactive, #B9C6D5);
     /* Body/Large */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-large, 15px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
     font-style: normal;
     font-weight: 400;
     line-height: 24px; /* 160% */
@@ -501,37 +420,52 @@ body {
     /* padding: 6px 0px; */
 }
 .nav-item:hover {
-    background: var(--color-surface-primary-card, #2C5581);
-    color: var(--color-text-body-onPrimary, #FFF);
+    background: var(--fds-color-surface-accent-card, #2C5581);
+    color: var(--fds-color-text-body-accent, #FFF);
 }
 .nav-item > .nav-link {
     padding-left: 0px;
+}
+
+.nav-item-active > .nav-link{
+    color: var(--fds-color-text-body-accent, #FFF);
+
+    /* Strong/L */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 160% */
+}
+
+.nav-item-active > .nav-link > i{
+    color: var(--fds-color-icon-active, #F9E11E);
 }
 
 .nav-link {
     display: flex;
     /* padding: 6px 36px; */
     align-items: center;
-    padding: var(--sizes-spacings-xsmall, 8px);
-    gap: var(--sizes-spacings-xsmall, 8px);
-    color: var(--color-text-inactive, #B9C6D5);
+    padding: var(--fds-density-space-0_5x, 8px);
+    gap: var(--fds-density-space-0_5x, 8px);
+    color: var(--fds-color-text-inactive, #B9C6D5);
     /* Body/Large */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-large, 15px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
     font-style: normal;
     font-weight: 400;
     line-height: 24px; /* 160% */
     align-self: stretch;
 }
 .nav-link:hover{
-    background: var(--color-surface-primary-card, #2C5581);
-    color: var(--color-text-body-onPrimary, #FFF) !important;
+    background: var(--fds-color-surface-accent-card, #2C5581);
+    color: var(--fds-color-text-body-accent, #FFF) !important;
     text-decoration: none;
 }
 
 .nav-item:hover a{
-    background: var(--color-surface-primary-card, #2C5581);
-    color: var(--color-text-body-onPrimary, #FFF) !important;
+    background: var(--fds-color-surface-accent-card, #2C5581);
+    color: var(--fds-color-text-body-accent, #FFF) !important;
     text-decoration: none;
 }
 
@@ -592,10 +526,10 @@ body {
 .menu-not-selected {
     position: absolute;
     left: 248px;
-    background-color: var(--color-surface-primary, #154273);
+    background-color: var(--fds-color-surface-accent, #154273);
     z-index: 15;
     margin-top: -8px;
-    width: var(--sizes-sidebar-width, 256px);
+    width: var(--fds-density-width-sidenav, 256px);
     padding: 8px;
 }
 
@@ -633,7 +567,7 @@ font-family: RijksoverheidSansWebText;
     align-items: flex-start;
     gap: 16px;
     align-self: stretch;
-    background: var(--color-surface-card, #FFF);
+    background: var(--fds-color-surface-primary, #FFF);
 }
 
 .leaflet-left .leaflet-control {
@@ -662,28 +596,29 @@ font-family: RijksoverheidSansWebText;
     align-items: flex-start;
     top:14px;
     left:14px;
-    background: var(--color-surface-card, #FFF);
+    background: var(--fds-color-surface-primary, #FFF);
     box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.06);
 }
 
 .search-input {
+    position: relative;
     padding: 0px;
     display: flex;
     align-items: center;
     flex-grow:10;
-    border-right: 1px solid var(--color-border-light, #E6E6E6);
+    border-right: 1px solid var(--fds-color-line-secondary, #E6E6E6);
 }
 
 .search-bar-icon{
-    width: var(--typography-heading-H4, 16px);
-    height: var(--typography-heading-H4, 16px);
+    width: var(--fds-font-heading-level-4, 16px);
+    height: var(--fds-font-heading-level-4, 16px);
     font-size: 13px;
     justify-content: center;
     align-items: center;
 }
 .search-bar-filter-icon{
-    width: var(--typography-heading-H4, 16px);
-    height: var(--typography-heading-H4, 16px);
+    width: var(--fds-font-heading-level-4, 16px);
+    height: var(--fds-font-heading-level-4, 16px);
     font-size: 13px;
     justify-content: center;
     align-items: center;
@@ -692,9 +627,8 @@ font-family: RijksoverheidSansWebText;
 }
 
 .fa-search{
-    position: relative;
+    position: absolute;
     font-size: 13px;
-    left:16px;
 }
 
 .search-bar-trailing-icon {
@@ -702,7 +636,7 @@ font-family: RijksoverheidSansWebText;
     font-size: 13px;
     top: 15px;
     position: absolute;
-    right: 48px;
+    right: 8x;
 }
 
 .filter-button {
@@ -720,27 +654,27 @@ input[type=text] {
 
 input[type=text]:focus {
     outline: none;
-    border: 2px solid var(--color-border-selected-onDefault, #007BC7) !important;
-    background: var(--color-surface-card, #FFF) !important;
+    border: 2px solid var(--fds-color-line-primary-active, #007BC7) !important;
+    background: var(--fds-color-surface-primary, #FFF) !important;
     box-shadow: 0px 0px 0px 2px rgba(0, 123, 199, 0.25) !important;
 }
 
 #search-results-table{
-    color: var(--color-text-title-onDefault, #000);
-    margin: var(--sizes-spacings-medium, 24px);
+    color: var(--fds-color-text-title-primary, #000);
+    margin: var(--fds-density-space-1_5x, 24px);
     /* Body/Regular - Bold */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-regular, 13px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
     font-style: normal;
     font-weight: 700;
     line-height: 16px; /* 123.077% */
 }
 
 #search-results-table th{
-    color: var(--color-text-title-onDefault, #000);
+    color: var(--fds-color-text-title-primary, #000);
     /* Body/Regular - Bold */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-regular, 13px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
     font-style: normal;
     font-weight: 700;
     line-height: 16px; /* 123.077% */
@@ -748,17 +682,17 @@ input[type=text]:focus {
 
 #search-results-table tr{
     overflow: hidden;
-    /* color: var(--color-text-link, #01689B); */
+    /* color: var(--fds-color-text-link, #01689B); */
     text-overflow: ellipsis;
     /* Body/Regular */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-regular, 13px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
     font-style: normal;
     font-weight: 400;
     line-height: 16px; /* 123.077% */
 }
 #search-results-table tr:hover{
-    background: var(--color-surface-light-hovered, #E6E6E6);
+    background: var(--fds-color-surface-secondary-hovered, #E6E6E6);
 }
 
 
@@ -773,12 +707,12 @@ input[type=text]:focus {
 .search-box-input {
     flex-grow: 10;
     border: none;
-    color: var(--color-text-body-onDefault, #000);
+    color: var(--fds-color-text-body-primary, #000);
     padding: 4px 8px 4px 40px;
     margin-left: -16px;
     /* Forms/Value */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-forms-value, 15px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-value, 15px);
     font-style: normal;
     font-weight: 400;
     line-height: 24px; /* 160% */
@@ -788,14 +722,14 @@ input[type=text]:focus {
     display: flex;
     align-items: center;
     align-self: stretch;
-    border-bottom: 1px solid var(--color-border-light, #E6E6E6);
+    border-bottom: 1px solid var(--fds-color-line-secondary, #E6E6E6);
 }
 
 .filter-results-wrapper {
     display: flex;
     align-items: flex-start;
     align-self: stretch;
-    max-height: calc(100vh - 80px - 40px - var(--sizes-spacings-medium, 24px) - var(--sizes-spacings-medium, 24px));
+    max-height: calc(100vh - 80px - 40px - var(--fds-density-space-1_5x, 24px) - var(--fds-density-space-1_5x, 24px));
     overflow: scroll;
 }
 
@@ -809,8 +743,8 @@ input[type=text]:focus {
     top: 45px;
     right: 0px;
 
-    border: 2px solid var(--color-border-selected-onDefault, #007BC7);
-    background: var(--color-surface-card, #FFF);
+    border: 2px solid var(--fds-color-line-primary-active, #007BC7);
+    background: var(--fds-color-surface-primary, #FFF);
     box-shadow: 0px 0px 0px 2px rgba(0, 123, 199, 0.25);
 }
 .filter-checkbox{
@@ -822,13 +756,13 @@ input[type=text]:focus {
 }
 .filter-checkbox input:checked{
     border-radius: 2px;
-    background: var(--color-icon-primary, #154273);  
+    background: var(--fds-color-icon-accent, #154273);  
 }
 .filter-checkbox{
-    color: var(--color-text-body-onDefault, #000);
+    color: var(--fds-color-text-body-primary, #000);
     /* Body/Large */
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
-    font-size: var(--typography-body-large, 15px);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
     font-style: normal;
     font-weight: 400;
     line-height: 24px; /* 160% */
@@ -837,7 +771,7 @@ input[type=text]:focus {
 div.dt-container .dt-paging .dt-paging-button.current, div.dt-container .dt-paging .dt-paging-button.current{
     background-color: #154273;
     color: #ffffff !important;
-    font-family: var(--typography-font-family, RijksoverheidSansWebText);
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
 }
 
 thead{
@@ -849,3 +783,15 @@ font-style: normal;
 font-weight: 700;
 line-height: 16px; /* 123.077% */
 }
+
+thead > tr > td {
+    border-bottom: 1px solid var(--fds-color-line-inverted, #000) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(2n+1) {
+    background: var(--fds-color-surface-secondary, #F3F3F3);
+}
+
+.table > tbody > tr > td{
+    border-top: 0px;
+  }
