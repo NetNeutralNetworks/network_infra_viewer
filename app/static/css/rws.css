@@ -601,6 +601,7 @@ font-family: RijksoverheidSansWebText;
 }
 
 .search-input {
+    position: relative;
     padding: 0px;
     display: flex;
     align-items: center;
@@ -626,9 +627,8 @@ font-family: RijksoverheidSansWebText;
 }
 
 .fa-search{
-    position: relative;
+    position: absolute;
     font-size: 13px;
-    left:16px;
 }
 
 .search-bar-trailing-icon {
@@ -636,7 +636,7 @@ font-family: RijksoverheidSansWebText;
     font-size: 13px;
     top: 15px;
     position: absolute;
-    right: 48px;
+    right: 8x;
 }
 
 .filter-button {
