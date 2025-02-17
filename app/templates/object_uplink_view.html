@@ -2,17 +2,26 @@
 
 {% block head_css %}
 {{ super() }}
-
-</style>
 <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
 {% endblock %}
 
 {% block head_js %}
 {{ super() }}
-<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
 {% endblock %}
-
-
 
 {% block content %}
+
+<!-- <pre>
+    graph TD
+    {{mermaid_graph}}
+</pre> -->
+<!-- <pre class="mermaid">
+    graph TD
+    {{mermaid_graph}}
+</pre> -->
+
+{{l2_html | safe}}
+
 {% endblock %}
+

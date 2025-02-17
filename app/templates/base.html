@@ -9,10 +9,16 @@
 <link href="{{ url_for('static', filename='fontawesome/css/fontawesome.css') }}" rel="stylesheet" />
 <link href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}" rel="stylesheet" />
 <link href="{{ url_for('static', filename='fontawesome/css/solid.css') }}" rel="stylesheet" />
-<link href="{{ url_for('static', filename='fontawesome/css/sharp.css') }}" rel="stylesheet" />
+<!-- <link href="{{ url_for('static', filename='fontawesome/css/sharp.css') }}" rel="stylesheet" /> -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rws.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/device-page.css') }}">
 {% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+
 
 {% block body %}
         {% include 'appbuilder/general/confirm.html' %}

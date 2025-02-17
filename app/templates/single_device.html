@@ -555,6 +555,9 @@ function openTile(evt, url) {
                 datatable2 = $('#interface-table').DataTable({
                   paging: false,
                   destroy: true,
+                  language: {
+                      thousands: "."
+                  },
                   layout: {
                     topStart: null,
                     topEnd: null,
@@ -894,7 +897,8 @@ function get_connection_type_color(x){
     searching: true,
     lengthMenu: [15, 25, {label: 'All', value: -1}],
     language: {
-      lengthMenu: 'rows per page _MENU_'
+      lengthMenu: 'rows per page _MENU_',
+      thousands: "."
     }
     
   });

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+    integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+    crossorigin=""/>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+    crossorigin=""/>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+    crossorigin=""/>
+
+    <style>
+        .marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #c30b82;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -15px 0 0 -15px;
+}
+
+.marker-pin::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    margin: 3px 0 0 3px;
+    background: #fff;
+    position: absolute;
+    border-radius: 50%;
+ }
+
+.custom-div-icon i {
+   position: absolute;
+   width: 22px;
+   font-size: 22px;
+   left: 0;
+   right: 0;
+   margin: 10px auto;
+   text-align: center;
+}
+
+.custom-div-icon i {
+   margin: 12px auto;
+   font-size: 17px;
+}
+
+.leaflet-control-layers label {
+  font-size: 2.5em;
+}
+    </style>
+
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
+crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+crossorigin=""></script>
+{% endblock %}
+
+{% block page_title %}
+i-SVC - Uplink redundancy
+{% endblock %}
+
+
+{% block content %}
+<div id="map" class="col col-md-6" style="width: 100%; height: 100%;"></div>
+<script type="text/javascript">
+    var map = L.map('map').setView([52.2, 5.4], 7);
+
+	var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+	var baseLayers = {"Map": tiles};
+    var overlays = {};
+    
+    function create_marker(color = "#154273", icon="fa fa-file-circle-question"){
+        return L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color:"+color+";' class='marker-pin'></div><i class='fa "+icon+"'>",
+        iconSize: [30, 42],
+        iconAnchor: [15, 42]
+    });
+    };
+
+
+	// var markers = [
+    // {
+    //     "lat": 52.09083,
+    //     "lon": 5.12222,
+    //     "icon": vcIcon
+    // },
+    // {
+    //     "lat": 51.9225 ,
+    //     "lon": 4.47917,
+    //     "icon": shipIcon
+    // },
+    // {
+    //     "lat": 52.37403,
+    //     "lon": 4.88969,
+    //     "icon": tunnelIcon
+    // },
+
+    // ]
+    var locations = {{locations|safe}};
+    for (const loc in locations) {
+        var marker_group = L.layerGroup();
+        locations[loc].forEach(element => {
+            var color = "";
+            if (element['fiber_uplinks'] == 1){
+                color = "#f5b942";
+            } else if (element['fiber_uplinks'] > 1) {
+                color = "#1da61b";
+            } else {
+                color = "#a6261b";
+            }
+            try{
+                var icon = create_marker();
+                if (element['type'] == 'Overig'){
+                    icon = create_marker(color=color, icon = "fa fa-file-circle-question");
+                }else if (element['type'] == 'Wegkant/Waterkant/CVR'){
+                    icon = create_marker(color=color, icon = "fa fa-road");
+                }else if (element['type'] == 'Kantoor'){
+                    icon = create_marker(color=color, icon = "fa fa-city");
+                }else if (element['type'] == 'Verkeerscentrale / Verkeerspost'){
+                    icon = create_marker(color=color, icon = "fa fa-road-bridge");
+                }else if (element['type'] == 'Datacenter'){
+                    icon = create_marker(color=color, icon = "fa fa-database");
+                }else if (element['type'] == 'Sluis'){
+                    icon = create_marker(color=color, icon = "fa fa-ship");
+                }else if (element['type'] == 'Brug'){
+                    icon = create_marker(color=color, icon = "fa fa-bridge-water");
+                }else if (element['type'] == 'VC/VP'){
+                    icon = create_marker(color=color, icon = "fa fa-road-bridge");
+                }else if (element['type'] == 'Tunnel'){
+                    icon = create_marker(color=color, icon = "fa fa-car-tunnel");
+                }
+            var marker = L.marker([element.latitude.replace(',', '.'), element.longitude.replace(',', '.')], {icon: icon});
+            marker.bindPopup("<a href='/locationview/uplink_view/?location="+element.name+"' target='_blank'>"+element.name+"</a>") ;
+		    marker_group.addLayer(marker)
+            } catch(error){
+                console.error(error)
+            }
+        });
+        overlays[loc] = marker_group;
+		map.addLayer(marker_group)
+	}
+    var layerControl = L.control.layers(null, overlays).addTo(map);
+
+	
+</script>
+{% endblock %}
+

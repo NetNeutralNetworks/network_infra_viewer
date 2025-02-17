@@ -14,7 +14,7 @@ from .views.generate_fake_score import GenerateFakeScores
 from .views.empty import EmptyView, UITestView
 from .views.dataquality import LijnbenamingMissingPort, DeviceMissingLocation, DeviceMissingPort, NonConsecutiveLine
 from .views.abnomalies import DualHoming, Redundancy, LineRedundancy, LineRedundancyMap
-from .views.specific_requests import CVRFibers, WKSImport, InterfacesDevices, DevicesSerial, WirelessUplinks, RegexTest
+from .views.specific_requests import CVRFibers, WKSImport, InterfacesDevices, DevicesSerial, WirelessUplinks, RegexTest, ObjectClassification
 from .views.abbreviations import Abbreviations
 from .views.location_plotting import MatchDeviceToLocation
 
@@ -44,7 +44,7 @@ db = SQLA(app)
 appCache.init_app(app)
 
 class MyIndexView(IndexView):
-    index_template = 'home.html'
+    index_template = 'overview_new.html'
 
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView)
 
@@ -80,6 +80,8 @@ appbuilder.add_view(WirelessUplinks, "Wireless connected devices", category='Spe
 appbuilder.add_view(CEInterConnect, "Interconnect", category='Specific requests')
 appbuilder.add_view(DevicesSerial, "Serial numbers", category='Specific requests')
 appbuilder.add_view(RegexTest, "Regex test", category='Specific requests')
+appbuilder.add_view(ObjectClassification, "iSVC", category='Specific requests')
+
 
 appbuilder.add_view(Abbreviations, "Afkortingen", category='Info', category_icon='fa-circle-info')
 appbuilder.add_view(UITestView, "UI test", category='Info', category_icon='fa-circle-info')

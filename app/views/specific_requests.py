@@ -314,6 +314,68 @@ class DevicesSerial(BaseView):
         """   
         return self.render_template('single_column_table.html', table_header="Hostname</td><td>Serial", entries=entries, page_info=info)
     
+class ObjectClassification(BaseView):
+    default_view = 'main_page'
+
+    @expose('/list/', methods=['GET'])
+    @has_access
+    def main_page(self):
+        query = f"""
+        MATCH (O:RWS_object)
+        WHERE O.classification = 'A' or O.classification = 'B'
+        OPTIONAL MATCH (O)--(dep:Department)
+        OPTIONAL MATCH (O)--(d:Device)
+
+        WHERE d.hostname =~ ".*CE.*"
+
+        WITH O, collect(d) as devices, d.object_type as obj_type, count(d.uplink = "dark_fiber") as c, dep
+        return O, size(devices), obj_type, c, dep.name
+        """
+        locations = {'unknown': []}
+        for location, ce_num, object_type, count_of_fiber_uplinks, department in execute_query(query):
+            object = location.properties
+            object['type'] = object_type
+            object['department'] = department
+            object['fiber_uplinks'] = int(count_of_fiber_uplinks)
+            logging.getLogger().debug(count_of_fiber_uplinks)
+            if not department:
+                locations['unknown'].append(object)
+            elif department in locations:
+                locations[department].append(object)
+            else:
+                locations[department] = [object]
+        
+        return self.render_template('isvc.html',locations = json.dumps(locations), page_category='Specific requests', page='iSVC')
+    
+    @expose('/list/all', methods=['GET'])
+    @has_access
+    def main_page_all(self):
+        query = f"""
+        MATCH (O:RWS_object)
+        OPTIONAL MATCH (O)--(dep:Department)
+        OPTIONAL MATCH (O)--(d:Device)
+
+        WHERE d.hostname =~ ".*CE.*"
+
+        WITH O, collect(d) as devices, d.object_type as obj_type, count(d.uplink = "dark_fiber") as c, dep
+        return O, size(devices), obj_type, c, dep.name
+        """
+        locations = {'unknown': []}
+        for location, ce_num, object_type, count_of_fiber_uplinks, department in execute_query(query):
+            object = location.properties
+            object['type'] = object_type
+            object['department'] = department
+            object['fiber_uplinks'] = int(count_of_fiber_uplinks)
+            logging.getLogger().debug(count_of_fiber_uplinks)
+            if not department:
+                locations['unknown'].append(object)
+            elif department in locations:
+                locations[department].append(object)
+            else:
+                locations[department] = [object]
+        
+        return self.render_template('isvc.html',locations = json.dumps(locations), page_category='Specific requests', page='iSVC')
+    
 class RegexTest(BaseView):
     default_view = 'main_page'
 

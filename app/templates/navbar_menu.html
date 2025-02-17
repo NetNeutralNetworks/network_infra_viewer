@@ -1,5 +1,5 @@
 {% macro menu_item(item) %}
-    <a class="nav-link" tabindex="-1" href="{{item.get_url()}}">
+    <a class="fds-nav-link" tabindex="-1" href="{{item.get_url()}}">
     {%if item.icon %}
         <i class="fa fa-fw {{item.icon}}"></i>
     {% endif %}
@@ -13,7 +13,7 @@
     {% if item1 | is_menu_visible %}
         {% if item1.childs %}
             <div class="nav-category {% if item1.label == page_category %}{% else %}NIVR-dropdown{% endif %}">
-            <div class="nav-link {% if item1.label == page_category %}active-category{% endif %}" data-toggle="dropdown" href="#">
+            <div class="fds-nav-link {% if item1.label == page_category %}active-category{% endif %}" data-toggle="dropdown" href="#">
                 {% if item1.icon %}
                 <i class="fa {{item1.icon}} "></i>
                 {% endif %}
