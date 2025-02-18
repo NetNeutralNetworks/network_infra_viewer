@@ -10,6 +10,7 @@ definitions = {
     'ACL': 'Access Control List',
     'ACS': 'Access Control Service',
     'ARP': 'Adress Resolution Protocol',
+    'ARK': 'Amsterdam-Rijnkanaal',
     'ABB': 'Architectural building blocks',
     'BB': 'Backbone (Netwerkbackbone, de logische en fysieke verbindingen tussen de PE routers. Deze maken samen de kerninfrastructuur van het netwerk. backbone wordt ook gebruikt als aanduiding voor de hoofd-glasvezelkabels langs weg- en waterkant.)',
     'BO': 'Break-out (Een afsplitsing vanaf de hoofd glasvezelkabels, veelal 4 of 8 vezels vanuit een GKP met GAB naar een object of wegkant toepassing.)',
