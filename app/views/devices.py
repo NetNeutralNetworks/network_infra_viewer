@@ -38,7 +38,7 @@ class DevicesOverview(BaseView):
             }
             devices.append(device)
         
-        return self.render_template('devices.html',devices=devices)
+        return self.render_template('devices.html',devices=devices, page_category='Network Components', page='Devices')
     @expose('/list/', methods=['GET'])
     @has_access
     def list_devices(self):

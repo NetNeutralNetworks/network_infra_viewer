@@ -1,0 +1,13 @@
+{% set menu = appbuilder.menu %}
+{% set languages = appbuilder.languages %}
+
+<div class="NIVR-navigation {{menu.extra_classes}}" role="navigation">
+   <div class="navbar-container">
+        <ul class="nav navbar-nav navbar-sites">
+            {% include 'navbar_menu.html' %}
+        </ul>
+        <ul class="nav navbar-nav navbar-right float-bottom">
+            {% include 'appbuilder/navbar_right.html' %}
+        </ul>
+   </div>
+</div>

@@ -1,0 +1,114 @@
+{% macro icon(icon_name, color = 'var(--rds-color-icon-primary, #000);') -%}
+    <div class="nivr-icon-wrapper" style="display: flex; width: 32px; height: 32px; justify-content: center; align-items: center;">
+        <i class="fa-solid {{icon_name}}" style="display: flex; width: 16px; height: 16px; flex-direction: column; justify-content: center; flex-shrink: 0;color: {{color}} text-align: center; font-size: 13px; font-style: normal; font-weight: 400; line-height: 16px; "></i>
+    </div>
+{%- endmacro %}
+
+{% macro info_icon(id, title, content) -%}
+    <div id="{{id}}_button" class="nivr-icon-wrapper" style="cursor:pointer; display: flex; width: 16px; height: 16px; justify-content: center; align-items: center; background: var(--fds-color-surface-info, #D9EBF7);">
+        <i class="fa-solid fa-info" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; color: var(--fds-color-icon-info, #007BC7); text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 16px; "></i>
+    </div>
+    <div id="{{id}}_modal" class="fds-modal"><div class="fds-modal-popup">
+        <div class="fds-modal-header">
+            <div class="fds-modal-title">
+                {{title}}
+            </div>
+            <div id="{{id}}_close" class="fds-modal-close">
+                {{icon('fa-close')}}
+            </div>
+        </div>
+        
+        <div class="fds-modal-content">{{content}}</div>
+        
+    </div>
+    </div>
+    <script>
+        var button = document.getElementById("{{id}}_button");
+        button.onclick = function(){
+            document.getElementById("{{id}}_modal").style.display = "flex";
+        }
+        var close_button = document.getElementById("{{id}}_close");
+        close_button.onclick = function(){
+            document.getElementById("{{id}}_modal").style.display = "none";
+        }
+    </script>
+{%- endmacro %}
+
+{% macro label_card(title, entry) -%}
+<div class="card data-card">
+    <div class="card-label">
+        {{title}}
+    </div>
+    <div class="card-entry">
+        {{entry}}
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro medium_tile(label, active=False, onclick=False, extra_classes=False) -%}
+<div class="tile tile-medium{% if extra_classes %} {{extra_classes}} {% endif %}" {% if onclick %}onclick="{{onclick}}" {% endif %}>
+    <div class="tile-trailing-icon">
+      <i class="fa-solid fa-chevron-right" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 12px; "></i>
+    </div>
+    <div class="tile-data-label">
+
+      <div class="tile-label">
+        {{label}}
+      </div>
+        
+    </div>
+  </div>
+{%- endmacro %}
+
+{% macro empty_state(content, extra_classes=False) -%}
+<div class="empty-state{% if extra_classes %} {{extra_classes}} {% endif %}">
+    <div class="empty-state-content-wrapper">
+        <i class="fa-light fa-circle-exclamation" style="display: flex; width: 24px; height: 24px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 20px; font-style: normal; font-weight: 300; line-height: 24px; "></i>
+        <div class="empty-state-content">
+            {{content}}
+        </div>
+    </div>
+    
+</div>
+{%- endmacro %}
+
+{% macro searchbar(placeholder, id=False, filter=False, results=False, clear_filter=False) %}
+<div class='search-panel-container'>
+    
+    <div class='filter-wrapper'>
+            <div class='search-input'>
+                    <i class='fa fa-search search-bar-icon'></i>
+                    <input {% if id %}id='{{id}}'{% endif %} class="search-box-input" type='text' placeholder='{{placeholder}}' autofocus='true'></input>
+                    {% if clear_filter %}<span onclick='clear_filter()'><i class='fa fa-close search-bar-icon search-bar-trailing-icon'></i></span>{% endif %}
+            </div>
+            {% if filter %}
+            <div class='filter-button' onclick='toggleFilters()'>
+                    <i class='fa-solid fa-bars-filter search-bar-filter-icon'></i>
+            </div>
+            <div class='filter-options-wrapper hidden'>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Not yet in use</div></div>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>In use</div></div>
+                                    <div class='filter-checkbox'><input type='checkbox' checked><div class='filter-text'>Ready for removal</div></div>
+            </div>
+            {% endif %}
+    </div>
+    {% if results %}
+    <div class='filter-results-wrapper hidden'>
+            <table class='table table-striped' id='search-results-table'>
+                    <thead>
+                            <tr>
+                            <th scope='col'>Objects</th>
+                            <th scope='col'>Type</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                            <td>No data found</td>
+                            <td>No data found</td>
+                            </tr>
+                    </tbody>
+            </table>
+    </div>
+    {% endif %}
+</div>
+{%- endmacro %}

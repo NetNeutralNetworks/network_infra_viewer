@@ -14,4 +14,13 @@ class EmptyView(BaseView):
         
         return self.render_template('empty.html')
     
+    
+class UITestView(BaseView):
+    default_view = 'ui_test'
+    @expose('/ui_test/', methods=['GET'])
+    @has_access
+    def ui_test(self):
+        
+        return self.render_template('ui_test.html', page_category='Info')
+    
    

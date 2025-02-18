@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 
@@ -145,14 +145,7 @@ crossorigin=""></script>
   
 </script>
 {% endblock %}
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-     {% block messages %}
-     {{ super() }}
-      {% endblock %}
-      {% block content %}
+{% block content %}
 
 
 <div id="details-header" style="width:100%;display: grid;grid: auto auto/ 50% 50%;">
@@ -162,7 +155,7 @@ crossorigin=""></script>
     {% endif %}
 </div>
 </div>
-<div id="content" style="height: 100%;">
+<div id="device" style="height: 100%;">
 
 <div id="Layer2" style="grid-column-start: 1; grid-column-end: 3;">
   <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
@@ -188,11 +181,4 @@ crossorigin=""></script>
   </div>
 </div>
 </div>
-    {% endblock %}
-    <!-- {% block footer %}
-    {{ super() }}
-    {% endblock %} -->
-{% block tail_js %}
-
-{% endblock %}
 {% endblock %}

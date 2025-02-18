@@ -1,0 +1,500 @@
+#page-nav{
+    display: flex;
+    height: 48px;
+    padding: var(--fds-density-space-0_5x, 8px);
+    align-items: center;
+    align-self: stretch;
+    background: var(--fds-color-surface-primary, #FFF);
+    /* Elevation/1 */
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.04);
+
+}
+#page-nav-left{
+    display: flex;
+    align-items: center;
+    flex: 1 0 0;
+}
+
+#back-wrapper{
+    display: flex;
+    
+    padding-right: var(--fds-density-space-0_75x, 12px);
+    align-items: center;
+    gap: var(--fds-density-space-0_75x, 12px);
+    color: var(--fds-color-text-body-primary, #000);
+    text-align: center;
+
+    /* Button/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-button-m, 14px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 171.429% */
+}
+
+#back-button{
+    background: var(--fds-color-surface-secondary, #F3F3F3);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding-right: var(--fds-density-space-0_5x, 8px);
+    cursor: pointer;
+}
+
+#page-tabs{
+    display: flex;
+    align-items: center;
+}
+
+.tab-item{
+    display: flex;
+    padding: var(--fds-density-space-0_5x, 8px) var(--fds-density-space-1_0x, 16px);
+    justify-content: center;
+    align-items: center;
+    background: var(--fds-color-surface-primary, #FFF);
+    color: var(--fds-color-text-action-primary, #000);
+
+    /* Heading/5 */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-heading-level-5, 14px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 114.286% */
+    cursor: pointer;
+}
+
+.tab-item:hover{
+    background: var(--fds-color-surface-primary-hover, #F3F3F3);
+    transition: background .3s ease;
+}
+
+.tab-item.active{
+    background: var(--fds-color-surface-accent, #154273);
+    color: var(--fds-color-text-action-inverted, #FFF);
+}
+
+#page-nav-right{
+    display: flex;
+    padding: 0px var(--fds-density-space-0_25x, 4px);
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--fds-density-space-0_5x, 8px);
+}
+
+.tag{
+    display: flex;
+    padding: var(--fds-density-space-0_25x, 4px) var(--fds-density-space-0_5x, 8px);
+    align-items: flex-start;
+}
+
+.tag.error{
+    overflow: hidden;
+    color: var(--fds-color-text-error, #D52B1E);
+    background: var(--fds-color-surface-error, #F9DFDD);
+    text-align: right;
+    text-overflow: ellipsis;
+
+    /* Strong/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+.tag.warning{
+    overflow: hidden;
+    color: var(--fds-color-text-warning, #E17000);
+    background: var(--fds-color-surface-warning, #FEF4DB);
+    text-align: right;
+    text-overflow: ellipsis;
+    
+    /* Strong/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+.tag.success{
+    overflow: hidden;
+    color: var(--fds-color-text-success, #39870C);
+    background: var(--fds-color-surface-success, #E1EDDA);
+    text-align: right;
+    text-overflow: ellipsis;
+    
+    /* Strong/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+.card{
+    display: flex;
+    padding: var(--fds-density-space-1_5x, 24px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fds-density-space-1_0x, 16px);
+    flex: 1 0 0;
+    align-self: stretch;
+    background: var(--fds-color-surface-primary, #FFF);
+
+    /* Elevation/1 */
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.04);
+}
+
+.data-card{
+    height: auto;
+    gap:0px;
+
+}
+
+.card-header{
+    display: flex;
+    align-items: center;
+    gap: var(--fds-density-space-1_0x, 16px);
+    align-self: stretch;
+    flex-direction: row;
+}
+.card-title-left{
+    display: flex;
+    /* width: 752px; */
+    align-items: center;
+    gap: var(--fds-density-space-0_5x, 8px);
+    color: var(--fds-color-text-title-primary, #000);
+    align-items: center;
+    flex: 1 0 0;
+
+    /* Heading/3 */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-heading-level-3, 19px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 126.316% */
+}
+
+.card-title-right{
+    display: flex;
+    width: 61px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.card-label{
+    display: flex;
+    height: 16px;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
+    color: var(--fds-color-text-label-primary, #535353);
+
+    /* Forms/Label */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+}
+
+.card-entry{
+    color: var(--fds-color-text-body-primary, #000);
+    text-align: center;
+    align-self: stretch;
+    /* Heading/3 */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-heading-level-3, 19px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 126.316% */
+}
+
+.card-content{
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    color: #000;
+    height: 100%;
+
+    /* Body/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 123.077% */
+    /* white-space: pre-wrap; */
+    overflow: scroll;
+}
+
+.tile{
+    position: relative;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+    background: var(--fds-color-surface-chart-blue);
+    /* Clickable/Default */
+    box-shadow: 0px 6px 0px -5px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+}
+
+.tile-medium{
+    display: flex;
+    padding: var(--fds-density-space-0_75x, 12px) var(--fds-density-space-1_0x, 16px);
+    flex-direction: column;
+    align-items: flex-start;
+    max-height: 50px;
+}
+.tile::after {
+    content: '';
+    background: var(--fds-color-surface-primary, '#fff');
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: .88;
+  }
+
+.tile:hover{
+    box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.32);
+}
+
+.tile-active{
+    border: 2px solid var(--fds-color-line-primary-active, #007BC7);
+}
+
+.tile-tag-active{
+    display: none;
+    padding: var(--fds-density-space-0_25x, 4px) var(--fds-density-space-0_5x, 8px);
+    align-items: flex-start;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: var(--fds-color-surface-primary, #FFF);
+    overflow: hidden;
+    color: var(--fds-color-text-info, #007BC7);
+    text-align: right;
+    text-overflow: ellipsis;
+    z-index: 1;
+
+    /* Strong/M */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+.tile-active .tile-tag-active {
+    display: flex;
+}
+
+.tile-overlay{
+    width: 268px;
+    height: 240px;
+    margin-top: -20px;
+    margin-left: -20px;
+    z-index: 0;
+    position: absolute;
+    opacity: 0.88;
+    background: var(--fds-color-surface-primary, #FFF);
+}
+.tile-trailing-icon{
+    display: flex;
+    width: 12px;
+    height: 12px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 16px;
+    bottom: calc(50% - 6px);
+    color: var(--fds-color-icon-link, #01689B);
+    z-index: 1;
+}
+.tile-data-label{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fds-density-space-0_5x, 8px);
+    align-self: stretch;
+    z-index: 1;
+}
+.tile-title{
+    align-self: stretch;
+    color: var(--fds-color-text-title-primary, #000);
+
+    /* Heading/4 */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-heading-level-4, 16px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px; /* 125% */
+    z-index: 1;
+}
+.tile-label{
+    align-self: stretch;
+    color: var(--fds-color-text-body-primary, #000);
+
+    /* Body/L */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+    z-index: 1;
+}
+.tile-icon-wrapper{
+    display: flex;
+    width: 56px;
+    height: 56px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-radius: 40px;
+    background: var(--fds-color-surface-primary, #FFF);
+    z-index: 1;
+}
+
+.fds-row{
+    display: flex;
+    flex-direction: row;
+    gap: var(--fds-density-space-1_0x, 16px);
+    width: 100%;
+    height:100%
+}
+.fds-column{
+    display: flex;
+    flex-direction: column;
+    gap: var(--fds-density-space-1_0x, 16px);
+    height: 100%;
+    width: 100%;
+}
+
+.fds-modal{
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 32px;
+    top: 0px;
+    left: 0px;
+    z-index:9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    background: var(--fds-color-surface-overlay, rgba(45, 66, 90, 0.24));
+}
+.fds-modal-popup{
+    display: flex;
+    width: 560px;
+    padding: var(--fds-density-space-1_5x, 24px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fds-density-space-1_0x, 16px);
+    background: var(--fds-color-surface-primary, #FFF);
+
+    /* Elevation/5 */
+    box-shadow: 0px 6px 7px 0px rgba(0, 0, 0, 0.08);
+}
+
+.fds-modal-header{
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    flex-direction: row;
+}
+
+.fds-modal-title{
+    flex: 1 0 0;
+    align-self: stretch;    
+    color: var(--fds-color-text-body-primary, #000);
+
+    /* Heading/3 */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-heading-level-3, 19px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 126.316% */
+}
+
+.fds-modal-close{
+    cursor: pointer;
+}
+
+.fds-modal-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    color: var(--fds-color-text-body-primary, #000);
+
+    /* Body/L */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-l, 15px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 160% */
+}
+
+.empty-state{
+    display: flex;
+    padding: var(--fds-density-space-2_0x, 32px);
+    justify-content: center;
+    align-items: center;
+    gap: var(--fds-density-space-0_5x, 8px);
+    flex: 1 0 0;
+    align-self: stretch;
+    background: var(--fds-color-surface-info, #D9EBF7);
+}
+
+.empty-state-content-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.empty-state-content{
+    color: var(--fds-color-text-page_title, #154273);
+text-align: center;
+
+/* Forms/Placeholder */
+font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+font-size: var(--fds-font-forms-placeholder, 15px);
+font-style: italic;
+font-weight: 400;
+line-height: 24px; /* 160% */
+}
+
+table.dataTable>tbody>tr.selected, table.dataTable>tbody>tr.selected>*, table.dataTable>tbody>tr.selected:hover, table.dataTable>tbody>tr.selected a{
+    background: var(--fds-color-surface-highlight, #D9EBF7) !important;
+    color: var(--fds-color-text-highlight, #007BC7) !important;
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    box-shadow: none !important;
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 123.077% */
+}
+
+.jsontree_tree{
+    padding: 0px !important;
+    margin: 0px !important;
+}

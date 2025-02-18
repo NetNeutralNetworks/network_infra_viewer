@@ -30,7 +30,7 @@ class ServiceView(BaseView):
             <p>This page shows all VRF's within the network of RWS. Each VRF is unique to a device, but the design principles dictate that if two names of VRF are equal they should be connected.</p>
             <p>This data is provided by the CSPC collector.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Service</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Service</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, page_category='Network Components', page='Services')
     
     @expose('/show/<string:vpn>', methods=['GET'])
     @has_access
@@ -62,5 +62,5 @@ class ServiceView(BaseView):
             <p>This page shows a VPN with its connected components</p>
             <p>This data is provided by the CSPC collector.</p>
             """
-        return self.render_template('single_column_table_with_map.html', table_header=f"Devices with {vpn} configured</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help, markers=markers)
+        return self.render_template('single_column_table_with_map.html', table_header=f"Devices with {vpn} configured</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help, markers=markers, page_category='Network Components', page='Services')
     

@@ -1,0 +1,106 @@
+.legend-panel-container{
+    display: flex;
+    width: 176px;
+    padding: var(--fds-density-space-1_0x, 16px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fds-density-space-0_5x, 8px);
+
+    background: var(--fds-color-surface-primary, #FFF);
+    /* Elevation 3 */
+    box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.06);
+}
+
+.overlay{
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 2
+}
+
+.legend-header{
+    color: var(--fds-color-text-label-primary, #535353);
+    /* Forms/Label */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+}
+
+.legend-body{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.legend-item{
+    display: flex;
+    height: var(--fds-font-heading-level-4, 16px);
+    align-items: center;
+    gap: var(--fds-density-space-0_5x, 8px);
+    align-self: stretch;
+}
+
+.legend-icon{
+    width: 6px;
+    height: 6px;
+    transform: rotate(-45deg);
+}
+
+.legend-description{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    flex: 1 0 0;
+    overflow: hidden;
+    color: var(--fds-color-text-label-primary, #535353);
+    text-overflow: ellipsis;
+
+    /* Body/Small */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-s, 11px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 145.455% */
+}
+
+.legend-class-1{
+    background: var(--color-border-map-line-40, #EA99BE);
+}
+.legend-class-2{
+    background: var(--color-border-map-line-50, #DF669E);
+}
+.legend-class-3{
+    background: var(--color-border-map-line-60, #DF669D);
+}
+.legend-class-4{
+    background: var(--color-border-map-line-70, #DA4D8E);
+}
+.legend-class-5{
+    background: var(--color-border-map-line-80, #D5337D);
+}
+.legend-class-6{
+    background: var(--color-border-map-line-90, #CF1A6D);
+}
+.legend-class-7{
+    background: var(--color-border-map-line-100, #CA005D);
+}
+.legend-class-red{
+    background: red;
+}
+.legend-class-purple{
+    background: purple;
+}
+.legend-class-orange{
+    background: orange;
+}
+.legend-class-yellow{
+    background: yellow;
+}
+.legend-class-blue{
+    background: blue;
+}

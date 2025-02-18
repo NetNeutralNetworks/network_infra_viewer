@@ -30,7 +30,7 @@ class LocationView(BaseView):
             <p>This page shows all RWS Object locations. An object can be a bridge, water lock, highway junction.</p>
             <p>This data is provided by the TOPdesk export.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Locations </td><td>Object type</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Locations </td><td>Object type</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, page_category='Network Components', page='Locations')
     
     @expose('/show/<string:location>', methods=['GET'])
     @has_access
@@ -57,7 +57,7 @@ class LocationView(BaseView):
             Show L2 overview
       </a>
         """
-        return self.render_template('single_column_table.html', table_header=f"Devices located at {location}</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help, extra_html = location_l2_button)
+        return self.render_template('single_column_table.html', table_header=f"Devices located at {location}</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help, extra_html = location_l2_button, page_category='Network Components', page='Locations')
     
     @expose('/l2/', methods=['GET'])
     @has_access
@@ -112,5 +112,5 @@ class LocationView(BaseView):
         markers = []
         for device, location in device_locations.items():
             markers.append({'hostname': device, 'latitude': location['latitude'],'longtitude': location['longtitude']})
-        return self.render_template('location.html',  page_info=help, html=l2_html, markers=markers, lines=[])
+        return self.render_template('location.html',  page_info=help, html=l2_html, markers=markers, lines=[], page_category='Network Components', page='Locations')
     

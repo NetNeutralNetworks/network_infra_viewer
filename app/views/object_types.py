@@ -30,7 +30,7 @@ class ObjectTypeView(BaseView):
             <p>This page shows all RWS Object types. An object_type can be a bridge, water lock, highway junction.</p>
             <p>This data is provided by the TOPdesk export.</p>
             """
-        return self.render_template('single_column_table.html', table_header="Locations </td><td>Object type</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="Locations </td><td>Object type</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, page_category='Network Components', page='Object types')
     
     @expose('/show/', methods=['GET'])
     @has_access
@@ -74,5 +74,5 @@ class ObjectTypeView(BaseView):
             <p>This page shows the RWS locations of a single object type. An object type can be a bridge, water lock, highway junction, etc.</p>
             <p>This data is provided by the TOPdesk export.</p>
             """
-        return self.render_template('single_column_table_with_map.html', table_header="Location</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, markers=markers)
+        return self.render_template('single_column_table_with_map.html', table_header="Location</td><td>#devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, markers=markers, page_category='Network Components', page='Object types')
     

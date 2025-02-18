@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 {{ super() }}
@@ -43,17 +43,7 @@ crossorigin=""></script>
 </script>
     
 {% endblock %}
-
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block messages %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block content %}
+{% block content %}
     <div style="margin:20px; display: grid; grid: auto / 50% 50%">
     <button type="button" class="btn btn-primary" style="grid-column: 1/2;" onclick="$('.page-info').toggle('slow');">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
@@ -114,13 +104,4 @@ crossorigin=""></script>
       
       
       </script>
-    {% endblock %}
-
-    {% block footer %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block tail_js %}
-    {% endblock %}
-
 {% endblock %}

@@ -1,9 +1,10 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" />
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
 integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
 crossorigin=""/>
@@ -12,7 +13,7 @@ crossorigin=""/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
 crossorigin=""/>
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css"
 crossorigin=""/>
 <link href="{{ url_for('static', filename='appbuilder/css/bootstrap.min.css')}}" rel="stylesheet">
 <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -54,16 +55,18 @@ html, body {
 /* Style the tab content */
 .tabcontent {
   display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
+  height: calc(100% - 60px);
+  /* padding: 6px 12px; */
+  /* border: 1px solid #ccc; */
   border-top: none;
-  grid-column-start: 1; 
+  /* grid-column-start: 1; 
   grid-column-end: 3;
-  display: grid;
-  grid-template-columns: auto auto  ;
+  display: grid; */
+  /* grid-template-columns: auto auto  ; */
   gap: 10px;
-  padding: 10px;
-  grid: 35px max-content/ 49% 49%;
+  /* padding: 10px; */
+  /* grid: 35px max-content/ 49% 49%; */
+  width:100%;
 }
 
  /* Style the buttons that are used to open and close the accordion panel */
@@ -109,289 +112,380 @@ crossorigin=""></script>
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 <script src="https://code.jquery.com/jquery-3.5.1.js"
 crossorigin=""></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"
 crossorigin=""></script>
 <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"
 crossorigin=""></script>
 <script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
 <script src="{{url_for('static',filename='jsonTree/jsonTree.js')}}"></script>
 
-<script type="text/javascript">
-  var datatable;
-  $(document).ready(function () {
-      datatable = $('#connection-table').DataTable({
-        scrollY: '600px',
-        scrollCollapse: true,
-        paging: false,
-        destroy: true,
-        select: true,
-      });
-      $('#connection-table tbody').on( 'click', 'tr', function () {
-        var rowData = datatable.row( this ).data();
-        changeSelectionInMap(rowData[2])
-      } );
-      if (map){
-        map.invalidateSize()
-      }
-      openView('evt','Layer1');
-  });
 
-  var datatable2;
-  $(document).ready(function () {
-      datatable2 = $('#interface-table').DataTable({
-        paging: false,
-        destroy: true,
-      });
-  });
+{% endblock %}
+
+{% block page_title %}
+{% if device is defined %}
+{{device.hostname}}
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="content">
+
+  <div id="page-nav">
+    <div id="page-nav-left">
+      <div id="back-wrapper">
+        <div id="back-button" onclick="window.location.replace('/devicesoverview/show_all/')">
+          {{ components.icon("fa-arrow-left")}} Back to devices
+        </div>
+        <div class="vert-divider"></div>
+      </div>
+      <div id="page-tabs">
+        <div class="tab-item active" onclick="openView(event, 'Layer1')">
+          Physical (Layer 1)
+        </div>
+        <div class="tab-item" onclick="openView(event, 'Layer2')">
+          Data (Layer 2)
+        </div>
+        <div class="tab-item" onclick="openView(event, 'Layer3')">
+          Network (Layer 3)
+        </div>
+        <div class="tab-item" onclick="openView(event, 'device_config')">
+          Device configuration
+        </div>
+        <div class="tab-item" onclick="openView(event, 'interfaces')">
+          Interfaces
+        </div>
+      </div>
+      
+    </div>
+    <div id="page-nav-right">
+        {% if device.security_score and device.management_score and device.reliability_score %}
+          {% if device.security_score < 70 %}
+          <span class="tag error"> 
+          {% elif device.security_score < 90 %}
+          <span class="tag warning">
+          {% else %}
+          <span class="tag success">
+          {% endif %}
+          Security: {{device.security_score}}
+          </span>
+    
+          {% if device.reliability_score < 70 %}
+          <span class="tag error"> 
+          {% elif device.reliability_score < 90 %}
+          <span class="tag warning">
+          {% else %}
+          <span class="tag success">
+          {% endif %}
+          Reliability: {{device.reliability_score}}
+          </span>
+    
+          {% if device.management_score < 70 %}
+          <span class="tag error"> 
+          {% elif device.management_score < 90 %}
+          <span class="tag warning">
+          {% else %}
+          <span class="tag success">
+          {% endif %}
+          Management: {{device.management_score}}
+          </span>
+        {% endif %}
+    </div>
+  </div>
+  
+  <!-- Tab content -->
+  <div id="Layer1" class="tabcontent" style="display: flex;" >
+    <div class="fds-column">
+      <div class="fds-row" style="height:auto;">
+        {{ components.label_card('Type', device.object_type) }}
+        {{ components.label_card('Serial', device.serial) }}
+        {{ components.label_card('Hardware', device.hardware) }}
+        {{ components.label_card('Os_type',device.os_type) }}
+        {{ components.label_card('latitude', device.latitude) }}
+        {{ components.label_card('longtitude', device.longtitude) }}
+      </div>
+    <div class="fds-row" style="display: grid; grid-template-columns: repeat(6, 1fr);">
+      <div class="card" style="grid-column: 1 / 5;">
+        <div class="card-header">
+          <div class="card-title-left">
+            Connected devices {{components.info_icon('l1' ,'About this page', 'This page shows all the known physical fibers that are connected to this devices. Information is gathered from Cocon')}}
+            
+            
+          </div>
+          <div class="card-title-right">
+            {{components.searchbar('Search devices...', id='connection-table_filter')}}
+          </div>
+        </div>
+        
+        <div class="card-content">
+          <div id="connection-details" style="width: 100%">
+            <table id="connection-table" class="table table-striped">
+              <thead><tr><td>Local device</td><td>Local port</td><td>Line name</td><td>Remote port</td><td>Remote device</td></tr></thead>
+              <tbody>
+                  {% for entry in connections %}
+                  <tr><td><a href='/deviceview/show/?hostname={{entry.0}}'>{{entry.0}}</a></td><td>{{entry.1}}</td><td>{{entry.2}}</td><td>{{entry.3}}</td><td><a href='/deviceview/show/?hostname={{entry.4}}'>{{entry.4}}</a></td></tr>
+                  {% endfor %}
+          
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="map" style="background-color:green; grid-column:5 / 7; width:100%;"></div>
+    </div>
+  </div>
+
+    
+  </div>
+  
+  <div id="Layer2" class="tabcontent">
+    <div class="card">
+      <div class="card-title-left">
+        Data views {{components.info_icon('l2','About this page','This page shows all the known layer 2 neighbors for the selected device. This data is gathered from the CSPC: "show neighbors" command. Note that most layer 3 connections dont have a neighborship protocol running so LTE or rented lines are probably not shown.')}}
+      </div>
+      <div class="card-content" style="display: flex;flex-direction: column; padding-bottom: 5px;">
+          <div class="tile tile-active" onclick="openTile(event,'/deviceview/l2_graph/?hostname={{device.hostname}}') ">
+            <div class="tile-icon-wrapper">
+              <i class="fa-light fa-server" style="display: flex; width: 24px; height: 24px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 20px; font-style: normal; font-weight: 400; line-height: 24px; "></i>
+            </div>
+            <div class="tile-tag-active">
+              Active view
+            </div>
+            <div class="tile-trailing-icon">
+              <i class="fa-solid fa-chevron-right" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 12px; "></i>
+            </div>
+            <div class="tile-data-label">
+              <div class="tile-title">
+                Default view
+              </div>
+              <div class="tile-label">
+                View the device with interface coupling
+              </div>
+                
+            </div>
+          </div>
+          <div class="tile" onclick="openTile(event, '/deviceview/l2_extended/?hostname={{device.hostname}}')">
+            <div class="tile-icon-wrapper">
+            <i class="fa-light fa-up-right-and-down-left-from-center" style="display: flex; width: 24px; height: 24px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 20px; font-style: normal; font-weight: 400; line-height: 24px; "></i>
+            </div>
+            <div class="tile-tag-active">
+              Active view
+            </div>
+            <div class="tile-trailing-icon">
+            <i class="fa-solid fa-chevron-right" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 12px; "></i>
+            </div>
+            <div class="tile-data-label">
+              <div class="tile-title">
+                Extended view
+              </div>
+              <div class="tile-label">
+                View the chain upto CE
+              </div>
+                
+            </div>
+          </div>
+          <div class="tile" onclick="openTile(event,'/deviceview/l2_summary/?hostname={{device.hostname}}') ">
+            <div class="tile-icon-wrapper">
+              <i class="fa-light fa-minimize" style="display: flex; width: 24px; height: 24px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 20px; font-style: normal; font-weight: 400; line-height: 24px; "></i>
+            </div>
+            <div class="tile-tag-active">
+              Active view
+            </div>
+            <div class="tile-trailing-icon">
+              <i class="fa-solid fa-chevron-right" style="display: flex; width: 12px; height: 12px; flex-direction: column; justify-content: center; flex-shrink: 0; text-align: center; font-size: 10px; font-style: normal; font-weight: 900; line-height: 12px; "></i>
+            </div>
+            <div class="tile-data-label">
+              <div class="tile-title">
+                Summary view
+              </div>
+              <div class="tile-label">
+                View the device without interface coupling
+              </div>
+                
+            </div>
+          </div>
+      </div>
+  </div>
+  <iframe id="l2_iframe" name="l2_frame" src="/deviceview/l2_graph/?hostname={{device.hostname}}" style="height: calc(100vh - 180px); border:none; flex-grow: 2; background-color: #fff;" title="Overview"></iframe> 
+  
+      <!-- {{html|safe}} -->
+      <script>
+function openTile(evt, url) {
+  // Declare all variables
+  tiles = evt.currentTarget.parentElement.children
+  for (i = 0; i < tiles.length; i++) {
+    tiles[i].className = tiles[i].className.replace(" tile-active", "");
+  }
+
+  evt.currentTarget.className += " tile-active";
+  $('iframe')[0].src=url;
+} 
+      </script>
 
   
-</script>
-{% endblock %}
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-     {% block messages %}
-     {{ super() }}
-      {% endblock %}
-      {% block content %}
-
-
-<div id="details-header" style="width:100%;display: grid;grid: auto auto/ 50% 50%;">
-  <div id="device-details" style="float:left; margin:20px; background-color:#f1f1f1; border-radius: 10px;  padding-left: 20px;">
-    {% if device is defined %}
-  <h2>Device: {{device.hostname}}</h2>
-  <br />
-  <h4>Location: {{device.location_name}}</h4>
-  {% for key, value in device.items() %}
-      <h5>{{key}}: {{value}}</h5>
-   {% endfor %}
-  {% endif %}
   </div>
-  <div id="search" style="margin-right:40px">
-  <form style="float:right">
-  <label for="hostname">Hostname:</label>
-                        <br>
-                        <input type="text" name="hostname"
-                                placeholder="Search" />
-                        <br>
-                        <button type="submit">Search</button>
-  </form>
+  
+  <div id="Layer3" class="tabcontent">
+    <script>
+      function switch_network_instance(instance){
+        // Declare all variables
+        var i, net_inst, tablinks;
+
+        // Get all elements with class="network_instance" and hide them
+        net_inst = document.getElementsByClassName("network-instance");
+        for (i = 0; i < net_inst.length; i++) {
+          net_inst[i].style.display = "none";
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(instance).style.display = "table";
+        document.getElementById('ni_label').innerText = instance.substr(14);
+
+      }
+    </script>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-left">
+          Networks {{components.info_icon('l3','About this page','This page shows the network segments configured on the selected device according to the configuration collected by the CSPC collector.')}}
+        </div>
+        <div class="card-title-right">
+          {{components.searchbar('Search networks...', id='l3_network_filter')}}
+          <script>
+            
+            $('#l3_network_filter').keyup(function(){
+              var l3_network_tiles = $('#l3_networklist')[0].children;
+              for(var x = 0; x < l3_network_tiles.length; x++) {
+                console.log(l3_network_tiles[x])
+                l3_network_tiles[x].style.display = 'none';
+                try{
+                  var content = l3_network_tiles[x].querySelector('.tile-label')
+                  if($('#l3_network_filter')[0].value == '' || content.outerText.toLowerCase().includes($('#l3_network_filter')[0].value.toLowerCase())){
+                    l3_network_tiles[x].style.display = 'flex';
+                  }
+                } catch{
+
+                }
+                
+              }
+            })
+            
+          </script>
+        </div>
+      </div>
+      <div class="card-content">
+
+    
+      <div id="l3_networklist" class="fds-column" style="gap: var(--fds-density-space-0_5x, 8px);">
+
+        {% for vrf in l3 %}
+          {{ components.medium_tile(vrf.name, onclick="switch_network_instance('table-netinst-" + vrf.name + "')") }}
+        {% endfor %}
+      </div>
+    </div> 
+      </div>
+      <div class="card" style="flex-grow: 2;">
+        <div id="ni_label" class="card-title-left">
+          NETWORK INSTANCE
+        </div>
+        <div class="card-content">
+          {{components.empty_state('No results found', extra_classes='network-instance')}}
+          {% for vrf in l3 %}
+          <table id="table-netinst-{{vrf.name}}" class="table table-striped network-instance" style="display: none;">
+          <thead><tr><th>Segments</th></tr></thead>
+          <tbody>
+            {% for interface in vrf.interfaces %}
+            <tr><td>{{ interface}}</td></tr>
+            {% endfor %}
+          </tbody>
+          </table>  
+          
+        {% endfor %}
+        </div>
+    </div>
   </div>
+    
+  
+  <div id="device_config" class="tabcontent" >
+    <div class="card">
+      <div class="card-title-left">
+        Configuration {{components.info_icon('device_config','About this page','This page shows the raw config as provided by the CSPC collector')}}
+      </div>
+      <div class="card-content" style="white-space: pre-wrap;">
+  {% for line in device_config %}{{ line }}{% endfor %}
+      </div>
   </div>
-
-  {% if device is defined %}
-    <div style="margin: 0 2em 1.5em;">
-    {% if device.security_score and device.management_score and device.reliability_score %}
-      <h3>{% if device.security_score < 70 %}
-      <span class="label label-danger"> 
-      {% elif device.security_score < 90 %}
-      <span class="label label-warning">
-      {% else %}
-      <span class="label label-success">
-      {% endif %}
-      Security: {{device.security_score}}
-      </span></h3>
-
-      <h3>{% if device.reliability_score < 70 %}
-      <span class="label label-danger"> 
-      {% elif device.reliability_score < 90 %}
-      <span class="label label-warning">
-      {% else %}
-      <span class="label label-success">
-      {% endif %}
-      Reliability: {{device.reliability_score}}
-      </span></h3>
-
-      <h3>{% if device.management_score < 70 %}
-      <span class="label label-danger"> 
-      {% elif device.management_score < 90 %}
-      <span class="label label-warning">
-      {% else %}
-      <span class="label label-success">
-      {% endif %}
-      Management: {{device.management_score}}
-      </span></h3>
-    {% endif %}
+  <div class="card">
+    <div class="card-title-left">
+      JSON
+    </div>
+    <div id="oc_content" class="card-content">
+  
+    </div>
   </div>
-  <i>Device config from: {{config_date}}</i>
-  {% endif %}
-<div id="content" style="height: 100%;">
-
-
-
- <!-- Tab links -->
- <div class="tab" style="grid-column-start: 1; grid-column-end: 3;">
-  <button class="tablinks" onclick="openView(event, 'Layer1')">Layer 1 (Physical)</button>
-  <button class="tablinks" onclick="openView(event, 'Layer2')">Layer 2 (Data)</button>
-  <button class="tablinks" onclick="openView(event, 'Layer3')">Layer 3 (Network)</button>
-  <button class="tablinks" onclick="openView(event, 'device_config')">Device config</button>
-  <button class="tablinks" onclick="openView(event, 'interfaces')">Interfaces</button>
-</div>
-
-<!-- Tab content -->
-<div id="Layer1" class="tabcontent" >
-  <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-    </svg>
-        What am i looking at?
-  </button>
-  <div class="page-info well" style="grid-column: 1/3; display: none;">
-    <p>This page shows the Layer 1 connections of the selected device{% if device is defined %}: {{device.hostname}}{% endif %} and the devices that are directly connected to this device according to data provided by KPN. Both panels are interactive, so go ahead and try hovering/clicking on the lines, markers and table rows...</p>
-    <p>On the left is a geographical view of the location of the fiber spans (according to Cocon) and the device locations. The locations are determined by the start of the hostname.{% if device is defined %} So device: "{{device.hostname}}" gets placed in location: "{{device.location_name}}".{% endif %} Color is by default determined by the type of connection (P-P, P-PE, PE-CE, or other)</p>
-    <p>On the Right is a tabular overview with all devices that are connected and to/from which port.</p>
-    <p><i>Please note that only information provided by KPN is used to determine if devices are connected.</i></p>
+    <script>
+      var wrapper = document.getElementById("oc_content");
+      var data = {{ oc | safe}};
+      var tree = jsonTree.create(data, wrapper);
+      tree.expand(function(node) {
+          return node.childNodes.length < 2;
+      });
+  </script>
   </div>
-  <div id="map" style="background-color:green;"></div>
-  <div id="connection-details" style="min-height:600px">
-    <table id="connection-table">
-      <thead><tr><td>Local device</td><td>Local port</td><td>Lijnbenaming</td><td>Remote port</td><td>Remote device</td></tr></thead>
+  
+  
+  <div id="interfaces" class="tabcontent" >
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-left">
+          Interfaces {{components.info_icon('inf','About this page','This page shows the interpretted interface data from config')}}
+        </div>
+        <div class="card-title-right">
+          {{components.searchbar('Search interfaces...', id='interfaces_filter')}}
+          <script>
+            var datatable2;
+            $(document).ready(function () {
+                datatable2 = $('#interface-table').DataTable({
+                  paging: false,
+                  destroy: true,
+                  language: {
+                      thousands: "."
+                  },
+                  layout: {
+                    topStart: null,
+                    topEnd: null,
+                    bottomStart: null,
+                    bottomEnd: null
+                  },
+                });
+                $('#interface-table_wrapper').css("width", "100%");
+            });
+            $('#interfaces_filter').keyup(function(){
+              datatable2.search($(this).val()).draw() ;
+            })
+          </script>
+        </div>
+      </div>
+      <div class="card-content">
+    <table id="interface-table" class="table table-striped" style="width: 100%">
+      <thead><tr><td>Interface name</td><td>Ip</td><td>description</td><td>VRF</td><td>enabled</td></tr></thead>
       <tbody>
-          {% for entry in connections %}
-          <tr><td><a href='/deviceview/show/?hostname={{entry.0}}'>{{entry.0}}</a></td><td>{{entry.1}}</td><td>{{entry.2}}</td><td>{{entry.3}}</td><td><a href='/deviceview/show/?hostname={{entry.4}}'>{{entry.4}}</a></td></tr>
+          {% for entry in interfaces %}
+          <tr><td>{{entry.name}}</td><td>{{entry.ip}}</td><td>{{entry.description}}</td><td>{{entry.vrf}}</td><td>{{entry.enabled}}</td></tr>
           {% endfor %}
   
       </tbody>
     </table>
+    </div>
   </div>
-</div>
-
-<div id="Layer2" class="tabcontent" style="grid-column-start: 1; grid-column-end: 3;">
-  <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-    </svg>
-        What am i looking at?
-  </button>
-  <div class="page-info well" style="grid-column: 1/3; display: none;">
-    <p>This page shows the Layer 2 neighborships according to the configuration collected by the CSPC collector.</p>
-    <p>At this time only CDP neighbors are being shown as LLDP is disabled on most if not all Cisco devices. In time there might be an option to visualize aggregated interfaces.</p>
-    <p>The color of the nodes is dependant on the type of device. (P, PE, CE or other)</p>
-    <p><i>Please note that only information provided by the CSPC collector is used to determine if devices are neighbors of each other.</i></p>
-  </div>
-  <div id="l2" style="grid-column-start: 1; grid-column-end: 2;min-height: 100%;">
-    {{html|safe}}
-    <script>
-      network.on('doubleClick', function(params){
-        window.location.replace("?hostname=" + nodes.get(params.nodes[0]).label);
-        // alert(nodes.get(params.nodes[0]).label)
-      })
-    </script>
-  </div>
-  <div id="l2_extra" style="grid-column-start: 2; grid-column-end: 3;min-height: 100%;">
-    <a href='/deviceview/l2_extended/?hostname={{device.hostname}}'>Get extended l2 view (This might take some time....)</a>
-  <br>
-    <a href='/deviceview/l2_summary/?hostname={{device.hostname}}'>Get summary view (without interface coupling)</a>
-  </div>
-</div>
-
-<div id="Layer3" class="tabcontent" style="grid-column-start: 1; grid-column-end: 3;">
-  <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-    </svg>
-        What am i looking at?
-  </button>
-  <div class="page-info well" style="grid-column: 1/3; display: none;">
-    <p>This page shows the network segments configured on the selected device according to the configuration collected by the CSPC collector.</p>
-  </div>
-
-<script type="text/javascript">
-
-</script>
-
-  <!-- {% for vrf in l3 %}
-  <button class="accordion" style="grid-column: 1/2;" >{{ vrf.vrf }}</button>
-  <div class="panel">
-    {% for vlan in vrf.vlans %}
-    <button class="accordion">VLAN: {{ vlan.vlan_interface}}</button>
-    <div class="panel">
-      {% for port in vlan.physical_interfaces %}
-      <button class="accordion">{{ port.name }}</button>
-      <div class="panel">
-        <p>Description: {{port.description}}</p>
-      </div>
-      {% endfor %}
-   </div>
   
   
-  {% endfor %}
-</div>
-{% endfor %}
-</div>  -->
-
-{% for vrf in l3 %}
-  <button class="accordion" style="grid-column: 1/2;" >{{ vrf.name }}</button>
-  <div class="panel">
-    {% for interface in vrf.interfaces %}
-    <div class="accordion">interface: {{ interface}}</div>  
-  {% endfor %}
-</div>
-{% endfor %}
-</div> 
-
-<div id="device_config" class="tabcontent" >
-  <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-    </svg>
-        What am i looking at?
-  </button>
-  <div class="page-info well" style="grid-column: 1/3; display: none;">
-    <p>This page shows the raw config as provided by the CSPC collector</p>
+  
+  
+  
   </div>
-  <pre>
-    <code>
-{% for line in device_config %}{{ line }}{% endfor %}
-    </code> 
-  </pre>
-  <div id="oc_content">
-
-  </div>
-  <script>
-    var wrapper = document.getElementById("oc_content");
-    var data = {{ oc | safe}};
-    var tree = jsonTree.create(data, wrapper);
-    tree.expand(function(node) {
-        return node.childNodes.length < 2;
-    });
-</script>
-  <!-- <pre>
-    <code>
-{% for line in oc %}{{ line }}{% endfor %}
-    </code> 
-  </pre> -->
-</div>
-
-
-<div id="interfaces" class="tabcontent" >
-  <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-    </svg>
-        What am i looking at?
-  </button>
-  <div class="page-info well" style="grid-column: 1/3; display: none;">
-    <p>This page shows the interpretted interface data from config</p>
-  </div>
-  <div style="grid-column: 1/3;">
-  <table id="interface-table" style="width: 100%">
-    <thead><tr><td>Interface name</td><td>Ip</td><td>description</td><td>VRF</td><td>enabled</td></tr></thead>
-    <tbody>
-        {% for entry in interfaces %}
-        <tr><td>{{entry.name}}</td><td>{{entry.ip}}</td><td>{{entry.description}}</td><td>{{entry.vrf}}</td><td>{{entry.enabled}}</td></tr>
-        {% endfor %}
-
-    </tbody>
-  </table>
-</div>
-</div>
-
-
-
 
 </div>
+
 
 <script type="text/javascript">
 
@@ -425,14 +519,19 @@ function openView(evt, viewName) {
   }
 
   // Get all elements with class="tablinks" and remove the class "active"
-  tablinks = document.getElementsByClassName("tablinks");
+  tablinks = document.getElementsByClassName("tab-item");
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
 
   // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(viewName).style.display = "grid";
+  document.getElementById(viewName).style.display = "flex";
   evt.currentTarget.className += " active";
+
+  if (viewName == 'Layer2'){
+    var l2frame = document.getElementById('l2_iframe');
+    l2frame.contentWindow.network.fit();
+  }
 } 
 
   function changeSelectionInTable(selected_item){
@@ -611,14 +710,79 @@ function get_connection_type_color(x){
   map.addLayer(marker_group)
   var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
   map.addControl(new L.Control.Fullscreen());
+
+  window.onload = function() {
+    map.invalidateSize();
+    var bounds2 = marker_group.getBounds();
+
+  map.flyToBounds(bounds2, {
+          animate: true,
+          duration:1
+  });
+};
+  
   
   
   </script>
-    {% endblock %}
-    <!-- {% block footer %}
-    {{ super() }}
-    {% endblock %} -->
-{% block tail_js %}
 
-{% endblock %}
+<script type="text/javascript">
+  var datatable;
+
+  datatable = new DataTable('#connection-table', {
+    layout: {
+          topStart: null,
+          topEnd: null,
+          bottomStart: {
+            paging: {
+                firstLast: false
+            }
+          },
+          bottomEnd: 'pageLength'
+        },
+    scrollY: '600px',
+    scrollCollapse: true,
+    pageLength: 15,
+    paging: true,
+    destroy: true,
+    select: {
+      style: 'single'
+    },
+    searching: true,
+    lengthMenu: [15, 25, {label: 'All', value: -1}],
+    language: {
+      lengthMenu: 'rows per page _MENU_',
+      thousands: "."
+    }
+    
+  });
+
+  $('#connection-table_filter').keyup(function(){
+    datatable.search($(this).val()).draw() ;
+    console.log('Typed!')
+  })
+  $(document).ready(function () {
+      $('#connection-table tbody').on( 'click', 'tr', function (e) {
+        var rowData = datatable.row( this ).data();
+        let classList = e.currentTarget.classList;
+ 
+    if (classList.contains('selected')) {
+        classList.remove('selected');
+    }
+    else {
+        datatable.rows('.selected').nodes().each((row) => row.classList.remove('selected'));
+        classList.add('selected');
+    }
+        changeSelectionInMap(rowData[2])
+      } );
+      if (map){
+        map.invalidateSize()
+      }
+      // openView('evt','Layer1');
+      
+  });
+
+  
+
+  
+</script>
 {% endblock %}

@@ -1,18 +1,11 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_js %}
 {{ super() }}
 <script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
 {% endblock %}
 
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-     {% block messages %}
-     {{ super() }}
-      {% endblock %}
-      {% block content %}
+{% block content %}
       <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
       <div id="device" style="margin:20px;">
@@ -48,12 +41,4 @@
               </form>
               </div>
       </div>
-
-
-    {% endblock %}
-    {% block footer %}
-    {{ super() }}
-    {% endblock %}
-{% block tail_js %}
-{% endblock %}
 {% endblock %}

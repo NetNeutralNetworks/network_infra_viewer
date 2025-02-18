@@ -30,7 +30,7 @@ class HardwareView(BaseView):
             <p>This page shows all RWS hardware.</p>
             <p>This data is provided by the TOPdesk export.</p>
             """
-        return self.render_template('single_column_table.html', table_header="hardware</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header="hardware</td><td>#Devices</td><td>Average security</td><td>Average reliabilty</td><td>Average management", entries=lines, page_info=help, page_category='Network Components', page='Hardware')
     
     @expose('/show/<string:hardware>', methods=['GET'])
     @has_access
@@ -51,5 +51,5 @@ class HardwareView(BaseView):
             <p>This page shows a hardware model with its devices</p>
             <p>This data is provided by TOPdesk export.</p>
             """
-        return self.render_template('single_column_table.html', table_header=f"Devices with model {hardware}</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help)
+        return self.render_template('single_column_table.html', table_header=f"Devices with model {hardware}</td><td>Security</td><td>Reliabilty</td><td>Management", entries=lines, page_info=help, page_category='Network Components', page='Hardware')
     

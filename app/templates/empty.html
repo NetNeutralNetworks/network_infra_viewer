@@ -1,4 +1,4 @@
-{% extends 'appbuilder/baselayout.html' %}
+{% extends 'base.html' %}
 
 {% block head_css %}
 {{ super() }}
@@ -11,23 +11,6 @@
 <script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
 {% endblock %}
 
-{% block body %}
-    {% block navbar %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block messages %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block content %}
-    {% endblock %}
-
-    {% block footer %}
-    {{ super() }}
-    {% endblock %}
-
-    {% block tail_js %}
-    {% endblock %}
-
+{% block content %}
 {% endblock %}
+

@@ -1,0 +1,61 @@
+/* Wrapper for entire popup*/
+.leaflet-popup-content{
+    background: var(--fds-color-surface-primary, #FFF);
+    width: 320px;
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    margin:0px;
+    max-height: 300px;
+}
+
+.popup-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+
+    color: var(--fds-color-text-label-primary, #535353);
+    /* Forms/Label */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+}
+
+.popup-content{
+    color: var(--fds-color-text-label-primary, #535353);
+
+    /* Forms/Label */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-forms-label, 11px);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px; /* 145.455% */
+    letter-spacing: 0.88px;
+    text-transform: uppercase;
+    overflow: scroll;
+    width: 100%;
+}
+
+.popup-content li{
+    color: var(--fds-color-text-link, #01689B);
+
+    /* Body/Regular */
+    font-family: var(--fds-font-family-sans_serif, RijksoverheidSansWebText);
+    font-size: var(--fds-font-body-m, 13px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 123.077% */
+}
+
+.popup-list{
+    list-style-position: inside;
+    padding-left: 0;
+}
