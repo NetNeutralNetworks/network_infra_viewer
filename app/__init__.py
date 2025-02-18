@@ -44,7 +44,7 @@ db = SQLA(app)
 appCache.init_app(app)
 
 class MyIndexView(IndexView):
-    index_template = 'home.html'
+    index_template = 'overview_new.html'
 
 appbuilder = AppBuilder(app, db.session, indexview=MyIndexView)
 
