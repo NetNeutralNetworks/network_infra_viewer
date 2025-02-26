@@ -139,7 +139,7 @@ input[type=text]:focus {
     align-items: flex-start;
     align-self: stretch;
     max-height: calc(100vh - 80px - 40px - var(--fds-density-space-1_5x, 24px) - var(--fds-density-space-1_5x, 24px));
-    overflow: scroll;
+    overflow:auto;
 }
 
 .filter-options-wrapper {
