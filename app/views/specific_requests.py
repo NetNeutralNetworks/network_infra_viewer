@@ -9,6 +9,7 @@ from pyvis.network import Network
 from app.parsing.drivers.cisco import ios
 
 from ..scripts.memgraph import execute_query
+from ..scripts.pyvis_helpers import parse_py_vis
 from ..scripts.location_calculations import get_GPS_from_RD, get_closest_point
 
 load_dotenv(override=True)
@@ -347,6 +348,35 @@ class ObjectClassification(BaseView):
         
         return self.render_template('isvc.html',locations = json.dumps(locations), page_category='Specific requests', page='iSVC')
     
+    @expose('/list/with_rented', methods=['GET'])
+    @has_access
+    def rented(self):
+        query = f"""
+        MATCH (O:RWS_object)
+OPTIONAL MATCH (O)--(dep:Department)
+OPTIONAL MATCH (O)--(d:Device)
+
+WHERE d.hostname =~ ".*CE.*"
+
+WITH O, collect(d) as devices, d.object_type as obj_type, count(d.uplink = "dark_fiber" OR d.huurlijn=true) as c, dep
+return O, size(devices), obj_type, c, dep.name
+        """
+        locations = {'unknown': []}
+        for location, ce_num, object_type, count_of_fiber_uplinks, department in execute_query(query):
+            object = location.properties
+            object['type'] = object_type
+            object['department'] = department
+            object['fiber_uplinks'] = int(count_of_fiber_uplinks)
+            logging.getLogger().debug(count_of_fiber_uplinks)
+            if not department:
+                locations['unknown'].append(object)
+            elif department in locations:
+                locations[department].append(object)
+            else:
+                locations[department] = [object]
+        
+        return self.render_template('isvc.html',locations = json.dumps(locations), page_category='Specific requests', page='iSVC')
+    
     @expose('/list/all', methods=['GET'])
     @has_access
     def main_page_all(self):
@@ -375,6 +405,159 @@ class ObjectClassification(BaseView):
                 locations[department] = [object]
         
         return self.render_template('isvc.html',locations = json.dumps(locations), page_category='Specific requests', page='iSVC')
+    
+    @expose('/table', methods=['GET'])
+    @has_access
+    def table_view(self):
+
+        
+        return self.render_template('isvc_table.html', page_category='Specific requests', page='iSVC')
+    
+    @expose('/table/data', methods=['GET'])
+    @has_access
+    def table_view_data(self):
+        query = f"""
+        MATCH (O:RWS_object)
+        OPTIONAL MATCH (O)--(dep:Department)
+        OPTIONAL MATCH (O)--(d:Device)
+
+        WHERE d.hostname =~ ".*CE.*"
+
+        WITH O, collect(d) as devices, d.object_type as obj_type, count(d.uplink = "dark_fiber") as c1,count(d.huurlijn = true) as c2, dep
+        return DISTINCT O,c1, c2
+        """
+        locations = []
+        for location, count_of_fiber_uplinks, count_of_rented_line in execute_query(query):
+            object = location.properties
+            classification = object.get('classification', 'F')
+            compliant = '<span class="label label-success">Yes</span>'
+            rendered_count_of_uplink = ""
+            rendered_count_of_rented_line = ""
+            if classification == 'A' or classification == 'B':
+                rendered_count_of_rented_line = f'<span class="label label-default">{count_of_rented_line}</span>'
+                if count_of_fiber_uplinks < 2:
+                    rendered_count_of_uplink = f'<span class="label label-danger">{count_of_fiber_uplinks}</span>'
+                    compliant = '<span class="label label-danger">Location needs 2 redundant self-owned fiber paths</span>'
+                else:
+                    rendered_count_of_uplink = f'<span class="label label-success">{count_of_fiber_uplinks}</span>'
+            elif classification == 'C':
+                if count_of_fiber_uplinks > 0 and count_of_fiber_uplinks + count_of_rented_line > 1:
+                    rendered_count_of_uplink = f'<span class="label label-success">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-success">{count_of_rented_line}</span>'
+                else:
+                    compliant = '<span class="label label-danger">Location needs 2 redundant paths of which one is self-owned</span>'
+                    rendered_count_of_uplink = f'<span class="label label-danger">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-danger">{count_of_rented_line}</span>'
+            elif classification == 'D':
+                if count_of_fiber_uplinks + count_of_rented_line > 1:
+                    rendered_count_of_uplink = f'<span class="label label-success">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-success">{count_of_rented_line}</span>'
+                else:
+                    compliant = '<span class="label label-danger">Location needs 2 redundant paths</span>'
+                    rendered_count_of_uplink = f'<span class="label label-danger">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-danger">{count_of_rented_line}</span>'
+            elif classification == 'E':
+                if count_of_fiber_uplinks + count_of_rented_line > 0:
+                    rendered_count_of_uplink = f'<span class="label label-success">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-success">{count_of_rented_line}</span>'
+                else:
+                    compliant = '<span class="label label-danger">Location needs a uplink path</span>'
+                    rendered_count_of_uplink = f'<span class="label label-danger">{count_of_fiber_uplinks}</span>'
+                    rendered_count_of_rented_line = f'<span class="label label-danger">{count_of_rented_line}</span>'
+                    
+
+            else:
+                rendered_count_of_uplink = f'<span class="label label-default">{count_of_fiber_uplinks}</span>'
+                rendered_count_of_rented_line = f'<span class="label label-default">{count_of_rented_line}</span>'
+
+            locations.append({
+                "location": object['name'],
+                "classification": classification,
+                "compliant": compliant,
+                "fiber_uplinks": rendered_count_of_uplink,
+                "rented_uplinks": rendered_count_of_rented_line,
+            })
+        
+        return locations
+
+
+class CoreNetworkView(BaseView):
+    default_view = 'main_page'
+
+    @expose('/map/', methods=['GET'])
+    @has_access
+    def main_page(self):
+        q_lines = f"""
+    MATCH (d:Device)--(:Port)--(lijn:Lijnbenaming)--(:Fiber)--(s:Span)
+    WHERE d.hostname =~ ".*-PE?\\\d+-.*"
+    return DISTINCT s
+
+
+        """
+        spans = []
+        for entry in execute_query(q_lines):
+            span = entry[0]
+            spans.append({
+                'span': span.properties['span'],
+                'path': json.loads(span.properties['path']),
+            })
+        q_devices = f"""
+MATCH (d:Device)--(loc:Location)
+WHERE d.hostname =~ ".*-PE?\\\d+-.*"
+return DISTINCT d, loc
+
+
+        """
+        devices = []
+        for device, location in execute_query(q_devices):
+            devices.append({
+                'name': f"{location.properties['name']}: {device.properties['hostname']}",
+                'latitude': location.properties['latitude'],
+                'longtitude': location.properties['longtitude'],
+            })
+                
+        help = """
+        <p>This page shows a map of all the fibers that are connected to any location that has P or PE devices. This is a report requested by Rob de Ruiter</p>
+        """
+        return self.render_template('generic_map.html', lines=spans, markers=devices, page_info=help, color_strategy="single")
+    
+    @expose('/graph/', methods=['GET'])
+    @has_access
+    def graph(self):
+        device_network = Network(notebook=False, cdn_resources='in_line', height='800px')
+        q_devices = f"""
+MATCH (d:Device)
+WHERE d.hostname =~ ".*-PE?\\\d+-.*"
+
+OPTIONAL MATCH path=((d)--(:Interface)--(:Interface)--(uplink:Device))
+WHERE uplink.hostname =~ ".*-PE?\\\d+-.*"
+return d, uplink
+        """
+        devices = []
+        for device1, device2 in execute_query(q_devices):
+            if device1.id not in devices:
+                if re.match(".*PE\\d+-.*", device1.properties.get("hostname", "")):
+                    color = "purple"
+                else:
+                    color = "blue"
+                device_network.add_node(device1.id, label=device1.properties.get("hostname"), color=color)
+                devices.append(device1.id)
+            if device2.id not in devices:
+                if re.match(".*PE\\d+-.*", device2.properties.get("hostname", "")):
+                    color = "purple"
+                else:
+                    color = "blue"
+                device_network.add_node(device2.id, label=device2.properties.get("hostname"), color=color)
+                devices.append(device2.id)
+            device_network.add_edge(device1.id, device2.id)
+            l2_html = device_network.generate_html()
+        l2_html = re.sub(r'<center>.+?<\/h1>\s+<\/center>', '', l2_html, 2, re.DOTALL)
+        l2_html = re.sub(r'<link\s*href.*?\/>', '', l2_html, 0, re.DOTALL)
+                
+        help = """
+        <p>This page shows a map of all the fibers that are connected to any location that has P or PE devices. This is a report requested by Rob de Ruiter</p>
+        """
+        return parse_py_vis(l2_html)
     
 class RegexTest(BaseView):
     default_view = 'main_page'

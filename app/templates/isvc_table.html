@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/universal.css') }}" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+crossorigin=""/>
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+{% endblock %}
+
+{% block head_js %}
+{{ super() }}
+<script src="https://code.jquery.com/jquery-3.7.0.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"
+crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"
+crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"
+crossorigin=""></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"
+crossorigin=""></script>
+<script src="{{url_for('static',filename='/appbuilder/js/bootstrap.min.js')}}"></script>
+<script src= 
+"https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"> 
+  </script> 
+
+<script type="text/javascript">
+    // $(document).ready(function () {
+    //     $('#object-table').DataTable({
+    //       scrollCollapse: true,
+    //       paging: true,
+    //       pageLength: 1000,
+    //       destroy: true,
+    //       dom: 'Bfrtip',
+    //       buttons: [
+    //         'copy', 'csv', 'excel', 'pdf', 'print'
+    //     ]
+    //     });
+    // });
+    var table;
+
+    $(document).ready(function () {
+        table = $('#object-table').DataTable({
+          scrollCollapse: true,
+          paging: true,
+          pageLength: 17,
+          columns: [
+              { data: 'location' },
+              { data: 'classification' },
+              { data: 'compliant' },
+              { data: 'fiber_uplinks' },
+              { data: 'rented_uplinks' }
+          ],
+          dom: 'Bfrtip',
+          // buttons: [
+          //   'copy', 'csv', 'excel', 'pdf', 'print'
+          //   ],
+          buttons: [],
+            initComplete: function () {
+            this.api()
+                .columns()
+                .every(function () {
+                    let column = this;
+                    let title = column.header().textContent;
+    
+                    // Create input element
+                    let input = document.createElement('input');
+                    input.placeholder = title;
+                    column.header().replaceChildren(input);
+    
+                    // Event listener for user input
+                    input.addEventListener('keyup', () => {
+                        if (column.search() !== this.value) {
+                            column.search(input.value, true, true).draw();
+                        }
+                    });
+                });
+              }
+            });        
+    });
+
+    $.ajax({
+     url: '/objectclassification/table/data',
+     dataType: 'json',
+     success: function(json){
+       table.rows.add(json).draw();
+       table.columns.adjust()
+   }
+ });
+    
+</script>
+    
+{% endblock %}
+{% block content %}
+    
+<div class="content"> 
+
+  <div class="card">
+    <table id="object-table" style="width:100%" data-url="/objectclassification/table/data">
+      <thead>
+        <tr>
+            <th data-field="location">Object</th>
+            <th data-field="classification">classification</th>
+            <th data-field="compliant">compliant</th>
+            <th data-field="fiber_uplinks">number of fiber uplinks</th>
+            <th data-field="rented_uplinks">number of rented uplinks</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+
+</div>
+
+<script>
+
+//   $(function () {
+//     $('#object-table').bootstrapTable({
+//       url: '/objectclassification/table/data'
+//     });
+// });
+
+
+
+</script>
+    
+{% endblock %}
+
+    

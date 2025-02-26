@@ -14,7 +14,7 @@ from .views.generate_fake_score import GenerateFakeScores
 from .views.empty import EmptyView, UITestView
 from .views.dataquality import LijnbenamingMissingPort, DeviceMissingLocation, DeviceMissingPort, NonConsecutiveLine
 from .views.abnomalies import DualHoming, Redundancy, LineRedundancy, LineRedundancyMap
-from .views.specific_requests import CVRFibers, WKSImport, InterfacesDevices, DevicesSerial, WirelessUplinks, RegexTest, ObjectClassification
+from .views.specific_requests import CVRFibers, WKSImport, InterfacesDevices, DevicesSerial, WirelessUplinks, RegexTest, ObjectClassification, CoreNetworkView
 from .views.abbreviations import Abbreviations
 from .views.location_plotting import MatchDeviceToLocation
 
@@ -73,14 +73,15 @@ appbuilder.add_view(NonConsecutiveLine, "Niet-doorlopende lijnen", category='Dat
 # appbuilder.add_view(EmptyView, "Empty page", category='Testing')
 # appbuilder.add_view(MatchDeviceToLocation, "Location plotting", category='Testing')
 
-appbuilder.add_view(CVRFibers, "CVR Fibers", category='Specific requests', category_icon='fa-bell-concierge')
-appbuilder.add_view(WKSImport, "WKS", category='Specific requests')
-appbuilder.add_view(InterfacesDevices, "Cellular devices", category='Specific requests')
+# appbuilder.add_view(CVRFibers, "CVR Fibers", category='Specific requests', category_icon='fa-bell-concierge')
+# appbuilder.add_view(WKSImport, "WKS", category='Specific requests')
+# appbuilder.add_view(InterfacesDevices, "Cellular devices", category='Specific requests')
 appbuilder.add_view(WirelessUplinks, "Wireless connected devices", category='Specific requests')
 appbuilder.add_view(CEInterConnect, "Interconnect", category='Specific requests')
 appbuilder.add_view(DevicesSerial, "Serial numbers", category='Specific requests')
-appbuilder.add_view(RegexTest, "Regex test", category='Specific requests')
+# appbuilder.add_view(RegexTest, "Regex test", category='Specific requests')
 appbuilder.add_view(ObjectClassification, "iSVC", category='Specific requests')
+appbuilder.add_view(CoreNetworkView, "P/PE locations", category='Specific requests')
 
 
 appbuilder.add_view(Abbreviations, "Afkortingen", category='Info', category_icon='fa-circle-info')

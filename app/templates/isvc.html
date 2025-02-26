@@ -117,9 +117,7 @@ i-SVC - Uplink redundancy
         var marker_group = L.layerGroup();
         locations[loc].forEach(element => {
             var color = "";
-            if (element['fiber_uplinks'] == 1){
-                color = "#f5b942";
-            } else if (element['fiber_uplinks'] > 1) {
+            if (element['fiber_uplinks'] > 1) {
                 color = "#1da61b";
             } else {
                 color = "#a6261b";
