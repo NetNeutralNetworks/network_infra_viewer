@@ -1,4 +1,4 @@
-flask-appbuilder==4.5.0
+flask-appbuilder==4.5.4
 Flask-Caching
 pyvis==0.3.2
 authlib==1.3.1
