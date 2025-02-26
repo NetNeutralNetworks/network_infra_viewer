@@ -133,23 +133,23 @@ crossorigin=""></script>
   <div id="page-nav">
     <div id="page-nav-left">
       <div id="back-wrapper">
-        <div id="back-button" onclick="history.go(-1)">
-          {{ components.icon("fa-arrow-left")}} Back to {page}
+        <div id="back-button" onclick="window.location.replace('/devicesoverview/show_all/')">
+          {{ components.icon("fa-arrow-left")}} Back to devices
         </div>
         <div class="vert-divider"></div>
       </div>
       <div id="page-tabs">
         <div class="tab-item active" onclick="openView(event, 'Layer1')">
-          Physical
+          Physical (Layer 1)
         </div>
         <div class="tab-item" onclick="openView(event, 'Layer2')">
-          Data
+          Data (Layer 2)
         </div>
         <div class="tab-item" onclick="openView(event, 'Layer3')">
-          Network
+          Network (Layer 3)
         </div>
         <div class="tab-item" onclick="openView(event, 'device_config')">
-          Device config
+          Device configuration
         </div>
         <div class="tab-item" onclick="openView(event, 'interfaces')">
           Interfaces
@@ -192,67 +192,6 @@ crossorigin=""></script>
     </div>
   </div>
   
-  
-  <!-- 
-  <div id="details-header" style="width:100%;display: grid;grid: auto auto/ 50% 50%;">
-    <div id="device-details" style="float:left; margin:20px; background-color:#f1f1f1; border-radius: 10px;  padding-left: 20px;">
-      {% if device is defined %}
-    <h2>Device: {{device.hostname}}</h2>
-    <br />
-    <h4>Location: {{device.location_name}}</h4>
-    </div>
-    </div>
-    {% endif %}
-    {% if device is defined %}
-      <div style="margin: 0 2em 1.5em;">
-      {% if device.security_score and device.management_score and device.reliability_score %}
-        <h3>{% if device.security_score < 70 %}
-        <span class="tag error"> 
-        {% elif device.security_score < 90 %}
-        <span class="tag warning">
-        {% else %}
-        <span class="tag success">
-        {% endif %}
-        Security: {{device.security_score}}
-        </span></h3>
-  
-        <h3>{% if device.reliability_score < 70 %}
-        <span class="tag error"> 
-        {% elif device.reliability_score < 90 %}
-        <span class="tag warning">
-        {% else %}
-        <span class="tag success">
-        {% endif %}
-        Reliability: {{device.reliability_score}}
-        </span></h3>
-  
-        <h3>{% if device.management_score < 70 %}
-        <span class="tag error"> 
-        {% elif device.management_score < 90 %}
-        <span class="tag warning">
-        {% else %}
-        <span class="tag success">
-        {% endif %}
-        Management: {{device.management_score}}
-        </span></h3>
-      {% endif %}
-    </div>
-    <i>Device config from: {{config_date}}</i>
-    {% endif %} 
-    -->
-  
-  
-  
-  
-   <!-- Tab links -->
-   <!-- <div class="tab" style="grid-column-start: 1; grid-column-end: 3;">
-    <button class="tablinks" onclick="openView(event, 'Layer1')">Layer 1 (Physical)</button>
-    <button class="tablinks" onclick="openView(event, 'Layer2')">Layer 2 (Data)</button>
-    <button class="tablinks" onclick="openView(event, 'Layer3')">Layer 3 (Network)</button>
-    <button class="tablinks" onclick="openView(event, 'device_config')">Device config</button>
-    <button class="tablinks" onclick="openView(event, 'interfaces')">Interfaces</button>
-  </div> -->
-  
   <!-- Tab content -->
   <div id="Layer1" class="tabcontent" style="display: flex;" >
     <div class="fds-column">
@@ -268,7 +207,7 @@ crossorigin=""></script>
       <div class="card" style="grid-column: 1 / 5;">
         <div class="card-header">
           <div class="card-title-left">
-            Connected devices {{components.info_icon('l1' ,'About this page', 'Content')}}
+            Connected devices {{components.info_icon('l1' ,'About this page', 'This page shows all the known physical fibers that are connected to this devices. Information is gathered from Cocon')}}
             
             
           </div>
@@ -280,7 +219,7 @@ crossorigin=""></script>
         <div class="card-content">
           <div id="connection-details" style="width: 100%">
             <table id="connection-table" class="table table-striped">
-              <thead><tr><td>Local device</td><td>Local port</td><td>Lijnbenaming</td><td>Remote port</td><td>Remote device</td></tr></thead>
+              <thead><tr><td>Local device</td><td>Local port</td><td>Line name</td><td>Remote port</td><td>Remote device</td></tr></thead>
               <tbody>
                   {% for entry in connections %}
                   <tr><td><a href='/deviceview/show/?hostname={{entry.0}}'>{{entry.0}}</a></td><td>{{entry.1}}</td><td>{{entry.2}}</td><td>{{entry.3}}</td><td><a href='/deviceview/show/?hostname={{entry.4}}'>{{entry.4}}</a></td></tr>
@@ -294,26 +233,14 @@ crossorigin=""></script>
       <div id="map" style="background-color:green; grid-column:5 / 7; width:100%;"></div>
     </div>
   </div>
-    <!-- <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-      </svg>
-          What am i looking at?
-    </button>
-    <div class="page-info well" style="grid-column: 1/3; display: none;">
-      <p>This page shows the Layer 1 connections of the selected device{% if device is defined %}: {{device.hostname}}{% endif %} and the devices that are directly connected to this device according to data provided by KPN. Both panels are interactive, so go ahead and try hovering/clicking on the lines, markers and table rows...</p>
-      <p>On the left is a geographical view of the location of the fiber spans (according to Cocon) and the device locations. The locations are determined by the start of the hostname.{% if device is defined %} So device: "{{device.hostname}}" gets placed in location: "{{device.location_name}}".{% endif %} Color is by default determined by the type of connection (P-P, P-PE, PE-CE, or other)</p>
-      <p>On the Right is a tabular overview with all devices that are connected and to/from which port.</p>
-      <p><i>Please note that only information provided by KPN is used to determine if devices are connected.</i></p>
-    </div> -->
-    
+
     
   </div>
   
   <div id="Layer2" class="tabcontent">
     <div class="card">
       <div class="card-title-left">
-        Data views {{components.info_icon('l2','About this page','Content')}}
+        Data views {{components.info_icon('l2','About this page','This page shows all the known layer 2 neighbors for the selected device. This data is gathered from the CSPC: "show neighbors" command. Note that most layer 3 connections dont have a neighborship protocol running so LTE or rented lines are probably not shown.')}}
       </div>
       <div class="card-content" style="display: flex;flex-direction: column; padding-bottom: 5px;">
           <div class="tile tile-active" onclick="openTile(event,'/deviceview/l2_graph/?hostname={{device.hostname}}') ">
@@ -393,18 +320,7 @@ function openTile(evt, url) {
   $('iframe')[0].src=url;
 } 
       </script>
-    <!-- <button type="button" class="btn btn-primary" style="grid-column: 1/3;" onclick="$('.page-info').toggle('slow');">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
-      </svg>
-          What am i looking at?
-    </button>
-    <div class="page-info well" style="grid-column: 1/3; display: none;">
-      <p>This page shows the Layer 2 neighborships according to the configuration collected by the CSPC collector.</p>
-      <p>At this time only CDP neighbors are being shown as LLDP is disabled on most if not all Cisco devices. In time there might be an option to visualize aggregated interfaces.</p>
-      <p>The color of the nodes is dependant on the type of device. (P, PE, CE or other)</p>
-      <p><i>Please note that only information provided by the CSPC collector is used to determine if devices are neighbors of each other.</i></p>
-    </div> -->
+
   
   </div>
   
@@ -457,35 +373,11 @@ function openTile(evt, url) {
         </div>
       </div>
       <div class="card-content">
-      <!-- {% for vrf in l3 %}
-      <button class="accordion" style="grid-column: 1/2;" >{{ vrf.vrf }}</button>
-      <div class="panel">
-        {% for vlan in vrf.vlans %}
-        <button class="accordion">VLAN: {{ vlan.vlan_interface}}</button>
-        <div class="panel">
-          {% for port in vlan.physical_interfaces %}
-          <button class="accordion">{{ port.name }}</button>
-          <div class="panel">
-            <p>Description: {{port.description}}</p>
-          </div>
-          {% endfor %}
-       </div>
-      
-      
-      {% endfor %}
-    </div>
-    {% endfor %}
-    </div>  -->
+
     
       <div id="l3_networklist" class="fds-column" style="gap: var(--fds-density-space-0_5x, 8px);">
 
         {% for vrf in l3 %}
-          <!-- <button class="accordion">{{ vrf.name }}</button>
-          <div class="panel">
-            {% for interface in vrf.interfaces %}
-            <div class="accordion">interface: {{ interface}}</div>  
-          {% endfor %}
-        </div> -->
           {{ components.medium_tile(vrf.name, onclick="switch_network_instance('table-netinst-" + vrf.name + "')") }}
         {% endfor %}
       </div>
@@ -681,8 +573,11 @@ var stringToColour = function(str) {
 }
 var selected_component;
 {% if device is defined %}
-  var map = L.map('map').setView([{{device.latitude}}, {{device.longtitude}}], 12);
+  var map = L.map('map', {zoomControl: false}).setView([{{device.latitude}}, {{device.longtitude}}], 12);
 {% endif %}
+L.control.zoom({
+    position: 'bottomright'
+}).addTo(map);
   
   var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -817,7 +712,10 @@ function get_connection_type_color(x){
   // }
   map.addLayer(marker_group)
   var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
-  map.addControl(new L.Control.Fullscreen());
+  map.addControl(new L.Control.Fullscreen({
+    position: 'bottomright'
+}));
+  
 
   window.onload = function() {
     map.invalidateSize();
@@ -833,45 +731,6 @@ function get_connection_type_color(x){
   
   </script>
 
-<!-- <script type="text/javascript">
-  var datatable;
-  $(document).ready(function () {
-      datatable = $('#connection-table').DataTable({
-        scrollY: '600px',
-        scrollCollapse: true,
-        pageLength: 15,
-        paging: true,
-        destroy: true,
-        select: true,
-        searching: false,
-        layout: {
-          topStart: null,
-          topEnd: null,
-          bottomStart: 'paging',
-          bottomEnd: 'pageLength'
-        }
-      });
-      $('#connection-table tbody').on( 'click', 'tr', function () {
-        var rowData = datatable.row( this ).data();
-        changeSelectionInMap(rowData[2])
-      } );
-      if (map){
-        map.invalidateSize()
-      }
-      // openView('evt','Layer1');
-  });
-
-  var datatable2;
-  $(document).ready(function () {
-      datatable2 = $('#interface-table').DataTable({
-        paging: false,
-        destroy: true,
-      });
-      $('#interface-table_wrapper').css("width", "100%");
-  });
-
-  
-</script> -->
 <script type="text/javascript">
   var datatable;
 

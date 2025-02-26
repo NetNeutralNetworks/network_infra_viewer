@@ -40,7 +40,7 @@
     line-height: 16px; /* 145.455% */
     letter-spacing: 0.88px;
     text-transform: uppercase;
-    overflow: scroll;
+    overflow:auto;
     width: 100%;
 }
 
